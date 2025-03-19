@@ -4,7 +4,7 @@
       <div class="content-wrapper">
         <!-- 左侧分类导航 -->
         <div class="category-sidebar">
-          <h2 class="section-title">商品分类</h2>
+          <h2 class="section-title">PORDUCT catergary</h2>
           <div class="category-list">
             <div class="category-item" v-for="item in typeData" :key="item.id" @click="navTo('/front/type?id=' + item.id)">
               <img :src="item.img" :alt="item.name">
