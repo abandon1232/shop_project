@@ -15,8 +15,9 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * User business logic.
@@ -69,6 +70,15 @@ public class UserService {
      * Update a record.
      */
     public void updateById(User user) {
+        Account currentUser = TokenUtils.getCurrentUser();
+        if (RoleEnum.USER.name().equals(currentUser.getRole())) {
+            if (!Objects.equals(currentUser.getId(), user.getId())) {
+                throw new CustomException(ResultCodeEnum.FORBIDDEN_ERROR);
+            }
+            user.setUsername(null);
+            user.setPassword(null);
+            user.setRole(null);
+        }
         if (ObjectUtil.isNotEmpty(user.getPassword()) && passwordService.needsUpgrade(user.getPassword())) {
             user.setPassword(passwordService.encode(user.getPassword()));
         }

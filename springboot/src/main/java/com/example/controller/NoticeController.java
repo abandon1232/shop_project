@@ -1,11 +1,13 @@
 package com.example.controller;
 
 import com.example.common.Result;
+import com.example.common.enums.RoleEnum;
+import com.example.common.security.RequireRoles;
 import com.example.entity.Notice;
 import com.example.service.NoticeService;
 import com.github.pagehelper.PageInfo;
 import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**
@@ -22,6 +24,7 @@ public class NoticeController {
      * Create a record.
      */
     @PostMapping("/add")
+    @RequireRoles(RoleEnum.ADMIN)
     public Result add(@RequestBody Notice notice) {
         noticeService.add(notice);
         return Result.success();
@@ -31,6 +34,7 @@ public class NoticeController {
      * Delete a record.
      */
     @DeleteMapping("/delete/{id}")
+    @RequireRoles(RoleEnum.ADMIN)
     public Result deleteById(@PathVariable Integer id) {
         noticeService.deleteById(id);
         return Result.success();
@@ -40,6 +44,7 @@ public class NoticeController {
      * Delete multiple records.
      */
     @DeleteMapping("/delete/batch")
+    @RequireRoles(RoleEnum.ADMIN)
     public Result deleteBatch(@RequestBody List<Integer> ids) {
         noticeService.deleteBatch(ids);
         return Result.success();
@@ -49,6 +54,7 @@ public class NoticeController {
      * Update a record.
      */
     @PutMapping("/update")
+    @RequireRoles(RoleEnum.ADMIN)
     public Result updateById(@RequestBody Notice notice) {
         noticeService.updateById(notice);
         return Result.success();

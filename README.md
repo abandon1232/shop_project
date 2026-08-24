@@ -19,11 +19,11 @@ A full-stack product management and storefront application built with Spring Boo
 
 ### Backend
 
-- Java 8
-- Spring Boot 2.5
+- Java 25 LTS
+- Spring Boot 3.5
 - MyBatis and PageHelper
-- MySQL
-- Maven
+- MySQL 8 and Flyway
+- Maven 3.9
 - Auth0 Java JWT
 
 ### Frontend
@@ -48,10 +48,32 @@ shop_project/
 
 ### Prerequisites
 
-- JDK 8 or later
-- Maven 3.8+
-- Node.js 16+
+- JDK 25
+- Maven 3.9+
+- Node.js 20+
 - MySQL 8
+
+### Create the local database
+
+Open MySQL Workbench, connect to the local server as `root`, and run the
+following statements. Replace the example password before running them and use
+the same value for `DB_PASSWORD` below.
+
+```sql
+CREATE DATABASE IF NOT EXISTS manager
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_0900_ai_ci;
+
+CREATE USER IF NOT EXISTS 'shop_app'@'localhost'
+  IDENTIFIED BY 'replace-with-a-strong-local-password';
+
+GRANT ALL PRIVILEGES ON manager.* TO 'shop_app'@'localhost';
+FLUSH PRIVILEGES;
+```
+
+Flyway creates and versions the application tables automatically when the API
+starts. Application credentials are intentionally separate from the MySQL
+`root` account.
 
 ### Backend configuration
 
@@ -59,10 +81,13 @@ Set the following environment variables before starting the backend. Do not comm
 
 ```text
 DB_URL=jdbc:mysql://localhost:3306/manager
-DB_USERNAME=root
+DB_USERNAME=shop_app
 DB_PASSWORD=your-local-password
 FILE_STORAGE_PATH=./files/
 APP_HOST=localhost
+CORS_ALLOWED_ORIGIN=http://localhost:8080
+INITIAL_ADMIN_USERNAME=admin
+INITIAL_ADMIN_PASSWORD=choose-a-strong-temporary-password
 ```
 
 Start the backend:
@@ -74,15 +99,20 @@ mvn spring-boot:run
 
 The API runs at `http://localhost:9090` by default.
 
+The two `INITIAL_ADMIN_*` variables are optional and are used only to create the
+first administrator. Remove them from the run configuration after the first
+successful startup.
+
 ### Frontend
 
 ```bash
 cd vue
-npm install
+npm ci
 npm run serve
 ```
 
-The frontend development server forwards API requests to the backend according to `vue.config.js`.
+The frontend uses `http://localhost:9090` by default. Override it with
+`VUE_APP_BASEURL` when the API runs at a different address.
 
 ## Security notice
 
@@ -97,11 +127,13 @@ Password hashing and endpoint-level role authorization are part of the current m
 - [x] Add BCrypt password hashing with automatic migration of legacy passwords
 - [x] Add an initial password security test suite
 - [x] Add GitHub Actions backend verification and frontend build
-- [ ] Add endpoint-level role authorization
+- [x] Upgrade to Java 25 and Spring Boot 3.5
+- [x] Add versioned Flyway database migrations
+- [x] Prevent administrator creation through public registration
+- [x] Add endpoint-level role authorization and merchant ownership checks
 - [ ] Add order, order-item, and inventory transaction modules
 - [ ] Expand unit tests and add database integration tests
 - [ ] Add Docker Compose for the application and database
-- [ ] Upgrade to a current Java LTS and Spring Boot 3
 - [ ] Rebuild the client with React and TypeScript
 
 ## Author

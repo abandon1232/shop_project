@@ -1,11 +1,13 @@
 package com.example.controller;
 
 import com.example.common.Result;
+import com.example.common.enums.RoleEnum;
+import com.example.common.security.RequireRoles;
 import com.example.entity.Admin;
 import com.example.service.AdminService;
 import com.github.pagehelper.PageInfo;
 import org.springframework.web.bind.annotation.*;
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**
@@ -13,6 +15,7 @@ import java.util.List;
  **/
 @RestController
 @RequestMapping("/admin")
+@RequireRoles(RoleEnum.ADMIN)
 public class AdminController {
 
     @Resource

@@ -11,7 +11,7 @@ import com.example.service.BusinessService;
 import com.example.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * Public authentication endpoints.
@@ -63,7 +63,7 @@ public class WebController {
             return Result.error(ResultCodeEnum.PARAM_LOST_ERROR);
         }
         if (RoleEnum.ADMIN.name().equals(account.getRole())) {
-            adminService.register(account);
+            return Result.error(ResultCodeEnum.FORBIDDEN_ERROR);
         }
         if (RoleEnum.BUSINESS.name().equals(account.getRole())) {
             businessService.register(account);
@@ -86,6 +86,9 @@ public class WebController {
         }
         if (RoleEnum.ADMIN.name().equals(account.getRole())) {
             adminService.updatePassword(account);
+        }
+        if (RoleEnum.BUSINESS.name().equals(account.getRole())) {
+            businessService.updatePassword(account);
         }
         if (RoleEnum.USER.name().equals(account.getRole())) {
             userService.updatePassword(account);

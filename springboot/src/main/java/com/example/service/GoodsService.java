@@ -11,7 +11,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -44,6 +44,7 @@ public class GoodsService {
      * Delete a record.
      */
     public void deleteById(Integer id) {
+        requireBusinessOwnership(id);
         goodsMapper.deleteById(id);
     }
 
@@ -60,6 +61,11 @@ public class GoodsService {
      * Update a record.
      */
     public void updateById(Goods goods) {
+        requireBusinessOwnership(goods.getId());
+        Account currentUser = TokenUtils.getCurrentUser();
+        if (RoleEnum.BUSINESS.name().equals(currentUser.getRole())) {
+            goods.setBusinessId(currentUser.getId());
+        }
         goodsMapper.updateById(goods);
     }
 
@@ -160,5 +166,17 @@ public class GoodsService {
             list.add(goods.get(index));
         }
         return list;
+    }
+
+    private void requireBusinessOwnership(Integer goodsId) {
+        Account currentUser = TokenUtils.getCurrentUser();
+        if (!RoleEnum.BUSINESS.name().equals(currentUser.getRole())) {
+            return;
+        }
+        Goods storedGoods = goodsMapper.selectById(goodsId);
+        if (storedGoods == null || !Objects.equals(storedGoods.getBusinessId(), currentUser.getId())) {
+            throw new com.example.exception.CustomException(
+                    com.example.common.enums.ResultCodeEnum.FORBIDDEN_ERROR);
+        }
     }
 }
