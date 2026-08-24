@@ -6,32 +6,32 @@ import org.apache.ibatis.annotations.Select;
 import java.util.List;
 
 /**
- * 操作goods相关数据接口
+ * Data access operations for products.
 */
 public interface GoodsMapper {
 
     /**
-      * 新增
+      * Create a record.
     */
     int insert(Goods goods);
 
     /**
-      * 删除
+      * Delete a record.
     */
     int deleteById(Integer id);
 
     /**
-      * 修改
+      * Update a record.
     */
     int updateById(Goods goods);
 
     /**
-      * 根据ID查询
+      * Find a record by ID.
     */
     Goods selectById(Integer id);
 
     /**
-      * 查询所有
+      * Find all matching records.
     */
     List<Goods> selectAll(Goods goods);
     @Select("select * from goods order by count desc limit 15")

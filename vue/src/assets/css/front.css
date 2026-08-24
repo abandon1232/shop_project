@@ -47,12 +47,12 @@
     text-align: center !important;
 }
 
-/*页面具体样式自定义*/
+/*Page-specific styles.*/
 .main-content {
     width: 100%;
     margin: 0 auto;
 }
-/* ElementUI 样式覆盖 */
+/* Element UI style overrides. */
 .el-menu.el-menu--horizontal {
     border: none !important;
     height: 59px;

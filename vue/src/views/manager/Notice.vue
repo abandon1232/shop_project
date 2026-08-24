@@ -66,9 +66,9 @@ export default {
   name: "Notice",
   data() {
     return {
-      tableData: [],  // 所有的数据
-      pageNum: 1,   // 当前的页码
-      pageSize: 10,  // 每页显示的个数
+      tableData: [],  // All records.
+      pageNum: 1,   // Current page number.
+      pageSize: 10,  // Records per page.
       total: 0,
       title: null,
       fromVisible: false,
@@ -89,15 +89,15 @@ export default {
     this.load(1)
   },
   methods: {
-    handleAdd() {   // 新增数据
-      this.form = {}  // 新增数据的时候清空数据
-      this.fromVisible = true   // 打开弹窗
+    handleAdd() {   // Add a record.
+      this.form = {}  // Reset the form before adding a record.
+      this.fromVisible = true   // Open the dialog.
     },
-    handleEdit(row) {   // 编辑数据
-      this.form = JSON.parse(JSON.stringify(row))  // 给form对象赋值  注意要深拷贝数据
-      this.fromVisible = true   // 打开弹窗
+    handleEdit(row) {   // Edit a record.
+      this.form = JSON.parse(JSON.stringify(row))  // Copy the row into the form using a deep clone.
+      this.fromVisible = true   // Open the dialog.
     },
-    save() {   // 保存按钮触发的逻辑  它会触发新增或者更新
+    save() {   // Save the form by creating or updating a record.
       this.$refs.formRef.validate((valid) => {
         if (valid) {
           this.$request({
@@ -105,51 +105,51 @@ export default {
             method: this.form.id ? 'PUT' : 'POST',
             data: this.form
           }).then(res => {
-            if (res.code === '200') {  // 表示成功保存
+            if (res.code === '200') {  // Save succeeded.
               this.$message.success('保存成功')
               this.load(1)
               this.fromVisible = false
             } else {
-              this.$message.error(res.msg)  // 弹出错误的信息
+              this.$message.error(res.msg)  // Display the error message.
             }
           })
         }
       })
     },
-    del(id) {   // 单个删除
+    del(id) {   // Delete one record.
       this.$confirm('您确定删除吗？', '确认删除', {type: "warning"}).then(response => {
         this.$request.delete('/notice/delete/' + id).then(res => {
-          if (res.code === '200') {   // 表示操作成功
+          if (res.code === '200') {   // Operation succeeded.
             this.$message.success('操作成功')
             this.load(1)
           } else {
-            this.$message.error(res.msg)  // 弹出错误的信息
+            this.$message.error(res.msg)  // Display the error message.
           }
         })
       }).catch(() => {
       })
     },
-    handleSelectionChange(rows) {   // 当前选中的所有的行数据
+    handleSelectionChange(rows) {   // Currently selected rows.
       this.ids = rows.map(v => v.id)   //  [1,2]
     },
-    delBatch() {   // 批量删除
+    delBatch() {   // Delete multiple records.
       if (!this.ids.length) {
         this.$message.warning('请选择数据')
         return
       }
       this.$confirm('您确定批量删除这些数据吗？', '确认删除', {type: "warning"}).then(response => {
         this.$request.delete('/notice/delete/batch', {data: this.ids}).then(res => {
-          if (res.code === '200') {   // 表示操作成功
+          if (res.code === '200') {   // Operation succeeded.
             this.$message.success('操作成功')
             this.load(1)
           } else {
-            this.$message.error(res.msg)  // 弹出错误的信息
+            this.$message.error(res.msg)  // Display the error message.
           }
         })
       }).catch(() => {
       })
     },
-    load(pageNum) {  // 分页查询
+    load(pageNum) {  // Find records with pagination.
       if (pageNum) this.pageNum = pageNum
       this.$request.get('/notice/selectPage', {
         params: {

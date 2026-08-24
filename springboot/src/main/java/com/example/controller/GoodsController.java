@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 分类信息表前端操作接口
+ * REST endpoints for categories.
  **/
 @RestController
 @RequestMapping("/goods")
@@ -20,7 +20,7 @@ public class GoodsController {
     private GoodsService goodsService;
 
     /**
-     * 新增
+     * Create a record.
      */
     @PostMapping("/add")
     public Result add(@RequestBody Goods goods) {
@@ -29,7 +29,7 @@ public class GoodsController {
     }
 
     /**
-     * 删除
+     * Delete a record.
      */
     @DeleteMapping("/delete/{id}")
     public Result deleteById(@PathVariable Integer id) {
@@ -38,7 +38,7 @@ public class GoodsController {
     }
 
     /**
-     * 批量删除
+     * Delete multiple records.
      */
     @DeleteMapping("/delete/batch")
     public Result deleteBatch(@RequestBody List<Integer> ids) {
@@ -47,7 +47,7 @@ public class GoodsController {
     }
 
     /**
-     * 修改
+     * Update a record.
      */
     @PutMapping("/update")
     public Result updateById(@RequestBody Goods goods) {
@@ -78,7 +78,7 @@ public class GoodsController {
         return Result.success(list);
     }
     /**
-     * 根据ID查询
+     * Find a record by ID.
      */
     @GetMapping("/selectById")
     public Result selectById(@RequestParam Integer id) {
@@ -87,7 +87,7 @@ public class GoodsController {
     }
 
     /**
-     * 查询所有
+     * Find all matching records.
      */
     @GetMapping("/selectAll")
     public Result selectAll(Goods goods ) {
@@ -100,7 +100,7 @@ public class GoodsController {
         return Result.success(list);
     }
     /**
-     * 分页查询
+     * Find records with pagination.
      */
     @GetMapping("/selectPage")
     public Result selectPage(Goods goods,

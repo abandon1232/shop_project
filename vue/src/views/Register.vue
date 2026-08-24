@@ -36,7 +36,7 @@
 export default {
   name: "Register",
   data() {
-    // 验证码校验
+    // Validate the confirmation password.
     const validatePassword = (rule, confirmPass, callback) => {
       if (confirmPass === '') {
         callback(new Error('请确认密码'))
@@ -68,10 +68,10 @@ export default {
     register() {
       this.$refs['formRef'].validate((valid) => {
         if (valid) {
-          // 验证通过
+          // Validation succeeded.
           this.$request.post('/register', this.form).then(res => {
             if (res.code === '200') {
-              this.$router.push('/')  // 跳转登录页面
+              this.$router.push('/')  // Navigate to the login page.
               this.$message.success('注册成功')
             } else {
               this.$message.error(res.msg)

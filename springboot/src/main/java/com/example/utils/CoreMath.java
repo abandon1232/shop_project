@@ -10,27 +10,27 @@ import java.util.TreeMap;
 import java.util.stream.IntStream;
 
 /**
- * 核心算法
+ * Core recommendation algorithm.
  *
- * @author B站 UP：武哥聊编程
+ * @author Bilibili creator: Wuge Talks Programming
  * @version 1.0
  */
 public class CoreMath {
 
 
     /**
-     * 计算相关系数并排序
+     * Calculate and sort correlation scores.
      */
     public static Map<Integer, Double> computeNeighbor(Integer key, Map<Integer, List<RelateDTO>> map, int type) {
         Map<Integer, Double> distMap = new TreeMap<>();
         List<RelateDTO> userItems = map.get(key);
         if (CollectionUtil.isNotEmpty(userItems)) {
             map.forEach((k, v) -> {
-                //排除此用户
+                //Exclude the current user.
                 if (!k.equals(key)) {
-                    //关系系数
+                    //Correlation coefficient.
                     double coefficient = relateDist(v, userItems, type);
-                    //关系距离
+                    //Correlation distance.
                     double distance = Math.abs(coefficient);
                     distMap.put(k, distance);
                 }
@@ -41,7 +41,7 @@ public class CoreMath {
 
 
     /**
-     * 计算两个序列间的相关系数
+     * Calculate the correlation coefficient between two sequences.
      */
     private static double relateDist(List<RelateDTO> xList, List<RelateDTO> yList, int type) {
         List<Integer> xs = new ArrayList<>();
@@ -63,15 +63,15 @@ public class CoreMath {
     }
 
     /**
-     * 方法描述: 皮尔森（pearson）相关系数计算
-     * @param xs x集合
-     * @param ys y集合
+     * Calculate the Pearson correlation coefficient.
+     * @param xs x values.
+     * @param ys y values.
      * @Return {@link double}
-     * @author B站 UP：武哥聊编程
+     * @author Bilibili creator: Wuge Talks Programming
      */
     public static double getRelate(List<Integer> xs, List<Integer> ys) {
         int n = xs.size();
-        //至少有两个元素
+        //At least two elements are required.
         if (n < 2) {
             return 0D;
         }

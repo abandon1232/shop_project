@@ -19,7 +19,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 用户业务处理
+ * User business logic.
  **/
 @Service
 public class UserService {
@@ -30,7 +30,7 @@ public class UserService {
     private PasswordService passwordService;
 
     /**
-     * 新增
+     * Create a record.
      */
     public void add(User user) {
         User dbUser = userMapper.selectByUsername(user.getUsername());
@@ -50,14 +50,14 @@ public class UserService {
     }
 
     /**
-     * 删除
+     * Delete a record.
      */
     public void deleteById(Integer id) {
         userMapper.deleteById(id);
     }
 
     /**
-     * 批量删除
+     * Delete multiple records.
      */
     public void deleteBatch(List<Integer> ids) {
         for (Integer id : ids) {
@@ -66,7 +66,7 @@ public class UserService {
     }
 
     /**
-     * 修改
+     * Update a record.
      */
     public void updateById(User user) {
         if (ObjectUtil.isNotEmpty(user.getPassword()) && passwordService.needsUpgrade(user.getPassword())) {
@@ -76,21 +76,21 @@ public class UserService {
     }
 
     /**
-     * 根据ID查询
+     * Find a record by ID.
      */
     public User selectById(Integer id) {
         return userMapper.selectById(id);
     }
 
     /**
-     * 查询所有
+     * Find all matching records.
      */
     public List<User> selectAll(User user) {
         return userMapper.selectAll(user);
     }
 
     /**
-     * 分页查询
+     * Find records with pagination.
      */
     public PageInfo<User> selectPage(User user, Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);
@@ -99,7 +99,7 @@ public class UserService {
     }
 
     /**
-     * 登录
+     * Authenticate an account.
      */
     public Account login(Account account) {
         User dbUser = userMapper.selectByUsername(account.getUsername());
@@ -113,7 +113,7 @@ public class UserService {
             dbUser.setPassword(passwordService.encode(account.getPassword()));
             userMapper.updateById(dbUser);
         }
-        // 生成token
+        // Generate a token.
         String tokenData = dbUser.getId() + "-" + RoleEnum.USER.name();
         String token = TokenUtils.createToken(tokenData, dbUser.getPassword());
         dbUser.setToken(token);
@@ -121,7 +121,7 @@ public class UserService {
     }
 
     /**
-     * 注册
+     * Register an account.
      */
     public void register(Account account) {
         User user = new User();
@@ -131,7 +131,7 @@ public class UserService {
     }
 
     /**
-     * 修改密码
+     * Change a password.
      */
     public void updatePassword(Account account) {
         User dbUser = userMapper.selectByUsername(account.getUsername());

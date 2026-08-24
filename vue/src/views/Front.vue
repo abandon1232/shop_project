@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!--头部-->
+    <!--Header.-->
     <div class="front-header">
       <div class="front-header-left" @click="navTo('/front/home')">
         <img src="@/assets/imgs/logo.png" alt="">
@@ -32,7 +32,7 @@
         </div>
       </div>
     </div>
-    <!--主体-->
+    <!--Main content.-->
     <div class="main-body">
       <router-view ref="child" @update:user="updateUser" />
     </div>
@@ -75,12 +75,12 @@ export default {
       })
     },
     updateUser() {
-      this.user = JSON.parse(localStorage.getItem('xm-user') || '{}')   // 重新获取下用户的最新信息
+      this.user = JSON.parse(localStorage.getItem('xm-user') || '{}')   // Reload the latest cached account.
     },
     navTo(url) {
       location.href = url
     },
-    // 退出登录
+    // Log out.
     logout() {
       localStorage.removeItem("xm-user");
       this.$router.push("/login");

@@ -46,16 +46,16 @@ export default {
   },
   methods: {
     update() {
-      // 保存当前的用户信息到数据库
+      // Save the current account to the database.
       this.$request.put('/admin/update', this.user).then(res => {
         if (res.code === '200') {
-          // 成功更新
+          // Update succeeded.
           this.$message.success('保存成功')
 
-          // 更新浏览器缓存里的用户信息
+          // Update the cached account in the browser.
           localStorage.setItem('xm-user', JSON.stringify(this.user))
 
-          // 触发父级的数据更新
+          // Notify the parent component to refresh its data.
           this.$emit('update:user')
         } else {
           this.$message.error(res.msg)
@@ -63,7 +63,7 @@ export default {
       })
     },
     handleAvatarSuccess(response, file, fileList) {
-      // 把user的头像属性换成上传的图片的链接
+      // Set the avatar field to the uploaded image URL.
       this.$set(this.user, 'avatar', response.data)
     },
   }

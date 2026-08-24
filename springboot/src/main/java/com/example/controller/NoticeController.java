@@ -9,7 +9,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 公告信息表前端操作接口
+ * REST endpoints for notices.
  **/
 @RestController
 @RequestMapping("/notice")
@@ -19,7 +19,7 @@ public class NoticeController {
     private NoticeService noticeService;
 
     /**
-     * 新增
+     * Create a record.
      */
     @PostMapping("/add")
     public Result add(@RequestBody Notice notice) {
@@ -28,7 +28,7 @@ public class NoticeController {
     }
 
     /**
-     * 删除
+     * Delete a record.
      */
     @DeleteMapping("/delete/{id}")
     public Result deleteById(@PathVariable Integer id) {
@@ -37,7 +37,7 @@ public class NoticeController {
     }
 
     /**
-     * 批量删除
+     * Delete multiple records.
      */
     @DeleteMapping("/delete/batch")
     public Result deleteBatch(@RequestBody List<Integer> ids) {
@@ -46,7 +46,7 @@ public class NoticeController {
     }
 
     /**
-     * 修改
+     * Update a record.
      */
     @PutMapping("/update")
     public Result updateById(@RequestBody Notice notice) {
@@ -55,7 +55,7 @@ public class NoticeController {
     }
 
     /**
-     * 根据ID查询
+     * Find a record by ID.
      */
     @GetMapping("/selectById/{id}")
     public Result selectById(@PathVariable Integer id) {
@@ -64,7 +64,7 @@ public class NoticeController {
     }
 
     /**
-     * 查询所有
+     * Find all matching records.
      */
     @GetMapping("/selectAll")
     public Result selectAll(Notice notice ) {
@@ -73,7 +73,7 @@ public class NoticeController {
     }
 
     /**
-     * 分页查询
+     * Find records with pagination.
      */
     @GetMapping("/selectPage")
     public Result selectPage(Notice notice,

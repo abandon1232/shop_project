@@ -5,32 +5,32 @@ import com.example.entity.Type;
 import java.util.List;
 
 /**
- * 操作type相关数据接口
+ * Data access operations for categories.
 */
 public interface TypeMapper {
 
     /**
-      * 新增
+      * Create a record.
     */
     int insert(Type type);
 
     /**
-      * 删除
+      * Delete a record.
     */
     int deleteById(Integer id);
 
     /**
-      * 修改
+      * Update a record.
     */
     int updateById(Type type);
 
     /**
-      * 根据ID查询
+      * Find a record by ID.
     */
     Type selectById(Integer id);
 
     /**
-      * 查询所有
+      * Find all matching records.
     */
     List<Type> selectAll(Type type);
 

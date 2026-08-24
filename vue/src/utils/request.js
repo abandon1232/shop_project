@@ -1,19 +1,19 @@
 import axios from 'axios'
 import router from "@/router";
 
-// 创建可一个新的axios对象
+// Create a configured Axios client.
 const request = axios.create({
-    baseURL: process.env.VUE_APP_BASEURL,   // 后端的接口地址  ip:port
-    timeout: 30000                          // 30s请求超时
+    baseURL: process.env.VUE_APP_BASEURL,   // Backend API address: ip:port.
+    timeout: 30000                          // 30-second request timeout.
 })
 
-// request 拦截器
-// 可以自请求发送前对请求做一些处理
-// 比如统一加token，对请求参数统一加密
+// Request interceptor.
+// Process requests before they are sent.
+// For example, attach the token or encrypt request parameters consistently.
 request.interceptors.request.use(config => {
-    config.headers['Content-Type'] = 'application/json;charset=utf-8';        // 设置请求头格式
-    let user = JSON.parse(localStorage.getItem("xm-user") || '{}')  // 获取缓存的用户信息
-    config.headers['token'] = user.token  // 设置请求头
+    config.headers['Content-Type'] = 'application/json;charset=utf-8';        // Set the request content type.
+    let user = JSON.parse(localStorage.getItem("xm-user") || '{}')  // Load the cached account.
+    config.headers['token'] = user.token  // Attach the authentication header.
 
     return config
 }, error => {
@@ -21,13 +21,13 @@ request.interceptors.request.use(config => {
     return Promise.reject(error)
 });
 
-// response 拦截器
-// 可以在接口响应后统一处理结果
+// Response interceptor.
+// Process API responses consistently.
 request.interceptors.response.use(
     response => {
         let res = response.data;
 
-        // 兼容服务端返回的字符串数据
+        // Support string responses returned by the server.
         if (typeof res === 'string') {
             res = res ? JSON.parse(res) : res
         }
