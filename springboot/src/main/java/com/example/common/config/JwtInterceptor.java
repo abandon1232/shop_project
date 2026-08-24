@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * jwt拦截器
+ * JWT authentication interceptor.
  */
 @Component
 public class JwtInterceptor implements HandlerInterceptor {
@@ -39,23 +39,23 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        // 1. 从http请求的header中获取token
+        // 1. Read the token from the HTTP request header.
         String token = request.getHeader(Constants.TOKEN);
         if (ObjectUtil.isEmpty(token)) {
-            // 如果没拿到，从参数里再拿一次
+            // Fall back to the request parameter when the header is absent.
             token = request.getParameter(Constants.TOKEN);
         }
-        // 2. 开始执行认证
+        // 2. Start authentication.
         if (ObjectUtil.isEmpty(token)) {
             throw new CustomException(ResultCodeEnum.TOKEN_INVALID_ERROR);
         }
         Account account = null;
         try {
-            // 解析token获取存储的数据
+            // Decode the identity stored in the token.
             String userRole = JWT.decode(token).getAudience().get(0);
             String userId = userRole.split("-")[0];
             String role = userRole.split("-")[1];
-            // 根据userId查询数据库
+            // Load the account from the database by user ID.
             if (RoleEnum.ADMIN.name().equals(role)) {
                 account = adminService.selectById(Integer.valueOf(userId));
             }
@@ -72,9 +72,9 @@ public class JwtInterceptor implements HandlerInterceptor {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
         try {
-            // 用户密码加签验证 token
+            // Verify the token using the stored password hash as the signing key.
             JWTVerifier jwtVerifier = JWT.require(Algorithm.HMAC256(account.getPassword())).build();
-            jwtVerifier.verify(token); // 验证token
+            jwtVerifier.verify(token); // Verify the token.
         } catch (JWTVerificationException e) {
             throw new CustomException(ResultCodeEnum.TOKEN_CHECK_ERROR);
         }

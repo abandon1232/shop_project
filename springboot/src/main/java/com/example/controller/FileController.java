@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 文件接口
+ * File endpoints.
  */
 @RestController
 @RequestMapping("/files")
 public class FileController {
 
-    // 文件上传存储路径
+    // File upload storage path.
     @Value("${filePath}")
     private String filePath;
 
@@ -35,7 +35,7 @@ public class FileController {
     private String ip;
 
     /**
-     * 文件上传
+     * Upload a file.
      */
     @PostMapping("/upload")
     public Result upload(MultipartFile file) {
@@ -49,7 +49,7 @@ public class FileController {
             if (!FileUtil.isDirectory(filePath)) {
                 FileUtil.mkdir(filePath);
             }
-            // 文件存储形式：时间戳-文件名
+            // Store files as timestamp-filename.
             FileUtil.writeBytes(file.getBytes(), filePath + flag + "-" + fileName);  // ***/manager/files/1697438073596-avatar.png
             System.out.println(fileName + "--上传成功");
 
@@ -62,7 +62,7 @@ public class FileController {
 
 
     /**
-     * 获取文件
+     * Download a file.
      *
      * @param flag
      * @param response
@@ -86,7 +86,7 @@ public class FileController {
     }
 
     /**
-     * 删除文件
+     * Delete a file.
      *
      * @param flag
      */
@@ -97,14 +97,14 @@ public class FileController {
     }
 
     /**
-     * wang-editor编辑器文件上传接口
+     * Upload endpoint for wangEditor.
      */
     @PostMapping("/wang/upload")
     public Map<String, Object> wangEditorUpload(MultipartFile file) {
         String flag = System.currentTimeMillis() + "";
         String fileName = file.getOriginalFilename();
         try {
-            // 文件存储形式：时间戳-文件名
+            // Store files as timestamp-filename.
             FileUtil.writeBytes(file.getBytes(), filePath + flag + "-" + fileName);
             System.out.println(fileName + "--上传成功");
             Thread.sleep(1L);
@@ -113,7 +113,7 @@ public class FileController {
         }
         String http = "http://" + ip + ":" + port + "/files/";
         Map<String, Object> resMap = new HashMap<>();
-        // wangEditor上传图片成功后， 需要返回的参数
+        // Return the payload required by wangEditor after a successful image upload.
         resMap.put("errno", 0);
         resMap.put("data", CollUtil.newArrayList(Dict.create().set("url", http + flag + "-" + fileName)));
         return resMap;

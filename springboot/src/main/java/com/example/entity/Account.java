@@ -3,23 +3,23 @@ package com.example.entity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * 角色用户父类
+ * Base class for authenticated accounts.
  */
 public class Account {
     private Integer id;
-    /** 用户名 */
+    /** Username. */
     private String username;
-    /** 名称 */
+    /** Display name. */
     private String name;
-    /** 密码 */
+    /** Password. */
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
-    /** 角色标识 */
+    /** Role identifier. */
     private String role;
-    /** 新密码 */
+    /** New password. */
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String newPassword;
-    /** 头像 */
+    /** Avatar URL. */
     private String avatar;
 
     private String token;

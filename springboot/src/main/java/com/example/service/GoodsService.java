@@ -19,7 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
- * 商品信息表业务处理
+ * Product business logic.
  **/
 @Service
 public class GoodsService {
@@ -30,7 +30,7 @@ public class GoodsService {
     private UserMapper userMapper;
 
     /**
-     * 新增
+     * Create a record.
      */
     public void add(Goods goods) {
         Account currentUser = TokenUtils.getCurrentUser();
@@ -41,14 +41,14 @@ public class GoodsService {
     }
 
     /**
-     * 删除
+     * Delete a record.
      */
     public void deleteById(Integer id) {
         goodsMapper.deleteById(id);
     }
 
     /**
-     * 批量删除
+     * Delete multiple records.
      */
     public void deleteBatch(List<Integer> ids) {
         for (Integer id : ids) {
@@ -57,28 +57,28 @@ public class GoodsService {
     }
 
     /**
-     * 修改
+     * Update a record.
      */
     public void updateById(Goods goods) {
         goodsMapper.updateById(goods);
     }
 
     /**
-     * 根据ID查询
+     * Find a record by ID.
      */
     public Goods selectById(Integer id) {
         return goodsMapper.selectById(id);
     }
 
     /**
-     * 查询所有
+     * Find all matching records.
      */
     public List<Goods> selectAll(Goods goods) {
         return goodsMapper.selectAll(goods);
     }
 
     /**
-     * 分页查询
+     * Find records with pagination.
      */
     public PageInfo<Goods> selectPage(Goods goods, Integer pageNum, Integer pageSize) {
         Account currentUser = TokenUtils.getCurrentUser();
@@ -109,20 +109,20 @@ public class GoodsService {
     public List<Goods> recommend() {
         Account currentUser = TokenUtils.getCurrentUser();
         if (ObjectUtil.isEmpty(currentUser)) {
-            // 没有用户登录
+            // No authenticated user is available.
             return new ArrayList<>();
         }
-        // 获取所有的用户信息
+        // Load all users.
         List<User> allUsers = userMapper.selectAll(null);
-        // 获取所有的商品信息
+        // Load all products.
         List<Goods> allGoods = goodsMapper.selectAll(null);
 
-        // 定义一个存储每个商品和每个用户关系的List
+        // Store the relationship score between every product and user.
         List<RelateDTO> data = new ArrayList<>();
-        // 定义一个存储最后返回给前端的商品List
+        // Store the products that will be returned to the client.
         List<Goods> result = new ArrayList<>();
 
-        // 开始计算每个商品和每个用户之间的关系数据
+        // Calculate relationship data between each product and user.
         for (Goods goods : allGoods) {
             Integer goodsId = goods.getId();
             for (User user : allUsers) {
@@ -133,15 +133,15 @@ public class GoodsService {
             }
         }
 
-        // 数据准备结束后，就把这些数据一起喂给这个推荐算法
+        // Pass the prepared data to the recommendation algorithm.
         List<Integer> goodsIds = UserCF.recommend(currentUser.getId(), data);
-        // 把商品id转换成商品
+        // Convert product IDs to product records.
         List<Goods> recommendResult = goodsIds.stream().map(goodsId -> allGoods.stream()
                         .filter(x -> x.getId().equals(goodsId)).findFirst().orElse(null))
                 .limit(10).collect(Collectors.toList());
 
         if (CollectionUtil.isEmpty(recommendResult)) {
-            // 随机给它推荐10个
+            // Return ten random products as a fallback.
             return getRandomGoods(10);
         }
         if (recommendResult.size() < 10) {

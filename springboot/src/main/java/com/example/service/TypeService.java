@@ -13,7 +13,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 分类信息表业务处理
+ * Category business logic.
  **/
 @Service
 public class TypeService {
@@ -22,21 +22,21 @@ public class TypeService {
     private TypeMapper typeMapper;
 
     /**
-     * 新增
+     * Create a record.
      */
     public void add(Type type) {
         typeMapper.insert(type);
     }
 
     /**
-     * 删除
+     * Delete a record.
      */
     public void deleteById(Integer id) {
         typeMapper.deleteById(id);
     }
 
     /**
-     * 批量删除
+     * Delete multiple records.
      */
     public void deleteBatch(List<Integer> ids) {
         for (Integer id : ids) {
@@ -45,28 +45,28 @@ public class TypeService {
     }
 
     /**
-     * 修改
+     * Update a record.
      */
     public void updateById(Type type) {
         typeMapper.updateById(type);
     }
 
     /**
-     * 根据ID查询
+     * Find a record by ID.
      */
     public Type selectById(Integer id) {
         return typeMapper.selectById(id);
     }
 
     /**
-     * 查询所有
+     * Find all matching records.
      */
     public List<Type> selectAll(Type type) {
         return typeMapper.selectAll(type);
     }
 
     /**
-     * 分页查询
+     * Find records with pagination.
      */
     public PageInfo<Type> selectPage(Type type, Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);

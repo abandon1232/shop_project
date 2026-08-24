@@ -10,7 +10,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 /**
- * 商家前端操作接口
+ * REST endpoints for merchants.
  **/
 @RestController
 @RequestMapping("/business")
@@ -20,7 +20,7 @@ public class BusinessController {
     private BusinessService businessService;
 
     /**
-     * 新增
+     * Create a record.
      */
     @PostMapping("/add")
     public Result add(@RequestBody Business business) {
@@ -29,7 +29,7 @@ public class BusinessController {
     }
 
     /**
-     * 删除
+     * Delete a record.
      */
     @DeleteMapping("/delete/{id}")
     public Result deleteById(@PathVariable Integer id) {
@@ -38,7 +38,7 @@ public class BusinessController {
     }
 
     /**
-     * 批量删除
+     * Delete multiple records.
      */
     @DeleteMapping("/delete/batch")
     public Result deleteBatch(@RequestBody List<Integer> ids) {
@@ -47,7 +47,7 @@ public class BusinessController {
     }
 
     /**
-     * 修改
+     * Update a record.
      */
     @PutMapping("/update")
     public Result updateById(@RequestBody Business business) {
@@ -56,7 +56,7 @@ public class BusinessController {
     }
 
     /**
-     * 根据ID查询
+     * Find a record by ID.
      */
     @GetMapping("/selectById/{id}")
     public Result selectById(@PathVariable Integer id) {
@@ -65,7 +65,7 @@ public class BusinessController {
     }
 
     /**
-     * 查询所有
+     * Find all matching records.
      */
     @GetMapping("/selectAll")
     public Result selectAll(Business business ) {
@@ -74,7 +74,7 @@ public class BusinessController {
     }
 
     /**
-     * 分页查询
+     * Find records with pagination.
      */
     @GetMapping("/selectPage")
     public Result selectPage(Business business,

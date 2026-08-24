@@ -2,7 +2,7 @@
   <div class="main-content">
     <div class="container">
       <div class="content-wrapper">
-        <!-- 左侧分类导航 -->
+        <!-- Left category navigation. -->
         <div class="category-sidebar">
           <h2 class="section-title">PORDUCT catergary</h2>
           <div class="category-list">
@@ -13,16 +13,16 @@
           </div>
         </div>
 
-        <!-- 中间主要内容区 -->
+        <!-- Main center content. -->
         <div class="main-section">
-          <!-- 轮播图区域 -->
+          <!-- Carousel. -->
           <el-carousel class="banner-carousel" height="400px">
             <el-carousel-item v-for="(item, index) in carousel_top" :key="index">
               <img :src="item" alt="banner">
             </el-carousel-item>
           </el-carousel>
 
-          <!-- 热卖商品区域 -->
+          <!-- Popular products. -->
           <div class="section-block">
             <div class="section-header">
               <h2>热卖商品</h2>
@@ -45,7 +45,7 @@
             </div>
           </div>
 
-          <!-- 猜你喜欢区域 -->
+          <!-- Recommended products. -->
           <div class="section-block">
             <div class="section-header">
               <h2>猜你喜欢</h2>
@@ -69,7 +69,7 @@
           </div>
         </div>
 
-        <!-- 右侧用户信息区 -->
+        <!-- User information panel. -->
         <div class="user-sidebar">
           <div class="user-profile">
             <img :src="user.avatar" :alt="user.name" @click="navTo('/front/person')">
@@ -108,7 +108,7 @@ export default {
     this.loadGoods()
     this.loadRecommend()
   },
-  // methods：本页面所有的点击事件或者其他函数定义区
+  // methods：Click handlers and other methods for this page
   methods: {
     loadRecommend(){
       this.$request.get('/goods/recommend').then(res => {
@@ -167,7 +167,7 @@ export default {
   gap: 20px;
 }
 
-/* 左侧分类导航样式 */
+/* Left category navigation styles. */
 .category-sidebar {
   background: white;
   border-radius: 12px;
@@ -194,7 +194,7 @@ export default {
   margin-right: 12px;
 }
 
-/* 中间内容区样式 */
+/* Center content styles. */
 .main-section {
   background: transparent;
 }
@@ -272,7 +272,7 @@ export default {
   font-size: 16px;
 }
 
-/* 右侧用户信息样式 */
+/* User information styles. */
 .user-sidebar {
   background: white;
   border-radius: 12px;

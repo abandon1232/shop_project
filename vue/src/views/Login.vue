@@ -52,11 +52,11 @@ export default {
     login() {
       this.$refs['formRef'].validate((valid) => {
         if (valid) {
-          // 验证通过
+          // Validation succeeded.
           this.$request.post('/login', this.form).then(res => {
             if (res.code === '200') {
               let user = res.data
-              localStorage.setItem("xm-user", JSON.stringify(res.data))  // 存储用户数据
+              localStorage.setItem("xm-user", JSON.stringify(res.data))  // Cache the authenticated account.
               if (user.role === 'USER') {
                 location.href = '/front/home'
               } else {

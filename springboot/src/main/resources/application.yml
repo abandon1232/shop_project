@@ -1,7 +1,7 @@
 server:
   port: 9090
 
-# 数据库配置
+# Database configuration
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -13,7 +13,7 @@ spring:
       max-file-size: 100MB
       max-request-size: 100MB
 
-# 配置mybatis实体和xml映射
+# Configure MyBatis entity aliases and XML mappings.
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.example.entity
@@ -21,7 +21,7 @@ mybatis:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     map-underscore-to-camel-case: true
 
-# 分页
+# Pagination
 pagehelper:
   helper-dialect: mysql
   reasonable: true

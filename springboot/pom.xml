@@ -74,11 +74,11 @@
         </dependency>
 
 
-            <!-- FastJSON 依赖 -->
+            <!-- FastJSON dependency -->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
-                <!-- 可根据需要选择合适的版本 -->
+                <!-- Choose an appropriate version as needed. -->
                 <version>1.2.76</version>
             </dependency>
     </dependencies>

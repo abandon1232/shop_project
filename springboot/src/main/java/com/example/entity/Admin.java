@@ -5,27 +5,27 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 
 /**
- * 管理员
+ * Administrator.
 */
 public class Admin extends Account implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** ID */
     private Integer id;
-    /** 用户名 */
+    /** Username. */
     private String username;
-    /** 密码 */
+    /** Password. */
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
-    /** 姓名 */
+    /** Name. */
     private String name;
-    /** 电话 */
+    /** Phone number. */
     private String phone;
-    /** 邮箱 */
+    /** Email address. */
     private String email;
-    /** 头像 */
+    /** Avatar URL. */
     private String avatar;
-    /** 角色标识 */
+    /** Role identifier. */
     private String role;
 
     @Override

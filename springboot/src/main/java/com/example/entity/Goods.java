@@ -3,22 +3,22 @@ package com.example.entity;
 import java.io.Serializable;
 
 /**
- * 商品信息表
+ * Product record.
 */
 public class Goods implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** ID */
     private Integer id;
-    /** 商品名称 */
+    /** Product name. */
     private String name;
-    /** 商品描述 */
+    /** Product description. */
     private String description;
-    /** 商品主图 */
+    /** Primary product image. */
     private String img;
-    /** 商品价格 */
+    /** Product price. */
     private Double price;
-    /** 商品价格 */
+    /** Product price. */
     private String unit;
     private Integer count;
     private Integer typeId;

@@ -1,10 +1,10 @@
 package com.example.common.enums;
 
 public enum RoleEnum {
-    // 管理员
+    // Administrator.
     ADMIN,
-    //商家
+    //Merchant.
     BUSINESS,
-    //用户
+    //User.
     USER,
 }

@@ -75,7 +75,7 @@ export default {
     this.loadGoods()
     this.loadRecommend()
   },
-  // methods：本页面所有的点击事件或者其他函数定义区
+  // methods：Click handlers and other methods for this page
   methods: {
     loadRecommend() {
       this.$request.get('/goods/recommend').then(res => {

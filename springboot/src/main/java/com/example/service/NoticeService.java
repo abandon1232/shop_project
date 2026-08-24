@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * 公告信息表业务处理
+ * Notice business logic.
  **/
 @Service
 public class NoticeService {
@@ -21,7 +21,7 @@ public class NoticeService {
     private NoticeMapper noticeMapper;
 
     /**
-     * 新增
+     * Create a record.
      */
     public void add(Notice notice) {
         notice.setTime(DateUtil.today());
@@ -31,14 +31,14 @@ public class NoticeService {
     }
 
     /**
-     * 删除
+     * Delete a record.
      */
     public void deleteById(Integer id) {
         noticeMapper.deleteById(id);
     }
 
     /**
-     * 批量删除
+     * Delete multiple records.
      */
     public void deleteBatch(List<Integer> ids) {
         for (Integer id : ids) {
@@ -47,28 +47,28 @@ public class NoticeService {
     }
 
     /**
-     * 修改
+     * Update a record.
      */
     public void updateById(Notice notice) {
         noticeMapper.updateById(notice);
     }
 
     /**
-     * 根据ID查询
+     * Find a record by ID.
      */
     public Notice selectById(Integer id) {
         return noticeMapper.selectById(id);
     }
 
     /**
-     * 查询所有
+     * Find all matching records.
      */
     public List<Notice> selectAll(Notice notice) {
         return noticeMapper.selectAll(notice);
     }
 
     /**
-     * 分页查询
+     * Find records with pagination.
      */
     public PageInfo<Notice> selectPage(Notice notice, Integer pageNum, Integer pageSize) {
         PageHelper.startPage(pageNum, pageSize);

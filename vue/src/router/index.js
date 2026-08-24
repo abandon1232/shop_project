@@ -3,7 +3,7 @@ import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
 
-// 解决导航栏或者底部导航tabBar中的vue-router在3.0版本以上频繁点击菜单报错的问题。
+// Prevent duplicate-navigation errors when menu items are clicked repeatedly in vue-router 3+.
 const originalPush = VueRouter.prototype.push
 VueRouter.prototype.push = function push (location) {
   return originalPush.call(this, location).catch(err => err)
@@ -50,8 +50,8 @@ const router = new VueRouter({
   routes
 })
 
-// 注：不需要前台的项目，可以注释掉该路由守卫
-// 路由守卫
+// Projects without a storefront can disable this navigation guard.
+// Navigation guard.
 // router.beforeEach((to ,from, next) => {
 //   let user = JSON.parse(localStorage.getItem("xm-user") || '{}');
 //   if (to.path === '/') {
