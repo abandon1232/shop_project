@@ -3,30 +3,35 @@ server:
 
 # Database configuration
 spring:
+  application:
+    name: shop-project-api
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: ${DB_USERNAME:root}
+    username: ${DB_USERNAME:shop_app}
     password: ${DB_PASSWORD:}
-    url: ${DB_URL:jdbc:mysql://localhost:3306/manager?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+    url: ${DB_URL:jdbc:mysql://localhost:3306/manager?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
   servlet:
     multipart:
       max-file-size: 100MB
       max-request-size: 100MB
+
+app:
+  cors:
+    allowed-origin: ${CORS_ALLOWED_ORIGIN:http://localhost:8080}
+  bootstrap:
+    admin:
+      username: ${INITIAL_ADMIN_USERNAME:}
+      password: ${INITIAL_ADMIN_PASSWORD:}
 
 # Configure MyBatis entity aliases and XML mappings.
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.example.entity
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
     map-underscore-to-camel-case: true
-
-# Pagination
-pagehelper:
-  helper-dialect: mysql
-  reasonable: true
-  support-methods-arguments: true
-  params: count=countSql
 
 ip: ${APP_HOST:localhost}
 

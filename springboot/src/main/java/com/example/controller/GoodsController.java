@@ -1,12 +1,14 @@
 package com.example.controller;
 
 import com.example.common.Result;
+import com.example.common.enums.RoleEnum;
+import com.example.common.security.RequireRoles;
 import com.example.entity.Goods;
 import com.example.service.GoodsService;
 import com.github.pagehelper.PageInfo;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**
@@ -23,6 +25,7 @@ public class GoodsController {
      * Create a record.
      */
     @PostMapping("/add")
+    @RequireRoles({RoleEnum.ADMIN, RoleEnum.BUSINESS})
     public Result add(@RequestBody Goods goods) {
         goodsService.add(goods);
         return Result.success();
@@ -32,6 +35,7 @@ public class GoodsController {
      * Delete a record.
      */
     @DeleteMapping("/delete/{id}")
+    @RequireRoles({RoleEnum.ADMIN, RoleEnum.BUSINESS})
     public Result deleteById(@PathVariable Integer id) {
         goodsService.deleteById(id);
         return Result.success();
@@ -41,6 +45,7 @@ public class GoodsController {
      * Delete multiple records.
      */
     @DeleteMapping("/delete/batch")
+    @RequireRoles({RoleEnum.ADMIN, RoleEnum.BUSINESS})
     public Result deleteBatch(@RequestBody List<Integer> ids) {
         goodsService.deleteBatch(ids);
         return Result.success();
@@ -50,6 +55,7 @@ public class GoodsController {
      * Update a record.
      */
     @PutMapping("/update")
+    @RequireRoles({RoleEnum.ADMIN, RoleEnum.BUSINESS})
     public Result updateById(@RequestBody Goods goods) {
         goodsService.updateById(goods);
         return Result.success();

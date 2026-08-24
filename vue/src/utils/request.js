@@ -3,7 +3,7 @@ import router from "@/router";
 
 // Create a configured Axios client.
 const request = axios.create({
-    baseURL: process.env.VUE_APP_BASEURL,   // Backend API address: ip:port.
+    baseURL: process.env.VUE_APP_BASEURL || 'http://localhost:9090',
     timeout: 30000                          // 30-second request timeout.
 })
 
