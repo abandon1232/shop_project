@@ -1,12 +1,14 @@
 package com.example.controller;
 
 import com.example.common.Result;
+import com.example.common.enums.RoleEnum;
+import com.example.common.security.RequireRoles;
 import com.example.entity.Type;
 import com.example.service.TypeService;
 import com.github.pagehelper.PageInfo;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**
@@ -23,6 +25,7 @@ public class TypeController {
      * Create a record.
      */
     @PostMapping("/add")
+    @RequireRoles(RoleEnum.ADMIN)
     public Result add(@RequestBody Type type) {
         typeService.add(type);
         return Result.success();
@@ -32,6 +35,7 @@ public class TypeController {
      * Delete a record.
      */
     @DeleteMapping("/delete/{id}")
+    @RequireRoles(RoleEnum.ADMIN)
     public Result deleteById(@PathVariable Integer id) {
         typeService.deleteById(id);
         return Result.success();
@@ -41,6 +45,7 @@ public class TypeController {
      * Delete multiple records.
      */
     @DeleteMapping("/delete/batch")
+    @RequireRoles(RoleEnum.ADMIN)
     public Result deleteBatch(@RequestBody List<Integer> ids) {
         typeService.deleteBatch(ids);
         return Result.success();
@@ -50,6 +55,7 @@ public class TypeController {
      * Update a record.
      */
     @PutMapping("/update")
+    @RequireRoles(RoleEnum.ADMIN)
     public Result updateById(@RequestBody Type type) {
         typeService.updateById(type);
         return Result.success();

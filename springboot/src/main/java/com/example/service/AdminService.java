@@ -14,7 +14,7 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
 
 /**
@@ -78,6 +78,10 @@ public class AdminService {
      */
     public Admin selectById(Integer id) {
         return adminMapper.selectById(id);
+    }
+
+    public boolean existsByUsername(String username) {
+        return adminMapper.selectByUsername(username) != null;
     }
 
     /**

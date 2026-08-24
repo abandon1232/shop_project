@@ -8,6 +8,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.example.common.Constants;
 import com.example.common.enums.ResultCodeEnum;
 import com.example.common.enums.RoleEnum;
+import com.example.common.security.RequireRoles;
 import com.example.entity.Account;
 import com.example.exception.CustomException;
 import com.example.service.AdminService;
@@ -16,11 +17,14 @@ import com.example.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.core.annotation.AnnotatedElementUtils;
+import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 
 /**
  * JWT authentication interceptor.
@@ -39,6 +43,9 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        if ("GET".equalsIgnoreCase(request.getMethod()) && request.getRequestURI().startsWith("/files/")) {
+            return true;
+        }
         // 1. Read the token from the HTTP request header.
         String token = request.getHeader(Constants.TOKEN);
         if (ObjectUtil.isEmpty(token)) {
@@ -78,6 +85,23 @@ public class JwtInterceptor implements HandlerInterceptor {
         } catch (JWTVerificationException e) {
             throw new CustomException(ResultCodeEnum.TOKEN_CHECK_ERROR);
         }
+        authorize(handler, account);
         return true;
+    }
+
+    private void authorize(Object handler, Account account) {
+        if (!(handler instanceof HandlerMethod handlerMethod)) {
+            return;
+        }
+        RequireRoles requirement = AnnotatedElementUtils.findMergedAnnotation(
+                handlerMethod.getMethod(), RequireRoles.class);
+        if (requirement == null) {
+            requirement = AnnotatedElementUtils.findMergedAnnotation(
+                    handlerMethod.getBeanType(), RequireRoles.class);
+        }
+        if (requirement != null && Arrays.stream(requirement.value())
+                .noneMatch(role -> role.name().equals(account.getRole()))) {
+            throw new CustomException(ResultCodeEnum.FORBIDDEN_ERROR);
+        }
     }
 }

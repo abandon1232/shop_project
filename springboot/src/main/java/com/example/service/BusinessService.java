@@ -15,8 +15,9 @@ import com.github.pagehelper.PageInfo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Merchant business logic.
@@ -71,6 +72,16 @@ public class BusinessService {
      * Update a record.
      */
     public void updateById(Business business) {
+        Account currentUser = TokenUtils.getCurrentUser();
+        if (RoleEnum.BUSINESS.name().equals(currentUser.getRole())) {
+            if (!Objects.equals(currentUser.getId(), business.getId())) {
+                throw new CustomException(ResultCodeEnum.FORBIDDEN_ERROR);
+            }
+            business.setUsername(null);
+            business.setPassword(null);
+            business.setRole(null);
+            business.setStatus(null);
+        }
         if (ObjectUtil.isNotEmpty(business.getPassword()) && passwordService.needsUpgrade(business.getPassword())) {
             business.setPassword(passwordService.encode(business.getPassword()));
         }
