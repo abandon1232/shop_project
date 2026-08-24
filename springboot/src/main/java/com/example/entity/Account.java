@@ -1,5 +1,7 @@
 package com.example.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * 角色用户父类
  */
@@ -10,10 +12,12 @@ public class Account {
     /** 名称 */
     private String name;
     /** 密码 */
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     /** 角色标识 */
     private String role;
     /** 新密码 */
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String newPassword;
     /** 头像 */
     private String avatar;

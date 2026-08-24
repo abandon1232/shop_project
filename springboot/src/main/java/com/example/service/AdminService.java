@@ -25,6 +25,8 @@ public class AdminService {
 
     @Resource
     private AdminMapper adminMapper;
+    @Resource
+    private PasswordService passwordService;
 
     /**
      * 新增
@@ -37,6 +39,7 @@ public class AdminService {
         if (ObjectUtil.isEmpty(admin.getPassword())) {
             admin.setPassword(Constants.USER_DEFAULT_PASSWORD);
         }
+        admin.setPassword(passwordService.encode(admin.getPassword()));
         if (ObjectUtil.isEmpty(admin.getName())) {
             admin.setName(admin.getUsername());
         }
@@ -64,6 +67,9 @@ public class AdminService {
      * 修改
      */
     public void updateById(Admin admin) {
+        if (ObjectUtil.isNotEmpty(admin.getPassword()) && passwordService.needsUpgrade(admin.getPassword())) {
+            admin.setPassword(passwordService.encode(admin.getPassword()));
+        }
         adminMapper.updateById(admin);
     }
 
@@ -94,12 +100,16 @@ public class AdminService {
      * 登录
      */
     public Account login(Account account) {
-        Account dbAdmin = adminMapper.selectByUsername(account.getUsername());
+        Admin dbAdmin = adminMapper.selectByUsername(account.getUsername());
         if (ObjectUtil.isNull(dbAdmin)) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
-        if (!account.getPassword().equals(dbAdmin.getPassword())) {
+        if (!passwordService.matches(account.getPassword(), dbAdmin.getPassword())) {
             throw new CustomException(ResultCodeEnum.USER_ACCOUNT_ERROR);
+        }
+        if (passwordService.needsUpgrade(dbAdmin.getPassword())) {
+            dbAdmin.setPassword(passwordService.encode(account.getPassword()));
+            adminMapper.updateById(dbAdmin);
         }
         // 生成token
         String tokenData = dbAdmin.getId() + "-" + RoleEnum.ADMIN.name();
@@ -125,10 +135,10 @@ public class AdminService {
         if (ObjectUtil.isNull(dbAdmin)) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
-        if (!account.getPassword().equals(dbAdmin.getPassword())) {
+        if (!passwordService.matches(account.getPassword(), dbAdmin.getPassword())) {
             throw new CustomException(ResultCodeEnum.PARAM_PASSWORD_ERROR);
         }
-        dbAdmin.setPassword(account.getNewPassword());
+        dbAdmin.setPassword(passwordService.encode(account.getNewPassword()));
         adminMapper.updateById(dbAdmin);
     }
 

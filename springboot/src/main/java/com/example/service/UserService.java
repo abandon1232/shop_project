@@ -26,6 +26,8 @@ public class UserService {
 
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private PasswordService passwordService;
 
     /**
      * 新增
@@ -38,6 +40,7 @@ public class UserService {
         if (ObjectUtil.isEmpty(user.getPassword())) {
             user.setPassword(Constants.USER_DEFAULT_PASSWORD);
         }
+        user.setPassword(passwordService.encode(user.getPassword()));
         if (ObjectUtil.isEmpty(user.getName())) {
             user.setName(user.getUsername());
         }
@@ -66,6 +69,9 @@ public class UserService {
      * 修改
      */
     public void updateById(User user) {
+        if (ObjectUtil.isNotEmpty(user.getPassword()) && passwordService.needsUpgrade(user.getPassword())) {
+            user.setPassword(passwordService.encode(user.getPassword()));
+        }
         userMapper.updateById(user);
     }
 
@@ -96,12 +102,16 @@ public class UserService {
      * 登录
      */
     public Account login(Account account) {
-        Account dbUser = userMapper.selectByUsername(account.getUsername());
+        User dbUser = userMapper.selectByUsername(account.getUsername());
         if (ObjectUtil.isNull(dbUser)) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
-        if (!account.getPassword().equals(dbUser.getPassword())) {
+        if (!passwordService.matches(account.getPassword(), dbUser.getPassword())) {
             throw new CustomException(ResultCodeEnum.USER_ACCOUNT_ERROR);
+        }
+        if (passwordService.needsUpgrade(dbUser.getPassword())) {
+            dbUser.setPassword(passwordService.encode(account.getPassword()));
+            userMapper.updateById(dbUser);
         }
         // 生成token
         String tokenData = dbUser.getId() + "-" + RoleEnum.USER.name();
@@ -128,10 +138,10 @@ public class UserService {
         if (ObjectUtil.isNull(dbUser)) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
-        if (!account.getPassword().equals(dbUser.getPassword())) {
+        if (!passwordService.matches(account.getPassword(), dbUser.getPassword())) {
             throw new CustomException(ResultCodeEnum.PARAM_PASSWORD_ERROR);
         }
-        dbUser.setPassword(account.getNewPassword());
+        dbUser.setPassword(passwordService.encode(account.getNewPassword()));
         userMapper.updateById(dbUser);
     }
 

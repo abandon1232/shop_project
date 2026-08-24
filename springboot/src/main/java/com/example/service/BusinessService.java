@@ -26,6 +26,8 @@ public class BusinessService {
 
     @Resource
     private BusinessMapper businessMapper;
+    @Resource
+    private PasswordService passwordService;
 
     /**
      * 新增
@@ -38,6 +40,7 @@ public class BusinessService {
         if (ObjectUtil.isEmpty(business.getPassword())) {
             business.setPassword(Constants.USER_DEFAULT_PASSWORD);
         }
+        business.setPassword(passwordService.encode(business.getPassword()));
         if (ObjectUtil.isEmpty(business.getName())) {
             business.setName(business.getUsername());
         }
@@ -68,6 +71,9 @@ public class BusinessService {
      * 修改
      */
     public void updateById(Business business) {
+        if (ObjectUtil.isNotEmpty(business.getPassword()) && passwordService.needsUpgrade(business.getPassword())) {
+            business.setPassword(passwordService.encode(business.getPassword()));
+        }
         businessMapper.updateById(business);
     }
 
@@ -98,12 +104,16 @@ public class BusinessService {
      * 登录
      */
     public Account login(Account account) {
-        Account dbBusiness = businessMapper.selectByUsername(account.getUsername());
+        Business dbBusiness = businessMapper.selectByUsername(account.getUsername());
         if (ObjectUtil.isNull(dbBusiness)) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
-        if (!account.getPassword().equals(dbBusiness.getPassword())) {
+        if (!passwordService.matches(account.getPassword(), dbBusiness.getPassword())) {
             throw new CustomException(ResultCodeEnum.USER_ACCOUNT_ERROR);
+        }
+        if (passwordService.needsUpgrade(dbBusiness.getPassword())) {
+            dbBusiness.setPassword(passwordService.encode(account.getPassword()));
+            businessMapper.updateById(dbBusiness);
         }
         // 生成token
         String tokenData = dbBusiness.getId() + "-" + RoleEnum.BUSINESS.name();
@@ -130,10 +140,10 @@ public class BusinessService {
         if (ObjectUtil.isNull(dbBusiness)) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
-        if (!account.getPassword().equals(dbBusiness.getPassword())) {
+        if (!passwordService.matches(account.getPassword(), dbBusiness.getPassword())) {
             throw new CustomException(ResultCodeEnum.PARAM_PASSWORD_ERROR);
         }
-        dbBusiness.setPassword(account.getNewPassword());
+        dbBusiness.setPassword(passwordService.encode(account.getNewPassword()));
         businessMapper.updateById(dbBusiness);
     }
 
