@@ -14,17 +14,27 @@
         left join type on goods.type_id = type.id
         left join business on goods.business_id = business.id
         <where>
-            <if test="id != null"> and id= #{id}</if>
-            <if test="name != null"> and name like concat('%', #{name}, '%')</if>
-            <if test="description != null"> and description= #{description}</if>
-            <if test="img != null"> and img= #{img}</if>
-            <if test="price != null"> and price= #{price}</if>
-            <if test="unit != null"> and unit= #{unit}</if>
-            <if test="count != null"> and count= #{count}</if>
-            <if test="typeId != null"> and type_id= #{typeId}</if>
-            <if test="businessId != null"> and business_id= #{businessId}</if>
+            <if test="id != null"> and goods.id = #{id}</if>
+            <if test="name != null"> and goods.name like concat('%', #{name}, '%')</if>
+            <if test="description != null"> and goods.description = #{description}</if>
+            <if test="img != null"> and goods.img = #{img}</if>
+            <if test="price != null"> and goods.price = #{price}</if>
+            <if test="unit != null"> and goods.unit = #{unit}</if>
+            <if test="count != null"> and goods.count = #{count}</if>
+            <if test="typeId != null"> and goods.type_id = #{typeId}</if>
+            <if test="businessId != null"> and goods.business_id = #{businessId}</if>
         </where>
-        order by id desc
+        order by goods.id desc
+    </select>
+
+    <select id="selectFeatured" resultType="com.example.entity.Goods">
+        select goods.*, type.name as typeName, business.name as businessName
+        from goods
+        join business on goods.business_id = business.id
+        left join type on goods.type_id = type.id
+        where business.status = '审核通过'
+        order by goods.id desc
+        limit #{limit}
     </select>
 
     <select id="selectById" resultType="com.example.entity.Goods">

@@ -1,11 +1,17 @@
 package com.example.controller;
 
 import com.example.common.Result;
+import com.example.common.enums.ResultCodeEnum;
 import com.example.common.enums.RoleEnum;
 import com.example.common.security.RequireRoles;
+import com.example.controller.request.GoodsRequest;
 import com.example.entity.Goods;
 import com.example.service.GoodsService;
 import com.github.pagehelper.PageInfo;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.annotation.Resource;
@@ -16,6 +22,7 @@ import java.util.List;
  **/
 @RestController
 @RequestMapping("/goods")
+@Validated
 public class GoodsController {
 
     @Resource
@@ -26,8 +33,8 @@ public class GoodsController {
      */
     @PostMapping("/add")
     @RequireRoles({RoleEnum.ADMIN, RoleEnum.BUSINESS})
-    public Result add(@RequestBody Goods goods) {
-        goodsService.add(goods);
+    public Result add(@Valid @RequestBody GoodsRequest request) {
+        goodsService.add(request.toGoods());
         return Result.success();
     }
 
@@ -56,15 +63,12 @@ public class GoodsController {
      */
     @PutMapping("/update")
     @RequireRoles({RoleEnum.ADMIN, RoleEnum.BUSINESS})
-    public Result updateById(@RequestBody Goods goods) {
-        goodsService.updateById(goods);
+    public Result updateById(@Valid @RequestBody GoodsRequest request) {
+        if (request.id() == null) {
+            return Result.error(ResultCodeEnum.PARAM_ERROR);
+        }
+        goodsService.updateById(request.toGoods());
         return Result.success();
-    }
-
-    @GetMapping("/selectTop15")
-    public Result selectTop15() {
-        List<Goods> list = goodsService.selectTop15();
-        return Result.success(list);
     }
 
     @GetMapping("/selectByTypeId")
@@ -100,9 +104,9 @@ public class GoodsController {
         List<Goods> list = goodsService.selectAll(goods);
         return Result.success(list);
     }
-    @GetMapping("/recommend")
-    public Result recommend(){
-        List<Goods> list = goodsService.recommend();
+    @GetMapping("/featured")
+    public Result featured(){
+        List<Goods> list = goodsService.featured();
         return Result.success(list);
     }
     /**
@@ -110,8 +114,8 @@ public class GoodsController {
      */
     @GetMapping("/selectPage")
     public Result selectPage(Goods goods,
-                             @RequestParam(defaultValue = "1") Integer pageNum,
-                             @RequestParam(defaultValue = "10") Integer pageSize) {
+                             @RequestParam(defaultValue = "1") @Min(1) Integer pageNum,
+                             @RequestParam(defaultValue = "10") @Min(1) @Max(100) Integer pageSize) {
         PageInfo<Goods> page = goodsService.selectPage(goods, pageNum, pageSize);
         return Result.success(page);
     }

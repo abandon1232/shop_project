@@ -1,6 +1,7 @@
 package com.example.mapper;
 
 import com.example.entity.Goods;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -34,8 +35,8 @@ public interface GoodsMapper {
       * Find all matching records.
     */
     List<Goods> selectAll(Goods goods);
-    @Select("select * from goods order by count desc limit 15")
-    List<Goods> selectTop15();
+
+    List<Goods> selectFeatured(@Param("limit") int limit);
 
     @Select("select * from goods where type_id = #{id}")
     List<Goods> selectByTypeId(Integer id);
