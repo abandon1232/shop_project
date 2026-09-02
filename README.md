@@ -75,7 +75,7 @@ FLUSH PRIVILEGES;
 
 Flyway creates and versions the tables when the API starts. For an existing pre-Flyway copy of this project, it records the original core schema as version 1 and then applies the later migrations.
 
-Migrations V1–V5 are retained unchanged for compatibility with earlier copies of the project. Migration `V6__replace_demo_catalog.sql` removes the old demo products and categories, then loads the current English catalogue while preserving accounts. Migration `V7__create_customer_orders.sql` adds the current fulfilment order table; the cart tables are created by the retained V4 migration.
+Migrations V1–V8 are retained for compatibility with earlier copies of the project. V1–V5 preserve the existing schema history; `V6__replace_demo_catalog.sql` removes the old demo products and categories, then loads the current English catalogue while preserving accounts. `V7__create_customer_orders.sql` adds the current fulfilment order table, and `V8__normalize_catalog_seller_name.sql` normalizes the portfolio catalogue seller display name; the cart tables are created by the retained V4 migration.
 
 ### 2. Configure and start the backend
 

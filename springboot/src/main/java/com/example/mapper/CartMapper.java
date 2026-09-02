@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 public interface CartMapper {
+    Integer lockUserById(Integer userId);
     List<CartItem> selectByUserId(Integer userId);
     CartItem selectByUserAndGoods(@Param("userId") Integer userId, @Param("goodsId") Integer goodsId);
     CartItem selectOwnedById(@Param("id") Integer id, @Param("userId") Integer userId);

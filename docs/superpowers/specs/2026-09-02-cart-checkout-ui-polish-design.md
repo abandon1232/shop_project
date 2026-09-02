@@ -103,7 +103,7 @@ The existing fulfilment and cancellation rules continue to operate on each resul
 
 ## Data Model
 
-No new migration is required because migration V4 already creates `cart_item` with:
+No new cart-schema migration is required because migration V4 already creates `cart_item` with:
 
 - a unique `(user_id, goods_id)` constraint;
 - foreign keys to `user` and `goods`;

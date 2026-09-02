@@ -23,6 +23,8 @@ public enum ResultCodeEnum {
     INSUFFICIENT_STOCK("4091", "Not enough stock is available"),
     INVALID_ORDER_STATUS("4092", "This order status change is not allowed"),
     CART_EMPTY("4093", "Your cart is empty"),
+    CART_CONFLICT("4094", "Your cart changed while checkout was in progress"),
+    ORDER_CREATE_FAILED("5006", "The order could not be saved"),
     ;
 
     public String code;

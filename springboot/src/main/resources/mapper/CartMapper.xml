@@ -39,6 +39,9 @@
         where cart_item.user_id = #{userId}
         order by cart_item.updated_at desc, cart_item.id desc
     </select>
+    <select id="lockUserById" resultType="java.lang.Integer">
+        select id from user where id = #{userId} for update
+    </select>
     <select id="selectByUserAndGoods" resultMap="CartItemResult">
         <include refid="Cart_Select"/>
         where cart_item.user_id = #{userId} and cart_item.goods_id = #{goodsId}

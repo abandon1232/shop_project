@@ -61,6 +61,9 @@ class CartServiceTest {
         CartItem result = service.add(new AddCartItemRequest(7, 3));
 
         assertEquals(5, result.getQuantity());
+        var sequence = inOrder(cartMapper);
+        sequence.verify(cartMapper).lockUserById(3);
+        sequence.verify(cartMapper).selectByUserAndGoods(3, 7);
         verify(cartMapper).updateQuantity(14, 3, 5);
         verify(cartMapper, never()).insert(any());
     }
@@ -110,6 +113,7 @@ class CartServiceTest {
 
         assertSame(savedCart, result);
         verify(cartMapper).selectByUserId(3);
+        verify(cartMapper, never()).lockUserById(any());
     }
 
     @Test
@@ -147,6 +151,9 @@ class CartServiceTest {
         CartItem result = service.update(99, new UpdateCartItemRequest(2));
 
         assertSame(updated, result);
+        var sequence = inOrder(cartMapper);
+        sequence.verify(cartMapper).lockUserById(3);
+        sequence.verify(cartMapper).selectOwnedById(99, 3);
         verify(cartMapper).updateQuantity(99, 3, 2);
     }
 
@@ -171,6 +178,9 @@ class CartServiceTest {
 
         service.delete(99);
 
+        var sequence = inOrder(cartMapper);
+        sequence.verify(cartMapper).lockUserById(3);
+        sequence.verify(cartMapper).deleteOwned(99, 3);
         verify(cartMapper).deleteOwned(99, 3);
     }
 
@@ -197,14 +207,31 @@ class CartServiceTest {
         CustomerOrder secondOrder = new CustomerOrder();
         when(orderService.placeOrder(new PlaceOrderRequest(7, 2))).thenReturn(firstOrder);
         when(orderService.placeOrder(new PlaceOrderRequest(8, 1))).thenReturn(secondOrder);
+        when(cartMapper.deleteByUserId(3)).thenReturn(2);
 
         List<CustomerOrder> result = service.checkout();
 
         assertEquals(List.of(firstOrder, secondOrder), result);
         var sequence = inOrder(orderService, cartMapper);
+        sequence.verify(cartMapper).lockUserById(3);
+        sequence.verify(cartMapper).selectByUserId(3);
         sequence.verify(orderService).placeOrder(new PlaceOrderRequest(7, 2));
         sequence.verify(orderService).placeOrder(new PlaceOrderRequest(8, 1));
         sequence.verify(cartMapper).deleteByUserId(3);
+    }
+
+    @Test
+    void checkoutRejectsADeleteCountThatDoesNotMatchItsClaimedSnapshot() {
+        bindAccount(3, RoleEnum.USER);
+        CartItem line = cartItem(14, 3, 7, 1);
+        when(cartMapper.selectByUserId(3)).thenReturn(List.of(line));
+        when(goodsService.selectPurchasableById(7)).thenReturn(goods(7, 6, "Headphones", "1990.00"));
+        when(orderService.placeOrder(new PlaceOrderRequest(7, 1))).thenReturn(new CustomerOrder());
+        when(cartMapper.deleteByUserId(3)).thenReturn(0);
+
+        CustomException error = assertThrows(CustomException.class, service::checkout);
+
+        assertEquals("4094", error.getCode());
     }
 
     @Test

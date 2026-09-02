@@ -35,12 +35,14 @@ public class CartService {
         return cartMapper.selectByUserId(account.getId());
     }
 
+    @Transactional
     public CartItem add(AddCartItemRequest request) {
         Account account = currentCustomer();
         validateQuantity(request == null ? null : request.quantity());
         Goods goods = goodsService.selectPurchasableById(request.goodsId());
         validateStock(goods, request.quantity());
 
+        cartMapper.lockUserById(account.getId());
         CartItem existing = cartMapper.selectByUserAndGoods(account.getId(), goods.getId());
         int quantity = request.quantity();
         if (existing != null) {
@@ -62,9 +64,11 @@ public class CartService {
         return selectOwned(item.getId(), account.getId());
     }
 
+    @Transactional
     public CartItem update(Integer id, UpdateCartItemRequest request) {
         Account account = currentCustomer();
         validateQuantity(request == null ? null : request.quantity());
+        cartMapper.lockUserById(account.getId());
         CartItem item = selectOwned(id, account.getId());
         Goods goods = goodsService.selectPurchasableById(item.getGoodsId());
         validateStock(goods, request.quantity());
@@ -74,8 +78,10 @@ public class CartService {
         return selectOwned(id, account.getId());
     }
 
+    @Transactional
     public void delete(Integer id) {
         Account account = currentCustomer();
+        cartMapper.lockUserById(account.getId());
         if (cartMapper.deleteOwned(id, account.getId()) != 1) {
             throw new CustomException(ResultCodeEnum.CART_ITEM_NOT_FOUND);
         }
@@ -84,6 +90,7 @@ public class CartService {
     @Transactional
     public List<CustomerOrder> checkout() {
         Account account = currentCustomer();
+        cartMapper.lockUserById(account.getId());
         List<CartItem> items = cartMapper.selectByUserId(account.getId());
         if (items.isEmpty()) {
             throw new CustomException(ResultCodeEnum.CART_EMPTY);
@@ -98,7 +105,9 @@ public class CartService {
         for (CartItem item : items) {
             orders.add(orderService.placeOrder(new PlaceOrderRequest(item.getGoodsId(), item.getQuantity())));
         }
-        cartMapper.deleteByUserId(account.getId());
+        if (cartMapper.deleteByUserId(account.getId()) != items.size()) {
+            throw new CustomException(ResultCodeEnum.CART_CONFLICT);
+        }
         return orders;
     }
 
