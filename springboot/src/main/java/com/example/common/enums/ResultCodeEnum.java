@@ -17,9 +17,12 @@ public enum ResultCodeEnum {
     PARAM_PASSWORD_ERROR("5005", "Current password is incorrect"),
     PRODUCT_NOT_FOUND("4041", "Product not found"),
     ORDER_NOT_FOUND("4042", "Order not found"),
+    CART_ITEM_NOT_FOUND("4043", "Cart item not found"),
     ORDER_ACCESS_DENIED("4031", "You cannot access this order"),
+    CART_ACCESS_DENIED("4032", "You cannot access this cart"),
     INSUFFICIENT_STOCK("4091", "Not enough stock is available"),
     INVALID_ORDER_STATUS("4092", "This order status change is not allowed"),
+    CART_EMPTY("4093", "Your cart is empty"),
     ;
 
     public String code;

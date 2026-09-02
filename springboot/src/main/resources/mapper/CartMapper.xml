@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.CartMapper">
+    <resultMap id="CartItemResult" type="com.example.entity.CartItem">
+        <id property="id" column="id"/>
+        <result property="userId" column="userId"/>
+        <result property="goodsId" column="goodsId"/>
+        <result property="quantity" column="quantity"/>
+        <result property="createdAt" column="createdAt"/>
+        <result property="updatedAt" column="updatedAt"/>
+        <result property="productName" column="productName"/>
+        <result property="productImg" column="productImg"/>
+        <result property="unitPrice" column="unitPrice"/>
+        <result property="stock" column="stock"/>
+        <result property="businessName" column="businessName"/>
+        <result property="businessStatus" column="businessStatus"/>
+    </resultMap>
+
+    <sql id="Cart_Select">
+        select cart_item.id,
+               cart_item.user_id as userId,
+               cart_item.goods_id as goodsId,
+               cart_item.quantity,
+               cart_item.created_at as createdAt,
+               cart_item.updated_at as updatedAt,
+               goods.name as productName,
+               goods.img as productImg,
+               goods.price as unitPrice,
+               goods.count as stock,
+               business.name as businessName,
+               business.status as businessStatus
+        from cart_item
+        join goods on cart_item.goods_id = goods.id
+        left join business on goods.business_id = business.id
+    </sql>
+
+    <select id="selectByUserId" resultMap="CartItemResult">
+        <include refid="Cart_Select"/>
+        where cart_item.user_id = #{userId}
+        order by cart_item.updated_at desc, cart_item.id desc
+    </select>
+    <select id="selectByUserAndGoods" resultMap="CartItemResult">
+        <include refid="Cart_Select"/>
+        where cart_item.user_id = #{userId} and cart_item.goods_id = #{goodsId}
+    </select>
+    <select id="selectOwnedById" resultMap="CartItemResult">
+        <include refid="Cart_Select"/>
+        where cart_item.id = #{id} and cart_item.user_id = #{userId}
+    </select>
+    <insert id="insert" parameterType="com.example.entity.CartItem" useGeneratedKeys="true" keyProperty="id">
+        insert into cart_item (user_id, goods_id, quantity)
+        values (#{userId}, #{goodsId}, #{quantity})
+    </insert>
+    <update id="updateQuantity">
+        update cart_item set quantity = #{quantity}
+        where id = #{id} and user_id = #{userId}
+    </update>
+    <delete id="deleteOwned">
+        delete from cart_item where id = #{id} and user_id = #{userId}
+    </delete>
+    <delete id="deleteByUserId">
+        delete from cart_item where user_id = #{userId}
+    </delete>
+</mapper>
