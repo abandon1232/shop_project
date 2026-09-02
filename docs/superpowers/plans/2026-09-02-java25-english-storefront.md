@@ -31,9 +31,9 @@
 - Modify: `springboot/pom.xml`
 - Delete: `springboot/src/main/java/com/example/common/config/PageHelperConfig.java`
 - Create: `.java-version`
-- Create: `.mvn/wrapper/maven-wrapper.properties`
-- Create: `mvnw`
-- Create: `mvnw.cmd`
+- Create: `springboot/.mvn/wrapper/maven-wrapper.properties`
+- Create: `springboot/mvnw`
+- Create: `springboot/mvnw.cmd`
 - Test: all files under `springboot/src/test/java`
 
 **Interfaces:**
@@ -97,13 +97,14 @@ Create `.java-version` containing:
 25
 ```
 
-Generate Maven Wrapper 3.9.16 from the repository root:
+Generate Maven Wrapper 3.9.16 from the `springboot` directory:
 
 ```powershell
+Set-Location springboot
 mvn -N wrapper:wrapper -Dmaven=3.9.16
 ```
 
-Confirm `.mvn/wrapper/maven-wrapper.properties` points to Apache Maven 3.9.16 and that `mvnw` and `mvnw.cmd` are present.
+Confirm `springboot/.mvn/wrapper/maven-wrapper.properties` points to Apache Maven 3.9.16 and that `springboot/mvnw` and `springboot/mvnw.cmd` are present.
 
 - [ ] **Step 5: Verify Boot 4 compilation and tests**
 
@@ -119,7 +120,7 @@ Expected: tests pass; the dependency tree contains Spring Boot 4.1.1, MyBatis Sp
 - [ ] **Step 6: Commit the backend platform upgrade**
 
 ```powershell
-git add springboot/pom.xml springboot/src/main/java/com/example/common/config/PageHelperConfig.java .java-version .mvn mvnw mvnw.cmd
+git add springboot/pom.xml springboot/src/main/java/com/example/common/config/PageHelperConfig.java .java-version springboot/.mvn springboot/mvnw springboot/mvnw.cmd
 git commit -m "build: upgrade backend to Java 25 and Spring Boot 4"
 ```
 
@@ -207,43 +208,23 @@ git commit -m "refactor: replace Hutool with standard Java APIs"
 - Modify: `springboot/src/main/java/com/example/common/enums/StatusEnum.java`
 - Modify: `springboot/src/main/java/com/example/service/GoodsService.java`
 - Modify: `springboot/src/main/resources/mapper/GoodsMapper.xml`
-- Create: `springboot/src/test/java/com/example/common/enums/StatusEnumTest.java`
 - Modify: `springboot/src/test/java/com/example/service/GoodsServiceTest.java`
 
 **Interfaces:**
 - Consumes: existing `business.status` string values and Flyway V1 schema.
 - Produces: `StatusEnum.PENDING`, `StatusEnum.APPROVED`, and `StatusEnum.REJECTED`; the database stores the enum names.
 
-- [ ] **Step 1: Write tests for the new stable status codes**
+- [ ] **Step 1: Change seller authorization tests to exercise the new persisted codes**
 
-Create `StatusEnumTest.java`:
-
-```java
-package com.example.common.enums;
-
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-class StatusEnumTest {
-    @Test
-    void exposesStableEnglishDatabaseCodes() {
-        assertEquals("PENDING", StatusEnum.PENDING.code());
-        assertEquals("APPROVED", StatusEnum.APPROVED.code());
-        assertEquals("REJECTED", StatusEnum.REJECTED.code());
-    }
-}
-```
-
-Update `GoodsServiceTest` fixtures to use `StatusEnum.PENDING.code()` and `StatusEnum.APPROVED.code()`.
+Update `GoodsServiceTest` fixtures to pass the literal persisted values `PENDING` and `APPROVED`. These assertions exercise the real authorization decision, so a wrong production enum value or comparison makes the tests fail independently of the enum implementation.
 
 - [ ] **Step 2: Run the new status tests and confirm failure**
 
 ```powershell
-./mvnw.cmd --batch-mode -Dtest=StatusEnumTest,GoodsServiceTest test
+./mvnw.cmd --batch-mode -Dtest=GoodsServiceTest test
 ```
 
-Expected: compilation fails because the new enum members and `code()` do not exist.
+Expected: seller-authorization tests fail because production still compares against Chinese status values.
 
 - [ ] **Step 3: Implement the enum and authorization comparison**
 
@@ -279,7 +260,7 @@ Change `GoodsMapper.xml` to filter approved sellers with `business.status = 'APP
 - [ ] **Step 5: Verify status behaviour and migration text**
 
 ```powershell
-./mvnw.cmd --batch-mode -Dtest=StatusEnumTest,GoodsServiceTest test
+./mvnw.cmd --batch-mode -Dtest=GoodsServiceTest test
 rg -n "审核中|审核通过|审核不通过" springboot/src/main/java springboot/src/main/resources/mapper
 ```
 
@@ -288,7 +269,7 @@ Expected: focused tests pass and Chinese status strings remain only in V2's migr
 - [ ] **Step 6: Commit the database status migration**
 
 ```powershell
-git add springboot/src/main/resources/db/migration/V2__translate_business_statuses.sql springboot/src/main/java/com/example/common/enums/StatusEnum.java springboot/src/main/java/com/example/service/GoodsService.java springboot/src/main/resources/mapper/GoodsMapper.xml springboot/src/test
+git add springboot/src/main/resources/db/migration/V2__translate_business_statuses.sql springboot/src/main/java/com/example/common/enums/StatusEnum.java springboot/src/main/java/com/example/service/GoodsService.java springboot/src/main/resources/mapper/GoodsMapper.xml springboot/src/test/java/com/example/service/GoodsServiceTest.java
 git commit -m "feat: migrate business statuses to English codes"
 ```
 
@@ -399,7 +380,7 @@ export const formatSek = value => sekFormatter.format(Number(value) || 0)
 
 - [ ] **Step 4: Upgrade routing and add lint tooling**
 
-Set `vue-router` to `5.3.0`. Add `eslint`, `@eslint/js`, `eslint-plugin-vue`, and `globals` as pinned dev dependencies compatible with Node 24. Add:
+Set `vue-router` to `5.3.0`. Add `eslint` 10.6.0, `@eslint/js` 10.6.0, `eslint-plugin-vue` 10.4.1, and `globals` 17.7.0 as pinned dev dependencies compatible with Node 24. Add:
 
 ```json
 "lint": "eslint .",
