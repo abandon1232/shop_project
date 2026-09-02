@@ -82,7 +82,9 @@ public class BusinessService {
             business.setRole(null);
             business.setStatus(null);
         }
-        if (ObjectUtil.isNotEmpty(business.getPassword()) && passwordService.needsUpgrade(business.getPassword())) {
+        if (StrUtil.isBlank(business.getPassword())) {
+            business.setPassword(null);
+        } else if (passwordService.needsUpgrade(business.getPassword())) {
             business.setPassword(passwordService.encode(business.getPassword()));
         }
         businessMapper.updateById(business);

@@ -78,7 +78,9 @@ public class UserService {
             user.setPassword(null);
             user.setRole(null);
         }
-        if (ObjectUtil.isNotEmpty(user.getPassword()) && passwordService.needsUpgrade(user.getPassword())) {
+        if (StrUtil.isBlank(user.getPassword())) {
+            user.setPassword(null);
+        } else if (passwordService.needsUpgrade(user.getPassword())) {
             user.setPassword(passwordService.encode(user.getPassword()));
         }
         userMapper.updateById(user);

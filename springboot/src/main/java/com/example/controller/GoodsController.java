@@ -18,7 +18,7 @@ import jakarta.annotation.Resource;
 import java.util.List;
 
 /**
- * REST endpoints for categories.
+ * REST endpoints for products.
  **/
 @RestController
 @RequestMapping("/goods")

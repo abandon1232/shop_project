@@ -67,7 +67,9 @@ public class AdminService {
      * Update a record.
      */
     public void updateById(Admin admin) {
-        if (ObjectUtil.isNotEmpty(admin.getPassword()) && passwordService.needsUpgrade(admin.getPassword())) {
+        if (StrUtil.isBlank(admin.getPassword())) {
+            admin.setPassword(null);
+        } else if (passwordService.needsUpgrade(admin.getPassword())) {
             admin.setPassword(passwordService.encode(admin.getPassword()));
         }
         adminMapper.updateById(admin);

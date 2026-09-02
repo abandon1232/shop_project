@@ -40,6 +40,8 @@ describe('store home', () => {
     await flushPromises()
 
     expect(requestedUrls).toContain('/goods/featured')
+    expect(requestedUrls).not.toContain('/goods/recommend')
+    expect(requestedUrls).not.toContain('/goods/selectTop15')
     expect(wrapper.text()).toContain('最新商品')
     expect(wrapper.text()).toContain('测试商品')
   })

@@ -22,6 +22,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
@@ -106,6 +107,28 @@ class AccountAccessTest {
         assertMissingPassword(() -> adminService.add(admin));
         assertMissingPassword(() -> businessService.add(business));
         assertMissingPassword(() -> userService.add(user));
+    }
+
+    @Test
+    void accountUpdatesIgnoreBlankPasswords() {
+        bindCurrentAccount(1, RoleEnum.ADMIN);
+        Admin admin = new Admin();
+        admin.setPassword(" ");
+        Business business = new Business();
+        business.setPassword("");
+        User user = new User();
+        user.setPassword(" ");
+
+        adminService.updateById(admin);
+        businessService.updateById(business);
+        userService.updateById(user);
+
+        assertNull(admin.getPassword());
+        assertNull(business.getPassword());
+        assertNull(user.getPassword());
+        verify(adminMapper).updateById(admin);
+        verify(businessMapper).updateById(business);
+        verify(userMapper).updateById(user);
     }
 
     private void assertMissingPassword(Runnable action) {

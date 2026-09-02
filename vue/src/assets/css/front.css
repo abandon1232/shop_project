@@ -52,7 +52,7 @@
     width: 100%;
     margin: 0 auto;
 }
-/* Element UI style overrides. */
+/* Element Plus style overrides. */
 .el-menu.el-menu--horizontal {
     border: none !important;
     height: 59px;
