@@ -115,4 +115,17 @@ class CatalogMigrationTest {
         assertTrue(pom.contains("<artifactId>spring-boot-starter-flyway</artifactId>"));
         assertTrue(configuration.contains("baseline-on-migrate: true"));
     }
+
+    @Test
+    void catalogueSellerMigrationRenamesOnlyBlankOrNumericCatalogueOwners() throws IOException {
+        String sql = new ClassPathResource("db/migration/V8__normalize_catalog_seller_name.sql")
+                .getContentAsString(StandardCharsets.UTF_8);
+
+        assertTrue(sql.matches("(?s).*UPDATE\\s+business\\s+SET\\s+name\\s*=\\s*'NorrByte Electronics'"
+                        + "\\s+WHERE\\s+EXISTS\\s*\\(\\s*SELECT\\s+1\\s+FROM\\s+goods\\s+WHERE"
+                        + "\\s+goods\\.business_id\\s*=\\s*business\\.id\\s+AND\\s+goods\\.img"
+                        + "\\s+LIKE\\s*'/images/catalog/products/%'\\s*\\)\\s+AND\\s*\\(\\s*TRIM\\(name\\)"
+                        + "\\s*=\\s*''\\s+OR\\s+TRIM\\(name\\)\\s+REGEXP\\s*'\\^\\[0-9\\]\\+\\$'\\s*\\).*"),
+                "The seller migration must rename only blank or numeric catalogue owners");
+    }
 }
