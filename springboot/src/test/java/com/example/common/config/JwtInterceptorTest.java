@@ -17,6 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -61,5 +63,32 @@ class JwtInterceptorTest {
 
         assertTrue(interceptor.preHandle(request, new MockHttpServletResponse(), new Object()));
         assertSame(account, request.getAttribute("currentUser"));
+    }
+
+    @Test
+    void allowsReadOnlyStorefrontRequestsWithoutAToken() {
+        List<String> publicPaths = List.of(
+                "/goods/featured",
+                "/goods/selectByTypeId",
+                "/goods/selectByName",
+                "/type/selectAll",
+                "/type/selectById/3",
+                "/notice/selectAll");
+
+        for (String path : publicPaths) {
+            MockHttpServletRequest request = new MockHttpServletRequest("GET", path);
+
+            assertTrue(interceptor.preHandle(request, new MockHttpServletResponse(), new Object()), path);
+        }
+    }
+
+    @Test
+    void stillRequiresATokenForWritesToPublicResourcePaths() {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/goods/featured");
+
+        CustomException error = assertThrows(CustomException.class,
+                () -> interceptor.preHandle(request, new MockHttpServletResponse(), new Object()));
+
+        assertEquals(ResultCodeEnum.TOKEN_INVALID_ERROR.code, error.getCode());
     }
 }

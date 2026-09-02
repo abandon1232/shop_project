@@ -38,12 +38,26 @@ public interface GoodsMapper {
 
     List<Goods> selectFeatured(@Param("limit") int limit);
 
-    @Select("select * from goods where type_id = #{id}")
+    @Select("""
+            select goods.*, type.name as typeName, business.name as businessName
+            from goods
+            join business on goods.business_id = business.id
+            left join type on goods.type_id = type.id
+            where goods.type_id = #{id} and business.status = 'APPROVED'
+            order by goods.id desc
+            """)
     List<Goods> selectByTypeId(Integer id);
 
     @Select("select * from goods where business_id = #{id}")
     List<Goods> selectByBusinessId(Integer id);
 
-    @Select("select * from goods where name like concat('%', #{name}, '%')")
+    @Select("""
+            select goods.*, type.name as typeName, business.name as businessName
+            from goods
+            join business on goods.business_id = business.id
+            left join type on goods.type_id = type.id
+            where goods.name like concat('%', #{name}, '%') and business.status = 'APPROVED'
+            order by goods.id desc
+            """)
     List<Goods> selectByName(String name);
 }

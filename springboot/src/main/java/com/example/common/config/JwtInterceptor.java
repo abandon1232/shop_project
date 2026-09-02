@@ -24,6 +24,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
+import java.util.Set;
 
 /**
  * JWT authentication interceptor.
@@ -32,6 +33,12 @@ import java.util.Arrays;
 public class JwtInterceptor implements HandlerInterceptor {
 
     private static final Logger log = LoggerFactory.getLogger(JwtInterceptor.class);
+    private static final Set<String> PUBLIC_GET_PATHS = Set.of(
+            "/goods/featured",
+            "/goods/selectByTypeId",
+            "/goods/selectByName",
+            "/type/selectAll",
+            "/notice/selectAll");
 
     @Resource
     private AdminService adminService;
@@ -42,7 +49,7 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        if ("GET".equalsIgnoreCase(request.getMethod()) && request.getRequestURI().startsWith("/files/")) {
+        if (isPublicGetRequest(request)) {
             return true;
         }
         // 1. Read the token from the HTTP request header.
@@ -83,6 +90,16 @@ public class JwtInterceptor implements HandlerInterceptor {
         authorize(handler, account);
         request.setAttribute(Constants.CURRENT_USER, account);
         return true;
+    }
+
+    private boolean isPublicGetRequest(HttpServletRequest request) {
+        if (!"GET".equalsIgnoreCase(request.getMethod())) {
+            return false;
+        }
+        String requestUri = request.getRequestURI();
+        return requestUri.startsWith("/files/")
+                || requestUri.startsWith("/type/selectById/")
+                || PUBLIC_GET_PATHS.contains(requestUri);
     }
 
     private void authorize(Object handler, Account account) {
