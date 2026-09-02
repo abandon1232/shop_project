@@ -31,6 +31,7 @@ const routes = [
       { path: 'search', name: 'Search', meta: { name: 'Search', public: true }, component: () => import('../views/front/Search.vue') },
       { path: 'product/:id', name: 'ProductDetail', meta: { name: 'Product details', public: true }, component: () => import('../views/front/ProductDetail.vue') },
       { path: 'orders', name: 'CustomerOrders', meta: { name: 'My orders' }, component: () => import('../views/front/Orders.vue') },
+      { path: 'cart', name: 'CustomerCart', meta: { name: 'Cart', roles: ['USER'] }, component: () => import('../views/front/Cart.vue') },
     ],
   },
   { path: '/login', name: 'Login', meta: { name: 'Sign in', public: true }, component: () => import('../views/Login.vue') },

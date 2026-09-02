@@ -59,6 +59,30 @@ describe('router', () => {
     expect(router.currentRoute.value.query.redirect).toBe('/front/orders')
   })
 
+  it('protects the customer cart from guests and non-customer accounts', async () => {
+    const cartRoute = router.getRoutes().find(route => route.name === 'CustomerCart')
+
+    expect(cartRoute.path).toBe('/front/cart')
+    expect(cartRoute.meta.roles).toEqual(['USER'])
+
+    await router.push('/front/cart')
+    expect(router.currentRoute.value.path).toBe('/login')
+
+    localStorage.setItem('xm-user', JSON.stringify({ id: 3, role: 'USER', token: 'token' }))
+    await router.push('/front/cart')
+    expect(router.currentRoute.value.path).toBe('/front/cart')
+
+    localStorage.setItem('xm-user', JSON.stringify({ id: 7, role: 'BUSINESS', token: 'token' }))
+    await router.push('/front/home')
+    await router.push('/front/cart')
+    expect(router.currentRoute.value.path).toBe('/403')
+
+    localStorage.setItem('xm-user', JSON.stringify({ id: 1, role: 'ADMIN', token: 'token' }))
+    await router.push('/front/home')
+    await router.push('/front/cart')
+    expect(router.currentRoute.value.path).toBe('/403')
+  })
+
   it('stops a seller from opening administrator-only pages', async () => {
     localStorage.setItem('xm-user', JSON.stringify({ id: 7, role: 'BUSINESS', token: 'token' }))
 
