@@ -65,7 +65,11 @@ export default {
               let user = res.data
               localStorage.setItem("xm-user", JSON.stringify(res.data))  // Cache the authenticated account.
               if (user.role === 'USER') {
-                this.$router.push('/front/home')
+                const requested = this.$route.query.redirect
+                const destination = typeof requested === 'string' && requested.startsWith('/front/')
+                  ? requested
+                  : '/front/home'
+                this.$router.push(destination)
               } else {
                 this.$router.push('/home')
               }

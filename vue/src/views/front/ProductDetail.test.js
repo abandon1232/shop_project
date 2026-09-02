@@ -20,10 +20,7 @@ describe('ProductDetail', () => {
   function mountDetail() {
     const request = {
       get: vi.fn(() => Promise.resolve({ code: '200', data: product })),
-      post: vi.fn(() => Promise.resolve({
-        code: '200',
-        data: { orderNumber: 'NB-20260902-ABCD1234' },
-      })),
+      post: vi.fn(() => Promise.resolve({ code: '200' })),
     }
     const router = { push: vi.fn() }
     const message = { error: vi.fn(), success: vi.fn() }
@@ -45,7 +42,7 @@ describe('ProductDetail', () => {
     return { request, router, message, wrapper }
   }
 
-  it('loads and presents a purchasable product without a unit suffix', async () => {
+  it('loads a product with an add-to-cart action without a unit suffix', async () => {
     const { request, wrapper } = mountDetail()
     await flushPromises()
 
@@ -55,19 +52,21 @@ describe('ProductDetail', () => {
     expect(wrapper.text()).toContain(product.typeName)
     expect(wrapper.text()).toContain('NorrByte Market')
     expect(wrapper.text()).toContain('14 in stock')
-    expect(wrapper.text()).toContain('Buy now')
+    expect(wrapper.text()).toContain('Add to cart')
+    expect(wrapper.text()).not.toContain('Buy now')
+    expect(wrapper.text()).not.toContain('Demo checkout')
     expect(wrapper.text()).toMatch(/10[\s\u00a0]990,00\s*kr/)
     expect(wrapper.text()).not.toContain('/ p')
   })
 
-  it('does not expose a numeric seller profile name on the storefront', async () => {
+  it('shows the seller business name from the product', async () => {
     const originalBusinessName = product.businessName
-    product.businessName = '11'
+    product.businessName = 'Nordic Sound AB'
     const { wrapper } = mountDetail()
     await flushPromises()
 
-    expect(wrapper.text()).toContain('Approved marketplace seller')
-    expect(wrapper.text()).not.toContain('Sold by11')
+    expect(wrapper.text()).toContain('Nordic Sound AB')
+    expect(wrapper.text()).not.toContain('Approved marketplace seller')
     product.businessName = originalBusinessName
   })
 
@@ -75,7 +74,7 @@ describe('ProductDetail', () => {
     const { router, wrapper } = mountDetail()
     await flushPromises()
 
-    await wrapper.vm.buyNow()
+    await wrapper.vm.addToCart()
 
     expect(router.push).toHaveBeenCalledWith({
       path: '/login',
@@ -83,16 +82,17 @@ describe('ProductDetail', () => {
     })
   })
 
-  it('places an order using only product id and quantity', async () => {
+  it('adds a product to the cart using only product id and quantity', async () => {
     localStorage.setItem('xm-user', JSON.stringify({ id: 3, role: 'USER', token: 'signed-token' }))
     const { message, request, wrapper } = mountDetail()
     await flushPromises()
     wrapper.vm.quantity = 2
 
-    await wrapper.vm.buyNow()
+    await wrapper.vm.addToCart()
     await flushPromises()
 
-    expect(request.post).toHaveBeenCalledWith('/orders/add', { goodsId: 7, quantity: 2 })
-    expect(message.success).toHaveBeenCalledWith('Order NB-20260902-ABCD1234 placed successfully')
+    expect(request.post).toHaveBeenCalledWith('/cart/items', { goodsId: 7, quantity: 2 })
+    expect(message.success).toHaveBeenCalledWith('Added to cart')
+    expect(wrapper.emitted('cart-updated')).toBeTruthy()
   })
 })
