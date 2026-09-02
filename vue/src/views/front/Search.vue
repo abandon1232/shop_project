@@ -15,7 +15,7 @@
               <el-col :lg="6" :md="8" :sm="12" :xs="24" v-for="item in goodsData" :key="item.id">
                 <div class="product-card">
                   <div class="image-container">
-                    <img :src="item.img" alt="" class="product-image">
+                    <img :src="item.img || productPlaceholder" :alt="item.name" class="product-image" @error="handleImageError">
                   </div>
                   <div class="product-info">
                     <h3 class="product-name">{{item.name}}</h3>
@@ -39,7 +39,7 @@
             <div v-for="item in recommendData" :key="item.id" 
                  class="recommend-item">
               <div class="image-container">
-                <img :src="item.img" alt="" class="product-image">
+                <img :src="item.img || productPlaceholder" :alt="item.name" class="product-image" @error="handleImageError">
               </div>
               <div class="product-info">
                 <h3 class="product-name">{{item.name}}</h3>
@@ -57,7 +57,9 @@
 </template>
 
 <script>
+import productPlaceholder from '@/assets/imgs/product-placeholder.webp'
 import { formatSek } from '@/utils/format'
+import { applyImageFallback } from '@/utils/imageFallback'
 
 export default {
 
@@ -66,6 +68,7 @@ export default {
     return {
       user: JSON.parse(localStorage.getItem('xm-user') || '{}'),
       name,
+      productPlaceholder,
       goodsData: [],
       recommendData: [],
     }
@@ -77,6 +80,9 @@ export default {
   // Click handlers and data loaders for this page.
   methods: {
     formatSek,
+    handleImageError(event) {
+      applyImageFallback(event, productPlaceholder)
+    },
     loadRecommend() {
       this.$request.get('/goods/featured').then(res => {
         if (res.code === '200') {

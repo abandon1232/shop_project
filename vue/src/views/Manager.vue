@@ -3,7 +3,7 @@
     <!--  Header.  -->
     <div class="manager-header">
       <div class="manager-header-left">
-        <img src="@/assets/imgs/logo.png" />
+        <span class="manager-brand-mark" aria-hidden="true">N</span>
         <div class="title">NorrByte Admin</div>
       </div>
 
@@ -17,7 +17,8 @@
       <div class="manager-header-right">
         <el-dropdown placement="bottom">
           <div class="avatar">
-            <img :src="user.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" />
+            <img v-if="user.avatar" :src="user.avatar" :alt="user.name || 'Account avatar'" />
+            <span v-else class="manager-user-mark">{{ userInitial }}</span>
             <div>{{ user.name || 'Administrator' }}</div>
           </div>
           <template #dropdown>
@@ -80,6 +81,11 @@ export default {
     if (!this.user.id) {
       this.$router.push('/login')
     }
+  },
+  computed: {
+    userInitial() {
+      return (this.user.name || this.user.username || 'N').charAt(0).toUpperCase()
+    },
   },
   methods: {
     updateUser() {

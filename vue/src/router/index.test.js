@@ -30,4 +30,10 @@ describe('router', () => {
 
     expect(publicPaths).toEqual(expect.arrayContaining(['/login', '/register']))
   })
+
+  it('allows signed-out visitors to browse the storefront', async () => {
+    await router.push('/front/home')
+
+    expect(router.currentRoute.value.path).toBe('/front/home')
+  })
 })

@@ -16,9 +16,25 @@
     align-items: center
 }
 
-.manager-header-left img {
+.manager-brand-mark,
+.manager-user-mark {
+    display: grid;
+    place-items: center;
     width: 40px;
     height: 40px;
+    background: #e76f2e;
+    color: #fff;
+    font-weight: 800;
+}
+
+.manager-brand-mark {
+    border-radius: 9px;
+    font-size: 21px;
+}
+
+.manager-user-mark {
+    margin-right: 5px;
+    border-radius: 50%;
 }
 
 .manager-header-left .title {

@@ -3,10 +3,27 @@
     padding: 0;
     box-sizing: border-box;
 }
+
+:root {
+    color: #142033;
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+}
+
 body {
     font-size: 14px;
-    background-color: #efebeb;
+    background-color: #f3f5f7;
+    color: #142033;
 }
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
 a {
     text-decoration: none;
 }

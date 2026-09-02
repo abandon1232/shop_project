@@ -24,10 +24,10 @@ const routes = [
     name: 'Front',
     component: () => import('../views/Front.vue'),
     children: [
-      { path: 'home', name: 'StoreHome', meta: { name: 'Store' }, component: () => import('../views/front/Home.vue') },
+      { path: 'home', name: 'StoreHome', meta: { name: 'Store', public: true }, component: () => import('../views/front/Home.vue') },
       { path: 'person', name: 'Person', meta: { name: 'Profile' }, component: () => import('../views/front/Person.vue') },
-      { path: 'type', name: 'StoreType', meta: { name: 'Category' }, component: () => import('../views/front/Type.vue') },
-      { path: 'search', name: 'Search', meta: { name: 'Search' }, component: () => import('../views/front/Search.vue') },
+      { path: 'type', name: 'StoreType', meta: { name: 'Category', public: true }, component: () => import('../views/front/Type.vue') },
+      { path: 'search', name: 'Search', meta: { name: 'Search', public: true }, component: () => import('../views/front/Search.vue') },
     ],
   },
   { path: '/login', name: 'Login', meta: { name: 'Sign in', public: true }, component: () => import('../views/Login.vue') },
