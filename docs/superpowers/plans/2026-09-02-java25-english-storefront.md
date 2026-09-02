@@ -6,7 +6,7 @@
 
 **Architecture:** Preserve the existing Spring Boot modular monolith, MyBatis mappers, Flyway schema history, custom JWT request context, and Vue Options API. Apply compatibility changes in small commits, use a new Flyway migration for persisted status values, centralize frontend status and currency presentation, and keep all new static imagery local and original.
 
-**Tech Stack:** Java 25, Spring Boot 4.1.1, Maven 3.9.16 Wrapper, MyBatis Spring Boot 4.1.0, PageHelper Spring Boot 4.1.1, MySQL, Flyway, Vue 3.5.42, Vue Router 5.3.0, Element Plus 2.14.5, Axios 1.20.0, Vite 8.2.2, Vitest 4.1.11, Vue Test Utils 2.5.0, Node.js 24 LTS.
+**Tech Stack:** Java 25, Spring Boot 4.1.1, Maven 3.9.16 Wrapper, MyBatis Spring Boot 4.1.0, PageHelper Spring Boot 4.1.1, MySQL, Flyway, Vue 3.5.42, Vue Router 5.3.1, Element Plus 2.14.5, Axios 1.20.0, Vite 8.2.2, Vitest 4.1.11, Vue Test Utils 2.5.0, Node.js 24 LTS.
 
 **Spec:** `docs/superpowers/specs/2026-09-02-java25-english-storefront-design.md`
 
@@ -380,7 +380,7 @@ export const formatSek = value => sekFormatter.format(Number(value) || 0)
 
 - [ ] **Step 4: Upgrade routing and add lint tooling**
 
-Set `vue-router` to `5.3.0`. Add `eslint` 10.6.0, `@eslint/js` 10.6.0, `eslint-plugin-vue` 10.4.1, and `globals` 17.7.0 as pinned dev dependencies compatible with Node 24. Add:
+Set `vue-router` to `5.3.1`. Add `eslint` 10.9.1, `@eslint/js` 10.0.1, `eslint-plugin-vue` 10.10.0, and `globals` 17.12.0 as pinned dev dependencies compatible with Node 24. Add:
 
 ```json
 "lint": "eslint .",

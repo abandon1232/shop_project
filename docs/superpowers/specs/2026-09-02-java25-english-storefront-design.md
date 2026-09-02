@@ -37,7 +37,7 @@ The Spring Boot 4 migration must preserve the existing JSON `Result` envelope, r
 ### Frontend
 
 - Vue 3.5.42.
-- Vue Router 5.3.0, upgraded from 4.6.4.
+- Vue Router 5.3.1, upgraded from 4.6.4.
 - Element Plus 2.14.5.
 - Axios 1.20.0.
 - Vite 8.2.2 and `@vitejs/plugin-vue` 6.0.8.
@@ -196,7 +196,7 @@ Commits should remain reviewable and should not mix unrelated user files or work
 
 ## Acceptance Criteria
 
-- The project builds and tests with Java 25, Spring Boot 4.1.1, MyBatis 4.1.0, Node 24, Vue 3.5.42, and Vue Router 5.3.0.
+- The project builds and tests with Java 25, Spring Boot 4.1.1, MyBatis 4.1.0, Node 24, Vue 3.5.42, and Vue Router 5.3.1.
 - Existing authentication, authorization, ownership, validation, pagination, upload, and featured-product behaviour remains correct.
 - Existing Chinese business status values migrate safely and all code paths use the new English codes.
 - Application-controlled source, UI, API messages, tests, and README are English.
