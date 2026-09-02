@@ -23,7 +23,7 @@
         <div class="detail-meta">
           <div>
             <span>Sold by</span>
-            <strong>{{ product.businessName || 'NorrByte Market' }}</strong>
+            <strong>{{ sellerName }}</strong>
           </div>
           <div>
             <span>Availability</span>
@@ -74,6 +74,13 @@ import { applyImageFallback } from '@/utils/imageFallback'
 
 export default {
   name: 'ProductDetail',
+  computed: {
+    sellerName() {
+      const name = String(this.product?.businessName || '').trim()
+      if (!name) return 'NorrByte Market'
+      return /^\d+$/.test(name) ? 'Approved marketplace seller' : name
+    },
+  },
   data() {
     return {
       user: JSON.parse(localStorage.getItem('xm-user') || '{}'),

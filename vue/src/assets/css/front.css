@@ -81,6 +81,7 @@
 .front-header-right {
     display: flex;
     justify-content: flex-end;
+    min-width: 0;
 }
 
 .guest-actions,
@@ -95,6 +96,8 @@
 
 .front-header-dropdown {
     gap: 10px;
+    min-width: 0;
+    max-width: 100%;
     color: #fff;
     cursor: pointer;
 }
@@ -114,8 +117,17 @@
 }
 
 .account-name {
+    display: flex;
+    min-width: 0;
     color: #fff;
     font-weight: 600;
+}
+
+.account-name span:first-child {
+    overflow: hidden;
+    max-width: 170px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .main-content {

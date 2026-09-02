@@ -60,6 +60,17 @@ describe('ProductDetail', () => {
     expect(wrapper.text()).not.toContain('/ p')
   })
 
+  it('does not expose a numeric seller profile name on the storefront', async () => {
+    const originalBusinessName = product.businessName
+    product.businessName = '11'
+    const { wrapper } = mountDetail()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Approved marketplace seller')
+    expect(wrapper.text()).not.toContain('Sold by11')
+    product.businessName = originalBusinessName
+  })
+
   it('sends a guest to sign in with a return address', async () => {
     const { router, wrapper } = mountDetail()
     await flushPromises()

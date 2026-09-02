@@ -49,4 +49,37 @@ describe('Management orders', () => {
     expect(request.put).toHaveBeenCalledWith('/orders/status', { id: 41, status: 'PROCESSING' })
     expect(success).toHaveBeenCalledWith('Order status updated')
   })
+
+  it('uses a friendly seller label for an imported numeric profile name', async () => {
+    localStorage.setItem('xm-user', JSON.stringify({ id: 1, role: 'ADMIN' }))
+    const request = {
+      get: vi.fn(() => Promise.resolve({
+        code: '200',
+        data: {
+          list: [{
+            id: 42,
+            orderNumber: 'NB-20260902-EFGH5678',
+            customerName: 'A customer with a deliberately long account name',
+            businessName: '11',
+            productName: 'Climate Mini Sensor',
+            quantity: 1,
+            totalPrice: 449,
+            status: 'CANCELLED',
+            createdAt: '2026-09-02T18:15:00',
+          }],
+          total: 1,
+        },
+      })),
+    }
+    const wrapper = mount(Orders, {
+      global: {
+        mocks: { $request: request, $message: { success: vi.fn(), error: vi.fn() } },
+        stubs: { ElPagination: true },
+      },
+    })
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Approved marketplace seller')
+    expect(wrapper.text()).not.toContain('Customer account11')
+  })
 })

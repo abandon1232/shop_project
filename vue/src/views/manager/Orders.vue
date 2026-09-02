@@ -14,7 +14,7 @@
       <div v-else-if="orders.length" class="management-order-list">
         <article v-for="order in orders" :key="order.id" class="management-order-card">
           <div class="order-identity"><span>{{ order.orderNumber }}</span><strong>{{ order.productName }}</strong><small>{{ formatDate(order.createdAt) }}</small></div>
-          <div class="order-customer"><span>Customer</span><strong>{{ order.customerName || 'Customer account' }}</strong><small v-if="user.role === 'ADMIN'">{{ order.businessName || 'NorrByte Market' }}</small></div>
+          <div class="order-customer"><span>Customer</span><strong>{{ order.customerName || 'Customer account' }}</strong><small v-if="user.role === 'ADMIN'">{{ sellerName(order.businessName) }}</small></div>
           <div class="order-value"><span>{{ order.quantity }} item{{ order.quantity === 1 ? '' : 's' }}</span><strong>{{ formatSek(order.totalPrice) }}</strong></div>
           <div class="order-state"><span class="status-pill" :class="`status-${orderStatusTone(order.status)}`">{{ orderStatusLabel(order.status) }}</span></div>
           <div class="order-actions">
@@ -59,6 +59,11 @@ export default {
     formatDate(value) {
       const date = new Date(value)
       return Number.isNaN(date.getTime()) ? 'Date unavailable' : dateFormatter.format(date)
+    },
+    sellerName(value) {
+      const name = String(value || '').trim()
+      if (!name) return 'NorrByte Market'
+      return /^\d+$/.test(name) ? 'Approved marketplace seller' : name
     },
     load(pageNum) {
       this.pageNum = pageNum || 1

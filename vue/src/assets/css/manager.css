@@ -210,6 +210,8 @@
     border-radius: 11px;
 }
 
+.management-order-card > div { min-width: 0; }
+
 .order-identity span,
 .order-identity strong,
 .order-identity small,
@@ -223,6 +225,9 @@
 .order-value span { color: #7a8797; font-size: 11px; }
 .order-identity strong,
 .order-customer strong { margin: 5px 0; }
+.order-identity strong,
+.order-customer strong,
+.order-customer small { overflow-wrap: anywhere; }
 .order-identity small,
 .order-customer small { color: #8b97a5; }
 .order-value strong { margin-top: 5px; font-size: 16px; }
@@ -257,8 +262,7 @@
     .nav-symbol,
     .storefront-link { display: none; }
     .manager-nav-section a { white-space: nowrap; }
-    .manager-topbar { position: static; padding: 10px 16px; }
-    .manager-topbar > div { display: none; }
+    .manager-topbar { display: none; }
     .manager-account { margin-left: auto; }
     .manager-content { padding: 20px 14px; }
     .dashboard-lower-grid { grid-template-columns: 1fr; }
