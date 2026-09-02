@@ -74,4 +74,16 @@ public interface GoodsMapper {
 
     @Update("update goods set count = count + #{quantity} where id = #{id}")
     int increaseStock(@Param("id") Integer id, @Param("quantity") Integer quantity);
+
+    @Select("select count(*) from goods")
+    long countAll();
+
+    @Select("select count(*) from goods where business_id = #{businessId}")
+    long countByBusinessId(Integer businessId);
+
+    @Select("select count(*) from goods where count <= 5")
+    long countLowStock();
+
+    @Select("select count(*) from goods where business_id = #{businessId} and count <= 5")
+    long countLowStockByBusinessId(Integer businessId);
 }

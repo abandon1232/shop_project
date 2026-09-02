@@ -1,6 +1,7 @@
 package com.example.mapper;
 
 import com.example.entity.Type;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -33,5 +34,8 @@ public interface TypeMapper {
       * Find all matching records.
     */
     List<Type> selectAll(Type type);
+
+    @Select("select count(*) from type")
+    long countAll();
 
 }

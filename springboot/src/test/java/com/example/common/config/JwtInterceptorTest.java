@@ -69,6 +69,7 @@ class JwtInterceptorTest {
     void allowsReadOnlyStorefrontRequestsWithoutAToken() {
         List<String> publicPaths = List.of(
                 "/goods/featured",
+                "/goods/selectById",
                 "/goods/selectByTypeId",
                 "/goods/selectByName",
                 "/type/selectAll",

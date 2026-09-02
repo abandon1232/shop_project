@@ -35,6 +35,7 @@ public class JwtInterceptor implements HandlerInterceptor {
     private static final Logger log = LoggerFactory.getLogger(JwtInterceptor.class);
     private static final Set<String> PUBLIC_GET_PATHS = Set.of(
             "/goods/featured",
+            "/goods/selectById",
             "/goods/selectByTypeId",
             "/goods/selectByName",
             "/type/selectAll",
