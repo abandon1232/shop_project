@@ -12,7 +12,7 @@ describe('router', () => {
 
     expect(new Set(names).size).toBe(names.length)
     expect(names).toEqual(expect.arrayContaining([
-      'ManagerHome', 'ManagerType', 'StoreHome', 'StoreType',
+      'ManagerHome', 'ManagerType', 'StoreHome', 'StoreType', 'ProductDetail',
     ]))
   })
 
@@ -35,5 +35,15 @@ describe('router', () => {
     await router.push('/front/home')
 
     expect(router.currentRoute.value.path).toBe('/front/home')
+  })
+
+  it('allows signed-out visitors to open a product detail route', async () => {
+    const detailRoute = router.getRoutes().find(route => route.name === 'ProductDetail')
+
+    expect(detailRoute.path).toBe('/front/product/:id')
+    expect(detailRoute.meta.public).toBe(true)
+
+    await router.push('/front/product/7')
+    expect(router.currentRoute.value.path).toBe('/front/product/7')
   })
 })

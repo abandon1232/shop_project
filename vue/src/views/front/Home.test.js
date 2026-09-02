@@ -1,5 +1,6 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import ProductCard from '@/components/ProductCard.vue'
 import Home from './Home.vue'
 
 describe('store home', () => {
@@ -25,11 +26,13 @@ describe('store home', () => {
       }),
     }
 
+    const router = { push: vi.fn() }
     const wrapper = mount(Home, {
       global: {
         mocks: {
           $request: request,
           $message: { error() {} },
+          $router: router,
         },
         stubs: {
           ElCarousel: { template: '<div><slot /></div>' },
@@ -46,5 +49,10 @@ describe('store home', () => {
     expect(wrapper.text()).toContain('Shop by category')
     expect(wrapper.text()).toContain('Nordic desk lamp')
     expect(wrapper.text()).toMatch(/1[\s\u00a0]299,00\s*kr/)
+    expect(wrapper.text()).not.toContain('/ each')
+    expect(wrapper.findComponent(ProductCard).exists()).toBe(true)
+
+    wrapper.findComponent(ProductCard).vm.$emit('select', { id: 7 })
+    expect(router.push).toHaveBeenCalledWith({ name: 'ProductDetail', params: { id: 7 } })
   })
 })

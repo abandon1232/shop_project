@@ -64,19 +64,12 @@
         </div>
 
         <div v-if="featuredData.length" class="products-grid">
-          <article v-for="item in featuredData" :key="item.id" class="product-card">
-            <div class="product-image">
-              <img :src="item.img || productPlaceholder" :alt="item.name" @error="handleImageError">
-            </div>
-            <div class="product-info">
-              <span class="product-kicker">{{ item.typeName || 'Marketplace product' }}</span>
-              <h3 class="product-name">{{ item.name }}</h3>
-              <div class="product-price">
-                <span class="amount">{{ formatSek(item.price) }}</span>
-                <span v-if="item.unit" class="unit">/ {{ item.unit }}</span>
-              </div>
-            </div>
-          </article>
+          <ProductCard
+            v-for="item in featuredData"
+            :key="item.id"
+            :product="item"
+            @select="openProduct"
+          />
         </div>
         <div v-else class="product-empty">
           <img :src="productPlaceholder" alt="Generic wireless speaker">
@@ -94,11 +87,12 @@
 import heroHome from '@/assets/imgs/hero-home.webp'
 import heroWorkspace from '@/assets/imgs/hero-workspace.webp'
 import productPlaceholder from '@/assets/imgs/product-placeholder.webp'
-import { formatSek } from '@/utils/format'
+import ProductCard from '@/components/ProductCard.vue'
 import { applyImageFallback } from '@/utils/imageFallback'
 
 export default {
   name: 'StoreHome',
+  components: { ProductCard },
   data() {
     return {
       typeData: [],
@@ -129,7 +123,6 @@ export default {
     this.loadFeatured()
   },
   methods: {
-    formatSek,
     handleImageError(event) {
       applyImageFallback(event, productPlaceholder)
     },
@@ -153,6 +146,9 @@ export default {
     },
     navTo(url) {
       this.$router.push(url)
+    },
+    openProduct(product) {
+      this.$router.push({ name: 'ProductDetail', params: { id: product.id } })
     },
     scrollToProducts() {
       document.getElementById('featured-products')?.scrollIntoView({ behavior: 'smooth' })
