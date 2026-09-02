@@ -9,12 +9,16 @@ A full-stack portfolio project for administrator, merchant, and customer workflo
 - Role checks, self-service account access, seller ownership checks, and seller approval rules
 - BCrypt password storage and Bean Validation request checks
 - Product and category management with non-negative price and stock validation
-- Public storefront browsing, pagination, category filtering, search, and a deterministic latest-products feed
+- Public storefront browsing, category filtering, search, clickable product cards, and product detail pages
+- Six English catalogue categories, 18 realistic products, and 24 local WebP catalogue images
+- Transactional customer ordering with server-side prices, atomic stock updates, and customer order history
+- Administrator and seller order fulfilment with guarded status transitions and stock restoration on cancellation
+- Role-scoped management dashboards for catalogue, order, revenue, account, and low-stock totals
 - JPEG, PNG, and GIF uploads with decoded-content validation, a 5 MiB limit, generated filenames, and path isolation
 - Flyway-managed MySQL schema migrations
 - JUnit/Mockito backend tests, Vitest frontend tests, and GitHub Actions verification
 
-`count` represents current stock. The latest-products feed is deliberately not described as a personalized recommendation system because the application has no interaction data or recommender evaluation.
+`count` represents current stock. The featured-products feed is deliberately not described as a personalized recommendation system because the application has no interaction data or recommender evaluation.
 
 ## Technology stack
 
@@ -69,6 +73,8 @@ FLUSH PRIVILEGES;
 ```
 
 Flyway creates and versions the tables when the API starts.
+
+Migration `V3__replace_demo_catalog.sql` removes the old demo products and categories, then loads the current English catalogue. Existing account records are preserved. Migration `V4__create_customer_orders.sql` adds the order table.
 
 ### 2. Configure and start the backend
 
@@ -138,6 +144,15 @@ npm run dev
 
 Open `http://localhost:8080/front/home`. If Vite reports that port 8080 is already in use and selects another port, update `CORS_ALLOWED_ORIGIN` to that exact origin and restart the backend.
 
+## Main demo flows
+
+- Visitor: browse categories, search, open a product, and inspect stock and price.
+- Customer: register or sign in, buy a product, and review the order under **My orders**.
+- Seller: sign in after approval, maintain owned products, review owned orders, and update fulfilment status.
+- Administrator: manage the whole catalogue and accounts, review all orders, and use the global dashboard.
+
+This project intentionally stops before payment processing. The purchase button creates a persisted demonstration order but does not collect payment details.
+
 ## Verification
 
 Run the same main checks used by continuous integration:
@@ -161,12 +176,13 @@ npm audit --omit=dev --audit-level=high
 - Visitors may browse the storefront, product categories, and search results without signing in.
 - Public users may log in and register customer or seller accounts; public administrator registration is blocked.
 - Customers may read or update only their own account profile.
-- Sellers may read or update only their own profile and may modify only their own products after approval.
-- Administrators may manage accounts, approvals, categories, notices, products, and uploaded files.
+- Customers may create orders from the server-side product price and see only their own order history.
+- Sellers may read or update only their own profile, may modify only their own products after approval, and may manage only their own orders.
+- Administrators may manage accounts, approvals, categories, notices, products, uploaded files, and all orders.
 
 ## Scope
 
-This is a shop management and catalogue storefront, not a production commerce platform. Orders, checkout, payment, shipping, transactional inventory history, and personalized recommendations are outside its current scope. The single backend and SPA keep deployment and code review understandable for an early-career portfolio.
+This is a shop management and catalogue storefront, not a production commerce platform. Real payments, carrier integrations, refunds, invoices, transactional inventory history, and personalized recommendations remain outside its scope. The single backend and SPA keep deployment and code review understandable for an early-career portfolio.
 
 ## Author
 

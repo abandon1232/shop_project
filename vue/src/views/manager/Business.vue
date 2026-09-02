@@ -79,7 +79,7 @@
               class="avatar-uploader"
               :action="$baseUrl + '/files/upload'"
               :headers="{ token: user.token }"
-              accept="image/jpeg,image/png,image/webp"
+              accept="image/jpeg,image/png,image/gif"
               list-type="picture"
               :on-success="handleAvatarSuccess"
           >
