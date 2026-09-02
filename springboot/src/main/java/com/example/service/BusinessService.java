@@ -1,7 +1,5 @@
 package com.example.service;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.example.common.enums.ResultCodeEnum;
 import com.example.common.enums.RoleEnum;
 import com.example.common.enums.StatusEnum;
@@ -34,18 +32,18 @@ public class BusinessService {
      * Create a record.
      */
     public void add(Business business) {
-        if (StrUtil.isBlank(business.getPassword())) {
+        if (business.getPassword() == null || business.getPassword().isBlank()) {
             throw new CustomException(ResultCodeEnum.PARAM_LOST_ERROR);
         }
         Business dbBusiness = businessMapper.selectByUsername(business.getUsername());
-        if (ObjectUtil.isNotNull(dbBusiness)) {
+        if (dbBusiness != null) {
             throw new CustomException(ResultCodeEnum.USER_EXIST_ERROR);
         }
         business.setPassword(passwordService.encode(business.getPassword()));
-        if (ObjectUtil.isEmpty(business.getName())) {
+        if (business.getName() == null || business.getName().isEmpty()) {
             business.setName(business.getUsername());
         }
-        if (ObjectUtil.isEmpty(business.getStatus())){
+        if (business.getStatus() == null || business.getStatus().isEmpty()) {
             business.setStatus(StatusEnum.CHECKING.status);
         }
         business.setRole(RoleEnum.BUSINESS.name());
@@ -82,7 +80,7 @@ public class BusinessService {
             business.setRole(null);
             business.setStatus(null);
         }
-        if (StrUtil.isBlank(business.getPassword())) {
+        if (business.getPassword() == null || business.getPassword().isBlank()) {
             business.setPassword(null);
         } else if (passwordService.needsUpgrade(business.getPassword())) {
             business.setPassword(passwordService.encode(business.getPassword()));
@@ -128,7 +126,7 @@ public class BusinessService {
      */
     public Account login(Account account) {
         Business dbBusiness = businessMapper.selectByUsername(account.getUsername());
-        if (ObjectUtil.isNull(dbBusiness)) {
+        if (dbBusiness == null) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
         if (!passwordService.matches(account.getPassword(), dbBusiness.getPassword())) {
@@ -160,7 +158,7 @@ public class BusinessService {
      */
     public void updatePassword(Account account) {
         Business dbBusiness = businessMapper.selectByUsername(account.getUsername());
-        if (ObjectUtil.isNull(dbBusiness)) {
+        if (dbBusiness == null) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
         if (!passwordService.matches(account.getPassword(), dbBusiness.getPassword())) {

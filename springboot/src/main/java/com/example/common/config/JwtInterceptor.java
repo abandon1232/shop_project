@@ -1,6 +1,5 @@
 package com.example.common.config;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -49,7 +48,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         // 1. Read the token from the HTTP request header.
         String token = request.getHeader(Constants.TOKEN);
         // 2. Start authentication.
-        if (ObjectUtil.isEmpty(token)) {
+        if (token == null || token.isEmpty()) {
             throw new CustomException(ResultCodeEnum.TOKEN_INVALID_ERROR);
         }
         Account account = null;
@@ -71,7 +70,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         } catch (Exception e) {
             throw new CustomException(ResultCodeEnum.TOKEN_CHECK_ERROR);
         }
-        if (ObjectUtil.isNull(account)) {
+        if (account == null) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
         try {

@@ -1,6 +1,5 @@
 package com.example.service;
 
-import cn.hutool.core.date.DateUtil;
 import com.example.entity.Account;
 import com.example.entity.Notice;
 import com.example.mapper.NoticeMapper;
@@ -9,6 +8,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -24,7 +24,7 @@ public class NoticeService {
      * Create a record.
      */
     public void add(Notice notice) {
-        notice.setTime(DateUtil.today());
+        notice.setTime(LocalDate.now().toString());
         Account currentUser = TokenUtils.getCurrentUser();
         notice.setUser(currentUser.getUsername());
         noticeMapper.insert(notice);

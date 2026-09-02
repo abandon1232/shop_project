@@ -1,6 +1,5 @@
 package com.example.utils;
 
-import cn.hutool.core.date.DateUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.example.common.Constants;
@@ -10,6 +9,8 @@ import com.example.exception.CustomException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 
 /**
@@ -22,7 +23,7 @@ public class TokenUtils {
      */
     public static String createToken(String data, String sign) {
         return JWT.create().withAudience(data) // Store userId-role in the token audience claim.
-                .withExpiresAt(DateUtil.offsetHour(new Date(), 2)) // Expire the token after two hours.
+                .withExpiresAt(Date.from(Instant.now().plus(Duration.ofHours(2)))) // Expire after two hours.
                 .sign(Algorithm.HMAC256(sign)); // Use the stored password hash as the token signing key.
     }
 

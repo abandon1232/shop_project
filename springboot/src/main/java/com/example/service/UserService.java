@@ -1,7 +1,5 @@
 package com.example.service;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.example.common.enums.ResultCodeEnum;
 import com.example.common.enums.RoleEnum;
 import com.example.entity.Account;
@@ -33,15 +31,15 @@ public class UserService {
      * Create a record.
      */
     public void add(User user) {
-        if (StrUtil.isBlank(user.getPassword())) {
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
             throw new CustomException(ResultCodeEnum.PARAM_LOST_ERROR);
         }
         User dbUser = userMapper.selectByUsername(user.getUsername());
-        if (ObjectUtil.isNotNull(dbUser)) {
+        if (dbUser != null) {
             throw new CustomException(ResultCodeEnum.USER_EXIST_ERROR);
         }
         user.setPassword(passwordService.encode(user.getPassword()));
-        if (ObjectUtil.isEmpty(user.getName())) {
+        if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getUsername());
         }
 
@@ -78,7 +76,7 @@ public class UserService {
             user.setPassword(null);
             user.setRole(null);
         }
-        if (StrUtil.isBlank(user.getPassword())) {
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
             user.setPassword(null);
         } else if (passwordService.needsUpgrade(user.getPassword())) {
             user.setPassword(passwordService.encode(user.getPassword()));
@@ -124,7 +122,7 @@ public class UserService {
      */
     public Account login(Account account) {
         User dbUser = userMapper.selectByUsername(account.getUsername());
-        if (ObjectUtil.isNull(dbUser)) {
+        if (dbUser == null) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
         if (!passwordService.matches(account.getPassword(), dbUser.getPassword())) {
@@ -156,7 +154,7 @@ public class UserService {
      */
     public void updatePassword(Account account) {
         User dbUser = userMapper.selectByUsername(account.getUsername());
-        if (ObjectUtil.isNull(dbUser)) {
+        if (dbUser == null) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
         if (!passwordService.matches(account.getPassword(), dbUser.getPassword())) {
