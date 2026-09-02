@@ -31,3 +31,6 @@ Thumbs.db
 
 # Temporary local backup used during repository cleanup
 .local_backup/
+
+# Local Git worktrees
+/.worktrees/
