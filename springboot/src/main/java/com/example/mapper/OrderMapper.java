@@ -14,7 +14,10 @@ public interface OrderMapper {
 
     List<CustomerOrder> selectAll(CustomerOrder filter);
 
-    int updateStatus(@Param("id") Integer id, @Param("status") String status);
+    int updateStatus(
+            @Param("id") Integer id,
+            @Param("currentStatus") String currentStatus,
+            @Param("newStatus") String newStatus);
 
     @Select("select count(*) from customer_order")
     long countAll();

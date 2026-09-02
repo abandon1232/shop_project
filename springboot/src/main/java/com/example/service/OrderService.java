@@ -115,10 +115,12 @@ public class OrderService {
             throw new CustomException(ResultCodeEnum.INVALID_ORDER_STATUS);
         }
 
+        if (orderMapper.updateStatus(order.getId(), current.name(), request.status().name()) != 1) {
+            throw new CustomException(ResultCodeEnum.INVALID_ORDER_STATUS);
+        }
         if (request.status() == OrderStatus.CANCELLED && order.getGoodsId() != null) {
             goodsMapper.increaseStock(order.getGoodsId(), order.getQuantity());
         }
-        orderMapper.updateStatus(order.getId(), request.status().name());
     }
 
     private String createOrderNumber() {

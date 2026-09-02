@@ -139,17 +139,19 @@ class OrderServiceTest {
                 () -> service.updateStatus(new OrderStatusRequest(41, OrderStatus.PROCESSING)));
 
         assertEquals("4031", error.getCode());
-        verify(orderMapper, never()).updateStatus(any(), any());
+        verify(orderMapper, never()).updateStatus(any(), any(), any());
     }
 
     @Test
     void placedOrderCanMoveToProcessing() {
         bindAccount(1, RoleEnum.ADMIN);
         when(orderMapper.selectById(41)).thenReturn(order(41, 9, 7, 2, OrderStatus.PLACED));
+        when(orderMapper.updateStatus(41, OrderStatus.PLACED.name(), OrderStatus.PROCESSING.name()))
+                .thenReturn(1);
 
         service.updateStatus(new OrderStatusRequest(41, OrderStatus.PROCESSING));
 
-        verify(orderMapper).updateStatus(41, OrderStatus.PROCESSING.name());
+        verify(orderMapper).updateStatus(41, OrderStatus.PLACED.name(), OrderStatus.PROCESSING.name());
         verify(goodsMapper, never()).increaseStock(any(), any());
     }
 
@@ -162,7 +164,7 @@ class OrderServiceTest {
                 () -> service.updateStatus(new OrderStatusRequest(41, OrderStatus.CANCELLED)));
 
         assertEquals("4092", error.getCode());
-        verify(orderMapper, never()).updateStatus(any(), any());
+        verify(orderMapper, never()).updateStatus(any(), any(), any());
         verify(goodsMapper, never()).increaseStock(any(), any());
     }
 
@@ -170,12 +172,28 @@ class OrderServiceTest {
     void cancellingPlacedOrderRestoresStockOnce() {
         bindAccount(1, RoleEnum.ADMIN);
         when(orderMapper.selectById(41)).thenReturn(order(41, 9, 7, 2, OrderStatus.PLACED));
+        when(orderMapper.updateStatus(41, OrderStatus.PLACED.name(), OrderStatus.CANCELLED.name()))
+                .thenReturn(1);
 
         service.updateStatus(new OrderStatusRequest(41, OrderStatus.CANCELLED));
 
         InOrder changes = inOrder(goodsMapper, orderMapper);
+        changes.verify(orderMapper).updateStatus(41, OrderStatus.PLACED.name(), OrderStatus.CANCELLED.name());
         changes.verify(goodsMapper).increaseStock(7, 2);
-        changes.verify(orderMapper).updateStatus(41, OrderStatus.CANCELLED.name());
+    }
+
+    @Test
+    void failedConcurrentCancellationDoesNotRestoreStock() {
+        bindAccount(1, RoleEnum.ADMIN);
+        when(orderMapper.selectById(41)).thenReturn(order(41, 9, 7, 2, OrderStatus.PLACED));
+        when(orderMapper.updateStatus(41, OrderStatus.PLACED.name(), OrderStatus.CANCELLED.name()))
+                .thenReturn(0);
+
+        CustomException error = assertThrows(CustomException.class,
+                () -> service.updateStatus(new OrderStatusRequest(41, OrderStatus.CANCELLED)));
+
+        assertEquals("4092", error.getCode());
+        verify(goodsMapper, never()).increaseStock(any(), any());
     }
 
     private Goods goods(int id, int businessId, String name, String img, String price) {

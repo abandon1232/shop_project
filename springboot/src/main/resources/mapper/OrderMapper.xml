@@ -38,7 +38,7 @@
 
     <update id="updateStatus">
         update customer_order
-        set status = #{status}
-        where id = #{id}
+        set status = #{newStatus}
+        where id = #{id} and status = #{currentStatus}
     </update>
 </mapper>
