@@ -1,30 +1,30 @@
 <template>
   <div class="container">
     <div style="width: 400px; padding: 30px; background-color: white; border-radius: 5px;">
-      <div style="text-align: center; font-size: 20px; margin-bottom: 20px; color: #333">欢迎注册</div>
+      <div style="text-align: center; font-size: 20px; margin-bottom: 20px; color: #333">Create your account</div>
       <el-form :model="form" :rules="rules" ref="formRef">
         <el-form-item prop="username">
-          <el-input v-model="form.username" placeholder="请输入账号" />
+          <el-input v-model="form.username" placeholder="Username" />
         </el-form-item>
         <el-form-item prop="password">
-          <el-input v-model="form.password" type="password" placeholder="请输入密码" show-password />
+          <el-input v-model="form.password" type="password" placeholder="Password" show-password />
         </el-form-item>
         <el-form-item prop="confirmPass">
-          <el-input v-model="form.confirmPass" type="password" placeholder="请确认密码" show-password />
+          <el-input v-model="form.confirmPass" type="password" placeholder="Confirm password" show-password />
         </el-form-item>
         <el-form-item>
-          <el-select v-model="form.role" placeholder="请选择角色" style="width: 100%">
-            <el-option label="商家" value="BUSINESS"></el-option>
-            <el-option label="用户" value="USER"></el-option>
+          <el-select v-model="form.role" placeholder="Choose account type" style="width: 100%">
+            <el-option label="Seller" value="BUSINESS"></el-option>
+            <el-option label="Customer" value="USER"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button style="width: 100%; background-color: #333; border-color: #333; color: white" @click="register">注 册</el-button>
+          <el-button style="width: 100%; background-color: #333; border-color: #333; color: white" @click="register">Create account</el-button>
         </el-form-item>
         <div style="display: flex; align-items: center">
           <div style="flex: 1"></div>
           <div style="flex: 1; text-align: right">
-            已有账号？请 <router-link to="/login">登录</router-link>
+            Already registered? <router-link to="/login">Sign in</router-link>
           </div>
         </div>
       </el-form>
@@ -39,9 +39,9 @@ export default {
     // Validate the confirmation password.
     const validatePassword = (rule, confirmPass, callback) => {
       if (confirmPass === '') {
-        callback(new Error('请确认密码'))
+        callback(new Error('Confirm your password'))
       } else if (confirmPass !== this.form.password) {
-        callback(new Error('两次输入的密码不一致'))
+        callback(new Error('The passwords do not match'))
       } else {
         callback()
       }
@@ -50,10 +50,10 @@ export default {
       form: {},
       rules: {
         username: [
-          { required: true, message: '请输入账号', trigger: 'blur' },
+          { required: true, message: 'Enter a username', trigger: 'blur' },
         ],
         password: [
-          { required: true, message: '请输入密码', trigger: 'blur' },
+          { required: true, message: 'Enter a password', trigger: 'blur' },
         ],
         confirmPass: [
           { validator: validatePassword, trigger: 'blur' }
@@ -72,7 +72,7 @@ export default {
           this.$request.post('/register', this.form).then(res => {
             if (res.code === '200') {
               this.$router.push('/login')
-              this.$message.success('注册成功')
+              this.$message.success('Account created successfully')
             } else {
               this.$message.error(res.msg)
             }

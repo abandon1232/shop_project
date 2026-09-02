@@ -15,7 +15,7 @@ describe('store home', () => {
         if (url === '/goods/featured') {
           return Promise.resolve({
             code: '200',
-            data: [{ id: 7, name: '测试商品', price: 20, unit: '件' }],
+            data: [{ id: 7, name: 'Nordic desk lamp', price: 1299, unit: 'each' }],
           })
         }
         if (url === '/type/selectAll') {
@@ -42,7 +42,9 @@ describe('store home', () => {
     expect(requestedUrls).toContain('/goods/featured')
     expect(requestedUrls).not.toContain('/goods/recommend')
     expect(requestedUrls).not.toContain('/goods/selectTop15')
-    expect(wrapper.text()).toContain('最新商品')
-    expect(wrapper.text()).toContain('测试商品')
+    expect(wrapper.text()).toContain('Featured products')
+    expect(wrapper.text()).toContain('Shop by category')
+    expect(wrapper.text()).toContain('Nordic desk lamp')
+    expect(wrapper.text()).toMatch(/1[\s\u00a0]299,00\s*kr/)
   })
 })

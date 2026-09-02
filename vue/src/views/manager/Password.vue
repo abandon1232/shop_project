@@ -2,17 +2,17 @@
   <div>
     <el-card style="width: 50%">
       <el-form ref="formRef" :model="user" :rules="rules" label-width="100px" style="padding-right: 50px">
-        <el-form-item label="原始密码" prop="password">
-          <el-input v-model="user.password" type="password" show-password placeholder="原始密码" />
+        <el-form-item label="Current password" prop="password">
+          <el-input v-model="user.password" type="password" show-password placeholder="Current password" />
         </el-form-item>
-        <el-form-item label="新密码" prop="newPassword">
-          <el-input v-model="user.newPassword" type="password" show-password placeholder="新密码" />
+        <el-form-item label="New password" prop="newPassword">
+          <el-input v-model="user.newPassword" type="password" show-password placeholder="New password" />
         </el-form-item>
-        <el-form-item label="确认新密码" prop="confirmPassword">
-          <el-input v-model="user.confirmPassword" type="password" show-password placeholder="确认密码" />
+        <el-form-item label="Confirm password" prop="confirmPassword">
+          <el-input v-model="user.confirmPassword" type="password" show-password placeholder="Confirm password" />
         </el-form-item>
         <div style="text-align: center; margin-bottom: 20px">
-          <el-button type="primary" @click="update">确认修改</el-button>
+          <el-button type="primary" @click="update">Change password</el-button>
         </div>
       </el-form>
     </el-card>
@@ -25,9 +25,9 @@ export default {
   data() {
     const validatePassword = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('请确认密码'))
+        callback(new Error('Confirm your new password'))
       } else if (value !== this.user.newPassword) {
-        callback(new Error('确认密码错误'))
+        callback(new Error('The passwords do not match'))
       } else {
         callback()
       }
@@ -37,10 +37,10 @@ export default {
       user: JSON.parse(localStorage.getItem('xm-user') || '{}'),
       rules: {
         password: [
-          { required: true, message: '请输入原始密码', trigger: 'blur' },
+          { required: true, message: 'Enter your current password', trigger: 'blur' },
         ],
         newPassword: [
-          { required: true, message: '请输入新密码', trigger: 'blur' },
+          { required: true, message: 'Enter a new password', trigger: 'blur' },
         ],
         confirmPassword: [
           { validator: validatePassword, required: true, trigger: 'blur' },
@@ -59,7 +59,7 @@ export default {
             if (res.code === '200') {
               // Update succeeded.
               localStorage.removeItem('xm-user')   // Clear the cached account.
-              this.$message.success('修改密码成功')
+              this.$message.success('Password changed successfully')
               this.$router.push('/login')
             } else {
               this.$message.error(res.msg)

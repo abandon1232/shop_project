@@ -16,9 +16,8 @@
                 <div class="goods-info">
                   <div class="goods-name">{{item.name}}</div>
                   <div class="goods-price">
-                    <span class="price-symbol">￥</span>
-                    <span class="price-value">{{item.price}}</span>
-                    <span class="price-unit">/ {{item.unit}}</span>
+                    <span class="price-value">{{ formatSek(item.price) }}</span>
+                    <span v-if="item.unit" class="price-unit">/ {{ item.unit }}</span>
                   </div>
                 </div>
               </div>
@@ -29,7 +28,7 @@
       
       <div class="recommend-section">
         <div class="section-header">
-          <h2 class="section-title">最新商品</h2>
+          <h2 class="section-title">Latest products</h2>
           <div class="section-divider"></div>
         </div>
         <div class="recommend-list">
@@ -40,9 +39,8 @@
             <div class="goods-info">
               <div class="goods-name">{{item.name}}</div>
               <div class="goods-price">
-                <span class="price-symbol">￥</span>
-                <span class="price-value">{{item.price}}</span>
-                <span class="price-unit">/ {{item.unit}}</span>
+                <span class="price-value">{{ formatSek(item.price) }}</span>
+                <span v-if="item.unit" class="price-unit">/ {{ item.unit }}</span>
               </div>
             </div>
           </div>
@@ -53,6 +51,7 @@
 </template>
 
 <script>
+import { formatSek } from '@/utils/format'
 
 export default {
 
@@ -71,8 +70,9 @@ export default {
     this.loadType()
     this.loadRecommend()
   },
-  // methods：Click handlers and other methods for this page
+  // Click handlers and data loaders for this page.
   methods: {
+    formatSek,
     loadRecommend() {
       this.$request.get('/goods/featured').then(res => {
         if (res.code === '200') {

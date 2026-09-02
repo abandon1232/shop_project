@@ -1,30 +1,30 @@
 <template>
   <div class="container">
     <div style="width: 400px; padding: 30px; background-color: white; border-radius: 5px;">
-      <div style="text-align: center; font-size: 20px; margin-bottom: 20px; color: #333">欢迎登录在线购物商城系统</div>
+      <div style="text-align: center; font-size: 20px; margin-bottom: 20px; color: #333">Sign in to NorrByte Market</div>
       <el-form :model="form" :rules="rules" ref="formRef">
         <el-form-item prop="username">
-          <el-input v-model="form.username" placeholder="请输入账号" />
+          <el-input v-model="form.username" placeholder="Username" />
         </el-form-item>
         <el-form-item prop="password">
-          <el-input v-model="form.password" type="password" placeholder="请输入密码" show-password />
+          <el-input v-model="form.password" type="password" placeholder="Password" show-password />
         </el-form-item>
         <el-form-item>
-          <el-select v-model="form.role" placeholder="请选择角色" style="width: 100%">
-            <el-option label="管理员" value="ADMIN"></el-option>
-            <el-option label="商家" value="BUSINESS"></el-option>
-            <el-option label="用户" value="USER"></el-option>
+          <el-select v-model="form.role" placeholder="Choose account type" style="width: 100%">
+            <el-option label="Administrator" value="ADMIN"></el-option>
+            <el-option label="Seller" value="BUSINESS"></el-option>
+            <el-option label="Customer" value="USER"></el-option>
           </el-select>
         </el-form-item>
 
 
         <el-form-item>
-          <el-button style="width: 100%; background-color: 	#4169E1; border-color: 	#4169E1; color: white" @click="login">登 录</el-button>
+          <el-button style="width: 100%; background-color: #4169E1; border-color: #4169E1; color: white" @click="login">Sign in</el-button>
         </el-form-item>
         <div style="display: flex; align-items: center">
           <div style="flex: 1"></div>
           <div style="flex: 1; text-align: right">
-            还没有账号？请 <router-link to="/register">注册</router-link>
+            New here? <router-link to="/register">Create an account</router-link>
           </div>
         </div>
       </el-form>
@@ -39,9 +39,9 @@ export default {
     return {
       form: {  },
       rules: {
-        username: [{ required: true, message: '请输入账号', trigger: 'blur' },],
-        password: [{ required: true, message: '请输入密码', trigger: 'blur' },],
-        role: [{ required: true, message: '请选择角色', trigger: 'blur' },],
+        username: [{ required: true, message: 'Enter your username', trigger: 'blur' },],
+        password: [{ required: true, message: 'Enter your password', trigger: 'blur' },],
+        role: [{ required: true, message: 'Choose an account type', trigger: 'blur' },],
       }
     }
   },
@@ -63,7 +63,7 @@ export default {
                 this.$router.push('/home')
               }
 
-              this.$message.success('登录成功')
+              this.$message.success('Signed in successfully')
             } else {
               this.$message.error(res.msg)
             }

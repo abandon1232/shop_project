@@ -4,7 +4,7 @@
       <div class="search-header">
         <div class="search-title">
           <span class="search-icon">⌕</span>
-          <span class="search-text">搜索"{{name}}"的结果</span>
+          <span class="search-text">Search results for “{{ name }}”</span>
         </div>
       </div>
 
@@ -20,9 +20,8 @@
                   <div class="product-info">
                     <h3 class="product-name">{{item.name}}</h3>
                     <div class="product-price">
-                      <span class="currency">￥</span>
-                      <span class="amount">{{item.price}}</span>
-                      <span class="unit">/ {{item.unit}}</span>
+                      <span class="amount">{{ formatSek(item.price) }}</span>
+                      <span v-if="item.unit" class="unit">/ {{ item.unit }}</span>
                     </div>
                   </div>
                 </div>
@@ -34,7 +33,7 @@
         <div class="recommend-section">
           <div class="recommend-header">
             <span class="recommend-icon">★</span>
-            <span class="recommend-title">最新商品</span>
+            <span class="recommend-title">Latest products</span>
           </div>
           <div class="recommend-list">
             <div v-for="item in recommendData" :key="item.id" 
@@ -45,9 +44,8 @@
               <div class="product-info">
                 <h3 class="product-name">{{item.name}}</h3>
                 <div class="product-price">
-                  <span class="currency">￥</span>
-                  <span class="amount">{{item.price}}</span>
-                  <span class="unit">/ {{item.unit}}</span>
+                  <span class="amount">{{ formatSek(item.price) }}</span>
+                  <span v-if="item.unit" class="unit">/ {{ item.unit }}</span>
                 </div>
               </div>
             </div>
@@ -59,6 +57,7 @@
 </template>
 
 <script>
+import { formatSek } from '@/utils/format'
 
 export default {
 
@@ -75,8 +74,9 @@ export default {
     this.loadGoods()
     this.loadRecommend()
   },
-  // methods：Click handlers and other methods for this page
+  // Click handlers and data loaders for this page.
   methods: {
+    formatSek,
     loadRecommend() {
       this.$request.get('/goods/featured').then(res => {
         if (res.code === '200') {

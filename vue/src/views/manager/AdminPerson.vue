@@ -15,20 +15,20 @@
             <span v-else class="avatar-uploader-icon">+</span>
           </el-upload>
         </div>
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="user.username" placeholder="用户名" disabled></el-input>
+        <el-form-item label="Username" prop="username">
+          <el-input v-model="user.username" placeholder="Username" disabled></el-input>
         </el-form-item>
-        <el-form-item label="姓名" prop="name">
-          <el-input v-model="user.name" placeholder="姓名"></el-input>
+        <el-form-item label="Name" prop="name">
+          <el-input v-model="user.name" placeholder="Name"></el-input>
         </el-form-item>
-        <el-form-item label="电话" prop="phone">
-          <el-input v-model="user.phone" placeholder="电话"></el-input>
+        <el-form-item label="Phone" prop="phone">
+          <el-input v-model="user.phone" placeholder="Phone number"></el-input>
         </el-form-item>
-        <el-form-item label="邮箱" prop="email">
-          <el-input v-model="user.email" placeholder="邮箱"></el-input>
+        <el-form-item label="Email" prop="email">
+          <el-input v-model="user.email" placeholder="Email address"></el-input>
         </el-form-item>
         <div style="text-align: center; margin-bottom: 20px">
-          <el-button type="primary" @click="update">保 存</el-button>
+          <el-button type="primary" @click="update">Save</el-button>
         </div>
       </el-form>
     </el-card>
@@ -52,7 +52,7 @@ export default {
       this.$request.put('/admin/update', this.user).then(res => {
         if (res.code === '200') {
           // Update succeeded.
-          this.$message.success('保存成功')
+          this.$message.success('Saved successfully')
 
           // Update the cached account in the browser.
           localStorage.setItem('xm-user', JSON.stringify(this.user))

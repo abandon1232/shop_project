@@ -4,16 +4,16 @@
     <div class="front-header">
       <div class="front-header-left" @click="navTo('/front/home')">
         <img src="@/assets/imgs/logo.png" alt="">
-        <div class="title">在线购物商城</div>
+        <div class="title">NorrByte Market</div>
       </div>
       <div class="front-header-center" style="text-align: right">
-        <el-input style="width: 200px" placeholder="请输入商品名称" v-model="name"></el-input>
-        <el-button type="primary" style="margin-left: 5px" @click="search">搜索</el-button>
+        <el-input style="width: 200px" placeholder="Search products" v-model="name"></el-input>
+        <el-button type="primary" style="margin-left: 5px" @click="search">Search</el-button>
       </div>
       <div class="front-header-right">
         <div v-if="!user.username">
-          <el-button @click="$router.push('/login')">登录</el-button>
-          <el-button @click="$router.push('/register')">注册</el-button>
+          <el-button @click="$router.push('/login')">Sign in</el-button>
+          <el-button @click="$router.push('/register')">Create account</el-button>
         </div>
         <div v-else>
           <el-dropdown>
@@ -25,7 +25,7 @@
             </div>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item @click="logout">退出</el-dropdown-item>
+                <el-dropdown-item @click="logout">Sign out</el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>

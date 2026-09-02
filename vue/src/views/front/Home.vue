@@ -4,7 +4,7 @@
       <div class="content-wrapper">
         <!-- Left category navigation. -->
         <div class="category-sidebar">
-          <h2 class="section-title">商品分类</h2>
+          <h2 class="section-title">Shop by category</h2>
           <div class="category-list">
             <div class="category-item" v-for="item in typeData" :key="item.id" @click="navTo('/front/type?id=' + item.id)">
               <img :src="item.img" :alt="item.name">
@@ -25,8 +25,8 @@
           <!-- Latest approved products. -->
           <div class="section-block">
             <div class="section-header">
-              <h2>最新商品</h2>
-              <div class="section-more">查看更多 ></div>
+              <h2>Featured products</h2>
+              <div class="section-more">View all &gt;</div>
             </div>
             <div class="products-grid">
               <div class="product-card" v-for="item in featuredData" :key="item.id">
@@ -36,9 +36,8 @@
                 <div class="product-info">
                   <h3 class="product-name">{{ item.name }}</h3>
                   <div class="product-price">
-                    <span class="currency">¥</span>
-                    <span class="amount">{{ item.price }}</span>
-                    <span class="unit">/ {{ item.unit }}</span>
+                    <span class="amount">{{ formatSek(item.price) }}</span>
+                    <span v-if="item.unit" class="unit">/ {{ item.unit }}</span>
                   </div>
                 </div>
               </div>
@@ -50,7 +49,7 @@
         <div class="user-sidebar">
           <div class="user-profile">
             <img :src="user.avatar" :alt="user.name" @click="navTo('/front/person')">
-            <h3>Hi，{{ user.name }}</h3>
+            <h3>Hi, {{ user.name }}</h3>
           </div>
           <div class="promo-banner">
             <img src="@/assets/imgs/right.png" alt="promotional banner">
@@ -67,6 +66,7 @@
 import carouselOne from '@/assets/imgs/carousel-1.png'
 import carouselTwo from '@/assets/imgs/carousel-2.png'
 import carouselNine from '@/assets/imgs/carousel-9.png'
+import { formatSek } from '@/utils/format'
 export default {
 
   data() {
@@ -85,8 +85,9 @@ export default {
     this.loadType()
     this.loadFeatured()
   },
-  // methods：Click handlers and other methods for this page
+  // Click handlers and data loaders for this page.
   methods: {
+    formatSek,
     loadFeatured(){
       this.$request.get('/goods/featured').then(res => {
         if (res.code === '200') {
