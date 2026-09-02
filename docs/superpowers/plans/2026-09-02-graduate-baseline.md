@@ -256,6 +256,7 @@ git commit -m "fix: validate auth and protect account profiles"
 - Produces: `GoodsService.featured()` returning `goodsMapper.selectFeatured(10)`.
 - Produces: `GoodsMapper.selectFeatured(int limit)`.
 - Replaces: `GET /goods/recommend` with `GET /goods/featured`.
+- Removes: `GET /goods/selectTop15` and `GoodsMapper.selectTop15()` because the application has no sales events that could support a hot-sales ranking.
 
 - [ ] **Step 1: Write failing authorization and approval tests**
 
@@ -351,6 +352,7 @@ Add the mapper query:
 ```
 
 Delete the collaborative-filtering classes and expose only `/goods/featured`.
+Delete `selectTop15` from the controller, service, and mapper. Keep `count` as a required non-negative stock quantity.
 
 - [ ] **Step 7: Run focused and full backend tests and verify GREEN**
 
@@ -576,9 +578,9 @@ Keep the Options API and existing component methods so the migration does not be
 
 - [ ] **Step 4: Remove rich text and update storefront wording**
 
-In `Goods.vue`, remove the editor import, global editor variable, initialization function, editor DOM node, and wangEditor upload URL. Bind `form.description` to `<el-input type="textarea" :rows="6">`. Render `viewData` with interpolation inside a `white-space: pre-wrap` container. Remove `wangeditor` from `package.json` and regenerate the lockfile after the component no longer imports it.
+In `Goods.vue`, remove the editor import, global editor variable, initialization function, editor DOM node, and wangEditor upload URL. Bind `form.description` to `<el-input type="textarea" :rows="6">`, add a required non-negative numeric input for `form.count`, and label the table column `库存数量`. Render `viewData` with interpolation inside a `white-space: pre-wrap` container. Remove `wangeditor` from `package.json` and regenerate the lockfile after the component no longer imports it.
 
-Change Home and Search from `/goods/recommend` to `/goods/featured`, rename the section to `最新商品`, change `PORDUCT catergary` to `商品分类`, change `搜素` to `搜索`, and initialize `Front.vue` search name as `name: ''`.
+Remove Home's unsupported hot-sales section and its `/goods/selectTop15` request. Change Home and Search from `/goods/recommend` to `/goods/featured`, rename the remaining section to `最新商品`, change `PORDUCT catergary` to `商品分类`, change `搜素` to `搜索`, and initialize `Front.vue` search name as `name: ''`.
 
 - [ ] **Step 5: Run focused tests, full tests, and build**
 

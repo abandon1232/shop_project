@@ -58,6 +58,7 @@ The frontend remains a separate SPA. It will migrate from Vue 2/Vue CLI/Element 
 - `/goods/featured` returns at most ten distinct products ordered by descending product ID, which acts as a simple newest-products feed for the current schema.
 - An empty catalogue returns an empty list.
 - The frontend home page uses the new featured-products endpoint.
+- The existing `count` field is presented consistently as stock quantity; the unsupported `热卖商品` section and its count-based ranking endpoint are removed.
 
 ### File uploads
 
