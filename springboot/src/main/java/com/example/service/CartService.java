@@ -39,10 +39,10 @@ public class CartService {
     public CartItem add(AddCartItemRequest request) {
         Account account = currentCustomer();
         validateQuantity(request == null ? null : request.quantity());
+        cartMapper.lockUserById(account.getId());
         Goods goods = goodsService.selectPurchasableById(request.goodsId());
         validateStock(goods, request.quantity());
 
-        cartMapper.lockUserById(account.getId());
         CartItem existing = cartMapper.selectByUserAndGoods(account.getId(), goods.getId());
         int quantity = request.quantity();
         if (existing != null) {

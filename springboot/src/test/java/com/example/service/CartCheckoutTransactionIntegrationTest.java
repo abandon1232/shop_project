@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
                 "spring.datasource.username=sa",
                 "spring.datasource.password=",
                 "spring.datasource.driver-class-name=org.h2.Driver",
+                "spring.datasource.hikari.transaction-isolation=TRANSACTION_REPEATABLE_READ",
                 "spring.flyway.enabled=false",
                 "spring.main.allow-bean-definition-overriding=true"
         })
@@ -98,7 +99,7 @@ class CartCheckoutTransactionIntegrationTest {
         CountDownLatch addStarted = new CountDownLatch(1);
         Future<?> add = executor.submit(() -> {
             addStarted.countDown();
-            return asCustomer(() -> cartService.add(new AddCartItemRequest(2, 1)));
+            return asCustomer(() -> cartService.add(new AddCartItemRequest(1, 1)));
         });
         assertTrue(addStarted.await(5, TimeUnit.SECONDS));
         assertThrows(TimeoutException.class, () -> add.get(500, TimeUnit.MILLISECONDS));
@@ -110,8 +111,7 @@ class CartCheckoutTransactionIntegrationTest {
         assertEquals(1L, count("select count(*) from customer_order"));
         assertEquals(9, stock(1));
         assertEquals(10, stock(2));
-        assertEquals(1L, count("select count(*) from cart_item where user_id = 1 and goods_id = 2 and quantity = 1"));
-        assertEquals(0L, count("select count(*) from cart_item where user_id = 1 and goods_id = 1"));
+        assertEquals(1L, count("select count(*) from cart_item where user_id = 1 and goods_id = 1 and quantity = 1"));
     }
 
     @Test

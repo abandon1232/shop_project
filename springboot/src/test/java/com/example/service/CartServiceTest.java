@@ -69,6 +69,23 @@ class CartServiceTest {
     }
 
     @Test
+    void addingLocksTheCustomerBeforeLoadingProductState() {
+        bindAccount(3, RoleEnum.USER);
+        Goods goods = goods(7, 8, "QuietWave Headphones", "1990.00");
+        CartItem existing = cartItem(14, 3, 7, 2);
+        when(goodsService.selectPurchasableById(7)).thenReturn(goods);
+        when(cartMapper.selectByUserAndGoods(3, 7)).thenReturn(existing);
+        when(cartMapper.updateQuantity(14, 3, 3)).thenReturn(1);
+        when(cartMapper.selectOwnedById(14, 3)).thenReturn(cartItem(14, 3, 7, 3));
+
+        service.add(new AddCartItemRequest(7, 1));
+
+        var sequence = inOrder(cartMapper, goodsService);
+        sequence.verify(cartMapper).lockUserById(3);
+        sequence.verify(goodsService).selectPurchasableById(7);
+    }
+
+    @Test
     void customerCannotUpdateAnotherCustomersLine() {
         bindAccount(3, RoleEnum.USER);
         when(cartMapper.selectOwnedById(99, 3)).thenReturn(null);
@@ -90,7 +107,8 @@ class CartServiceTest {
                 () -> service.add(new AddCartItemRequest(7, 3)));
 
         assertEquals("4091", error.getCode());
-        verifyNoInteractions(cartMapper);
+        verify(cartMapper).lockUserById(3);
+        verify(cartMapper, never()).selectByUserAndGoods(any(), any());
     }
 
     @Test
