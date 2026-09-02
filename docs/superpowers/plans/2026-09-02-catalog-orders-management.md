@@ -23,8 +23,8 @@
 
 New backend files:
 
-- `springboot/src/main/resources/db/migration/V3__replace_demo_catalog.sql` — destructive replacement of catalogue rows and deterministic English seed data.
-- `springboot/src/main/resources/db/migration/V4__create_customer_orders.sql` — order table, indexes, and foreign keys.
+- `springboot/src/main/resources/db/migration/V6__replace_demo_catalog.sql` — destructive replacement of catalogue rows and deterministic English seed data.
+- `springboot/src/main/resources/db/migration/V7__create_customer_orders.sql` — order table, indexes, and foreign keys.
 - `springboot/src/main/java/com/example/common/enums/OrderStatus.java` — allowed persisted order statuses.
 - `springboot/src/main/java/com/example/entity/CustomerOrder.java` — order persistence and API view model.
 - `springboot/src/main/java/com/example/controller/request/PlaceOrderRequest.java` — validated purchase input.
@@ -62,7 +62,7 @@ Existing files modified together:
 
 **Files:**
 - Create: `springboot/src/test/java/com/example/db/CatalogMigrationTest.java`
-- Create: `springboot/src/main/resources/db/migration/V3__replace_demo_catalog.sql`
+- Create: `springboot/src/main/resources/db/migration/V6__replace_demo_catalog.sql`
 - Modify: `springboot/src/main/java/com/example/mapper/GoodsMapper.java`
 - Modify: `springboot/src/main/resources/mapper/GoodsMapper.xml`
 - Modify: `springboot/src/main/java/com/example/service/GoodsService.java`
@@ -82,12 +82,12 @@ Existing files modified together:
 
 - [ ] **Step 1: Write the failing catalogue contract test**
 
-Create a test that loads `db/migration/V3__replace_demo_catalog.sql`, asserts that it contains `DELETE FROM goods` before `DELETE FROM type`, and asserts every exact category and product name listed in Step 3. Also assert all 24 expected `.webp` paths are present in the migration or filesystem.
+Create a test that loads `db/migration/V6__replace_demo_catalog.sql`, asserts that it contains `DELETE FROM goods` before `DELETE FROM type`, and asserts every exact category and product name listed in Step 3. Also assert all 24 expected `.webp` paths are present in the migration or filesystem.
 
 ```java
 @Test
 void migrationReplacesOldCatalogueWithSixCategoriesAndEighteenProducts() throws IOException {
-    String sql = new ClassPathResource("db/migration/V3__replace_demo_catalog.sql")
+    String sql = new ClassPathResource("db/migration/V6__replace_demo_catalog.sql")
             .getContentAsString(StandardCharsets.UTF_8);
     assertTrue(sql.indexOf("DELETE FROM goods") < sql.indexOf("DELETE FROM type"));
     assertAll(CATEGORY_NAMES.stream().map(name -> () -> assertTrue(sql.contains(name))));
@@ -100,11 +100,11 @@ void migrationReplacesOldCatalogueWithSixCategoriesAndEighteenProducts() throws 
 
 Run: `cd springboot; .\mvnw.cmd -Dtest=CatalogMigrationTest test`
 
-Expected: FAIL because `V3__replace_demo_catalog.sql` does not exist.
+Expected: FAIL because `V6__replace_demo_catalog.sql` does not exist.
 
 - [ ] **Step 3: Add the deterministic English catalogue migration**
 
-Write `V3__replace_demo_catalog.sql` with this exact inventory:
+Write `V6__replace_demo_catalog.sql` with this exact inventory:
 
 | Category | Product slug | Product name | Price (SEK) | Stock |
 |---|---|---|---:|---:|
@@ -307,7 +307,7 @@ git commit -m "feat: add product details and clickable catalogue cards"
 ### Task 3: Implement Transactional Orders
 
 **Files:**
-- Create: `springboot/src/main/resources/db/migration/V4__create_customer_orders.sql`
+- Create: `springboot/src/main/resources/db/migration/V7__create_customer_orders.sql`
 - Create: `springboot/src/main/java/com/example/common/enums/OrderStatus.java`
 - Create: `springboot/src/main/java/com/example/entity/CustomerOrder.java`
 - Create: `springboot/src/main/java/com/example/controller/request/PlaceOrderRequest.java`
@@ -661,7 +661,7 @@ git commit -m "feat: redesign administrator and seller management"
 
 - [ ] **Step 1: Document the demo flow**
 
-Explain that Flyway replaces existing catalogue rows on the first run containing V3, preserves accounts, creates `customer_order`, and does not process real payments. Add exact administrator/seller/customer walkthroughs and keep the existing two-terminal commands.
+Explain that Flyway replaces existing catalogue rows when V6 first runs, preserves accounts, creates `customer_order` in V7, and does not process real payments. Add exact administrator/seller/customer walkthroughs and keep the existing two-terminal commands.
 
 - [ ] **Step 2: Run backend verification on Java 25**
 
@@ -687,7 +687,7 @@ Expected: Node 24, all Vitest files passing, ESLint exit code 0, and Vite produc
 
 - [ ] **Step 4: Run MySQL-backed API smoke checks**
 
-Start the backend with the configured `DB_USERNAME` and `DB_PASSWORD`. Verify Flyway applies V3 and V4, then confirm:
+Start the backend with the configured `DB_USERNAME` and `DB_PASSWORD`. Verify Flyway applies V6 and V7, then confirm:
 
 ```text
 GET  /type/selectAll                 -> 6 categories

@@ -1,3 +1,4 @@
+-- Persist the intentionally simple checkout and fulfilment workflow.
 CREATE TABLE IF NOT EXISTS customer_order (
     id INT NOT NULL AUTO_INCREMENT,
     order_number VARCHAR(64) NOT NULL,

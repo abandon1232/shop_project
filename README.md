@@ -72,9 +72,9 @@ GRANT ALL PRIVILEGES ON manager.* TO 'shop_app'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
-Flyway creates and versions the tables when the API starts.
+Flyway creates and versions the tables when the API starts. For an existing pre-Flyway copy of this project, it records the original core schema as version 1 and then applies the later migrations.
 
-Migration `V3__replace_demo_catalog.sql` removes the old demo products and categories, then loads the current English catalogue. Existing account records are preserved. Migration `V4__create_customer_orders.sql` adds the order table.
+Migrations V1–V5 are retained unchanged for compatibility with earlier copies of the project. Migration `V6__replace_demo_catalog.sql` removes the old demo products and categories, then loads the current English catalogue while preserving accounts. Migration `V7__create_customer_orders.sql` adds the current order table.
 
 ### 2. Configure and start the backend
 

@@ -77,7 +77,7 @@ class CatalogMigrationTest {
 
     @Test
     void migrationReplacesOldCatalogueWithSixCategoriesAndEighteenProducts() throws IOException {
-        String sql = new ClassPathResource("db/migration/V3__replace_demo_catalog.sql")
+        String sql = new ClassPathResource("db/migration/V6__replace_demo_catalog.sql")
                 .getContentAsString(StandardCharsets.UTF_8);
 
         int goodsDelete = sql.indexOf("DELETE FROM goods");
@@ -104,5 +104,15 @@ class CatalogMigrationTest {
                 () -> assertTrue(Files.isRegularFile(
                         catalogueRoot.resolve("products").resolve(slug + ".webp")),
                         "Missing product image: " + slug)));
+    }
+
+    @Test
+    void springBootFourLoadsFlywayAndCanBaselineTheExistingSchema() throws IOException {
+        String pom = Files.readString(Path.of("pom.xml"));
+        String configuration = new ClassPathResource("application.yml")
+                .getContentAsString(StandardCharsets.UTF_8);
+
+        assertTrue(pom.contains("<artifactId>spring-boot-starter-flyway</artifactId>"));
+        assertTrue(configuration.contains("baseline-on-migrate: true"));
     }
 }

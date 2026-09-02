@@ -1,3 +1,4 @@
+-- Replace the earlier portfolio catalogue while preserving all accounts.
 DELETE FROM goods;
 DELETE FROM type;
 
