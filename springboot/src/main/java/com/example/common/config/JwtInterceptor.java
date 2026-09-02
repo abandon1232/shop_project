@@ -48,10 +48,6 @@ public class JwtInterceptor implements HandlerInterceptor {
         }
         // 1. Read the token from the HTTP request header.
         String token = request.getHeader(Constants.TOKEN);
-        if (ObjectUtil.isEmpty(token)) {
-            // Fall back to the request parameter when the header is absent.
-            token = request.getParameter(Constants.TOKEN);
-        }
         // 2. Start authentication.
         if (ObjectUtil.isEmpty(token)) {
             throw new CustomException(ResultCodeEnum.TOKEN_INVALID_ERROR);
@@ -86,6 +82,7 @@ public class JwtInterceptor implements HandlerInterceptor {
             throw new CustomException(ResultCodeEnum.TOKEN_CHECK_ERROR);
         }
         authorize(handler, account);
+        request.setAttribute(Constants.CURRENT_USER, account);
         return true;
     }
 
