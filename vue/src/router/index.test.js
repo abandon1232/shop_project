@@ -46,4 +46,15 @@ describe('router', () => {
     await router.push('/front/product/7')
     expect(router.currentRoute.value.path).toBe('/front/product/7')
   })
+
+  it('protects customer order history', async () => {
+    const orderRoute = router.getRoutes().find(route => route.name === 'CustomerOrders')
+
+    expect(orderRoute.path).toBe('/front/orders')
+    expect(orderRoute.meta.public).not.toBe(true)
+
+    await router.push('/front/orders')
+    expect(router.currentRoute.value.path).toBe('/login')
+    expect(router.currentRoute.value.query.redirect).toBe('/front/orders')
+  })
 })

@@ -25,6 +25,8 @@
             </div>
             <template #dropdown>
               <el-dropdown-menu>
+                <el-dropdown-item v-if="user.role === 'USER'" @click="navTo('/front/orders')">My orders</el-dropdown-item>
+                <el-dropdown-item v-if="user.role === 'USER'" @click="navTo('/front/person')">Profile</el-dropdown-item>
                 <el-dropdown-item @click="logout">Sign out</el-dropdown-item>
               </el-dropdown-menu>
             </template>

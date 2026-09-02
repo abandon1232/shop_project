@@ -20,15 +20,20 @@ describe('ProductDetail', () => {
   function mountDetail() {
     const request = {
       get: vi.fn(() => Promise.resolve({ code: '200', data: product })),
+      post: vi.fn(() => Promise.resolve({
+        code: '200',
+        data: { orderNumber: 'NB-20260902-ABCD1234' },
+      })),
     }
     const router = { push: vi.fn() }
+    const message = { error: vi.fn(), success: vi.fn() }
     const wrapper = mount(ProductDetail, {
       global: {
         mocks: {
           $route: { params: { id: '7' }, fullPath: '/front/product/7' },
           $router: router,
           $request: request,
-          $message: { error: vi.fn() },
+          $message: message,
         },
         stubs: {
           ElButton: { template: '<button><slot /></button>' },
@@ -37,7 +42,7 @@ describe('ProductDetail', () => {
         },
       },
     })
-    return { request, router, wrapper }
+    return { request, router, message, wrapper }
   }
 
   it('loads and presents a purchasable product without a unit suffix', async () => {
@@ -65,5 +70,18 @@ describe('ProductDetail', () => {
       path: '/login',
       query: { redirect: '/front/product/7' },
     })
+  })
+
+  it('places an order using only product id and quantity', async () => {
+    localStorage.setItem('xm-user', JSON.stringify({ id: 3, role: 'USER', token: 'signed-token' }))
+    const { message, request, wrapper } = mountDetail()
+    await flushPromises()
+    wrapper.vm.quantity = 2
+
+    await wrapper.vm.buyNow()
+    await flushPromises()
+
+    expect(request.post).toHaveBeenCalledWith('/orders/add', { goodsId: 7, quantity: 2 })
+    expect(message.success).toHaveBeenCalledWith('Order NB-20260902-ABCD1234 placed successfully')
   })
 })

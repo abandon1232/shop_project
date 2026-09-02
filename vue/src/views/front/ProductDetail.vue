@@ -49,6 +49,7 @@
             type="primary"
             size="large"
             :disabled="!product.count"
+            :loading="purchasing"
             @click="buyNow"
           >
             Buy now
@@ -80,6 +81,7 @@ export default {
       productFallback,
       quantity: 1,
       loading: true,
+      purchasing: false,
     }
   },
   mounted() {
@@ -106,12 +108,33 @@ export default {
         this.loading = false
       })
     },
-    buyNow() {
+    async buyNow() {
       if (!this.user.token) {
         return this.$router.push({
           path: '/login',
           query: { redirect: this.$route.fullPath },
         })
+      }
+      if (this.user.role !== 'USER') {
+        this.$message.error('Sign in with a customer account to place an order')
+        return undefined
+      }
+      if (this.purchasing) return undefined
+
+      this.purchasing = true
+      try {
+        const res = await this.$request.post('/orders/add', {
+          goodsId: this.product.id,
+          quantity: this.quantity,
+        })
+        if (res.code === '200') {
+          this.$message.success(`Order ${res.data.orderNumber} placed successfully`)
+          await this.loadProduct()
+        } else {
+          this.$message.error(res.msg)
+        }
+      } finally {
+        this.purchasing = false
       }
       return undefined
     },
