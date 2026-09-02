@@ -104,6 +104,25 @@ class GoodsServiceTest {
         verify(goodsMapper).selectFeatured(10);
     }
 
+    @Test
+    void publicDetailUsesPurchasableProductQuery() {
+        Goods stored = goods(20, 7);
+        when(goodsMapper.selectPurchasableById(20)).thenReturn(stored);
+
+        assertSame(stored, service.selectPurchasableById(20));
+        verify(goodsMapper).selectPurchasableById(20);
+    }
+
+    @Test
+    void publicDetailRejectsUnavailableProduct() {
+        when(goodsMapper.selectPurchasableById(20)).thenReturn(null);
+
+        CustomException error = assertThrows(CustomException.class,
+                () -> service.selectPurchasableById(20));
+
+        assertEquals("4041", error.getCode());
+    }
+
     private Goods goods(int id, int businessId) {
         Goods goods = new Goods();
         goods.setId(id);

@@ -92,7 +92,7 @@ public class GoodsController {
      */
     @GetMapping("/selectById")
     public Result selectById(@RequestParam Integer id) {
-        Goods goods = goodsService.selectById(id);
+        Goods goods = goodsService.selectPurchasableById(id);
         return Result.success(goods);
     }
 

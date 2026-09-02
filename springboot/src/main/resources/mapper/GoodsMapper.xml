@@ -30,9 +30,9 @@
     <select id="selectFeatured" resultType="com.example.entity.Goods">
         select goods.*, type.name as typeName, business.name as businessName
         from goods
-        join business on goods.business_id = business.id
+        left join business on goods.business_id = business.id
         left join type on goods.type_id = type.id
-        where business.status = 'APPROVED'
+        where goods.business_id is null or business.status = 'APPROVED'
         order by goods.id desc
         limit #{limit}
     </select>
@@ -43,6 +43,15 @@
                  left join business on goods.business_id = business.id
                  left join type on goods.type_id = type.id
         where goods.id = #{id}
+    </select>
+
+    <select id="selectPurchasableById" resultType="com.example.entity.Goods">
+        select goods.*, business.name as businessName, type.name as typeName
+        from goods
+        left join business on goods.business_id = business.id
+        left join type on goods.type_id = type.id
+        where goods.id = #{id}
+          and (goods.business_id is null or business.status = 'APPROVED')
     </select>
 
     <delete id="deleteById">

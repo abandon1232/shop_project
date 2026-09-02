@@ -3,6 +3,7 @@ package com.example.mapper;
 import com.example.entity.Goods;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -32,6 +33,11 @@ public interface GoodsMapper {
     Goods selectById(Integer id);
 
     /**
+     * Find a product that may be shown and purchased on the public storefront.
+     */
+    Goods selectPurchasableById(Integer id);
+
+    /**
       * Find all matching records.
     */
     List<Goods> selectAll(Goods goods);
@@ -41,9 +47,10 @@ public interface GoodsMapper {
     @Select("""
             select goods.*, type.name as typeName, business.name as businessName
             from goods
-            join business on goods.business_id = business.id
+            left join business on goods.business_id = business.id
             left join type on goods.type_id = type.id
-            where goods.type_id = #{id} and business.status = 'APPROVED'
+            where goods.type_id = #{id}
+              and (goods.business_id is null or business.status = 'APPROVED')
             order by goods.id desc
             """)
     List<Goods> selectByTypeId(Integer id);
@@ -54,10 +61,17 @@ public interface GoodsMapper {
     @Select("""
             select goods.*, type.name as typeName, business.name as businessName
             from goods
-            join business on goods.business_id = business.id
+            left join business on goods.business_id = business.id
             left join type on goods.type_id = type.id
-            where goods.name like concat('%', #{name}, '%') and business.status = 'APPROVED'
+            where goods.name like concat('%', #{name}, '%')
+              and (goods.business_id is null or business.status = 'APPROVED')
             order by goods.id desc
             """)
     List<Goods> selectByName(String name);
+
+    @Update("update goods set count = count - #{quantity} where id = #{id} and count >= #{quantity}")
+    int decreaseStock(@Param("id") Integer id, @Param("quantity") Integer quantity);
+
+    @Update("update goods set count = count + #{quantity} where id = #{id}")
+    int increaseStock(@Param("id") Integer id, @Param("quantity") Integer quantity);
 }

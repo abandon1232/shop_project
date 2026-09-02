@@ -15,6 +15,7 @@ public enum ResultCodeEnum {
     USER_ACCOUNT_ERROR("5003", "Incorrect username or password"),
     USER_NOT_EXIST_ERROR("5004", "Account not found"),
     PARAM_PASSWORD_ERROR("5005", "Current password is incorrect"),
+    PRODUCT_NOT_FOUND("4041", "Product not found"),
     ;
 
     public String code;

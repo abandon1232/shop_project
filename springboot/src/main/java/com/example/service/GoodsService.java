@@ -81,6 +81,17 @@ public class GoodsService {
     }
 
     /**
+     * Find a product that is currently available on the public storefront.
+     */
+    public Goods selectPurchasableById(Integer id) {
+        Goods goods = goodsMapper.selectPurchasableById(id);
+        if (goods == null) {
+            throw new CustomException(ResultCodeEnum.PRODUCT_NOT_FOUND);
+        }
+        return goods;
+    }
+
+    /**
      * Find all matching records.
      */
     public List<Goods> selectAll(Goods goods) {
