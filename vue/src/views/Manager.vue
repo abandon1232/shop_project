@@ -1,105 +1,107 @@
 <template>
-  <div class="manager-container">
-    <!--  Header.  -->
-    <div class="manager-header">
-      <div class="manager-header-left">
-        <img src="@/assets/imgs/logo.png" />
-        <div class="title">后台管理系统</div>
-      </div>
+  <div class="manager-shell">
+    <aside class="manager-sidebar">
+      <button class="manager-brand" type="button" @click="$router.push('/home')">
+        <span class="manager-brand-mark" aria-hidden="true">N</span>
+        <span><strong>NorrByte</strong><small>Management</small></span>
+      </button>
 
-      <div class="manager-header-center">
-        <el-breadcrumb separator-class="el-icon-arrow-right">
-          <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-          <el-breadcrumb-item :to="{ path: $route.path }">{{ $route.meta.name }}</el-breadcrumb-item>
-        </el-breadcrumb>
-      </div>
+      <nav class="manager-navigation" aria-label="Management navigation">
+        <div v-for="section in navigation" :key="section.label" class="manager-nav-section">
+          <p>{{ section.label }}</p>
+          <router-link v-for="item in section.items" :key="item.path" :to="item.path">
+            <span class="nav-symbol" aria-hidden="true">{{ item.symbol }}</span>
+            {{ item.label }}
+          </router-link>
+        </div>
+      </nav>
 
-      <div class="manager-header-right">
-        <el-dropdown placement="bottom">
-          <div class="avatar">
-            <img :src="user.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" />
-            <div>{{ user.name ||  '管理员' }}</div>
-          </div>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item @click.native="goToPerson">个人信息</el-dropdown-item>
-            <el-dropdown-item @click.native="$router.push('/password')">修改密码</el-dropdown-item>
-            <el-dropdown-item @click.native="logout">退出登录</el-dropdown-item>
-          </el-dropdown-menu>
+      <button class="storefront-link" type="button" @click="$router.push('/front/home')">
+        View storefront <span aria-hidden="true">↗</span>
+      </button>
+    </aside>
+
+    <section class="manager-workspace">
+      <header class="manager-topbar">
+        <div><span class="topbar-eyebrow">{{ roleLabel }}</span><strong>{{ $route.meta.name || 'Management' }}</strong></div>
+        <el-dropdown placement="bottom-end">
+          <button class="manager-account" type="button">
+            <img v-if="user.avatar" :src="user.avatar" :alt="user.name || 'Account avatar'">
+            <span v-else class="manager-user-mark">{{ userInitial }}</span>
+            <span class="account-copy"><strong>{{ user.name || user.username || 'Account' }}</strong><small>{{ roleLabel }}</small></span>
+            <span aria-hidden="true">⌄</span>
+          </button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="goToPerson">Profile</el-dropdown-item>
+              <el-dropdown-item @click="$router.push('/password')">Change password</el-dropdown-item>
+              <el-dropdown-item @click="logout">Sign out</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
         </el-dropdown>
-      </div>
-    </div>
+      </header>
 
-    <!--  Main content.  -->
-    <div class="manager-main">
-      <!--  Sidebar.  -->
-      <div class="manager-main-left">
-        <el-menu :default-openeds="['info', 'user']" router style="border: none" :default-active="$route.path">
-          <el-menu-item index="/home">
-            <i class="el-icon-s-home"></i>
-            <span slot="title">系统首页</span>
-          </el-menu-item>
-          <el-submenu index="info">
-            <template slot="title">
-              <i class="el-icon-menu"></i><span>信息管理</span>
-            </template>
-            <el-menu-item v-if="user.role === 'ADMIN'" index="/notice">公告信息</el-menu-item>
-            <el-menu-item v-if="user.role === 'ADMIN'" index="/type">分类信息</el-menu-item>
-            <el-menu-item index="/goods">商品信息</el-menu-item>
-          </el-submenu>
-
-          <el-submenu index="user" v-if="user.role === 'ADMIN'">
-            <template slot="title">
-              <i class="el-icon-menu"></i><span>用户管理</span>
-            </template>
-            <el-menu-item index="/admin">管理员信息</el-menu-item>
-            <el-menu-item index="/business">商家信息</el-menu-item>
-            <el-menu-item index="/user">用户信息</el-menu-item>
-          </el-submenu>
-        </el-menu>
-      </div>
-
-      <!--  Data table.  -->
-      <div class="manager-main-right">
-        <router-view @update:user="updateUser" />
-      </div>
-    </div>
-
+      <main class="manager-content"><router-view @update:user="updateUser" /></main>
+    </section>
   </div>
 </template>
 
 <script>
 export default {
-  name: "Manager",
+  name: 'Manager',
   data() {
-    return {
-      user: JSON.parse(localStorage.getItem('xm-user') || '{}'),
-    }
+    return { user: JSON.parse(localStorage.getItem('xm-user') || '{}') }
+  },
+  computed: {
+    userInitial() {
+      return (this.user.name || this.user.username || 'N').charAt(0).toUpperCase()
+    },
+    roleLabel() {
+      return this.user.role === 'BUSINESS' ? 'Seller workspace' : 'Administrator workspace'
+    },
+    navigation() {
+      const commerce = this.user.role === 'ADMIN'
+        ? [
+            { path: '/goods', label: 'Products', symbol: 'P' },
+            { path: '/type', label: 'Categories', symbol: 'C' },
+            { path: '/orders', label: 'Orders', symbol: 'O' },
+          ]
+        : [
+            { path: '/goods', label: 'My products', symbol: 'P' },
+            { path: '/orders', label: 'My orders', symbol: 'O' },
+          ]
+      const sections = [
+        { label: 'Overview', items: [{ path: '/home', label: 'Dashboard', symbol: 'D' }] },
+        { label: 'Commerce', items: commerce },
+      ]
+      if (this.user.role === 'ADMIN') {
+        sections.push({
+          label: 'People & content',
+          items: [
+            { path: '/business', label: 'Sellers', symbol: 'S' },
+            { path: '/user', label: 'Customers', symbol: 'U' },
+            { path: '/admin', label: 'Administrators', symbol: 'A' },
+            { path: '/notice', label: 'Notices', symbol: 'N' },
+          ],
+        })
+      }
+      return sections
+    },
   },
   created() {
-    if (!this.user.id) {
-      this.$router.push('/login')
-    }
+    if (!this.user.id) this.$router.push('/login')
   },
   methods: {
     updateUser() {
-      this.user = JSON.parse(localStorage.getItem('xm-user') || '{}')   // Reload the latest cached account.
+      this.user = JSON.parse(localStorage.getItem('xm-user') || '{}')
     },
     goToPerson() {
-      if (this.user.role === 'ADMIN') {
-        this.$router.push('/adminPerson')
-      }
-      if (this.user.role === 'BUSINESS') {
-        this.$router.push('/businessPerson')
-      }
+      this.$router.push(this.user.role === 'BUSINESS' ? '/businessPerson' : '/adminPerson')
     },
     logout() {
       localStorage.removeItem('xm-user')
       this.$router.push('/login')
-    }
-  }
+    },
+  },
 }
 </script>
-
-<style scoped>
-@import "@/assets/css/manager.css";
-</style>

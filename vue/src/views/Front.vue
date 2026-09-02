@@ -1,38 +1,39 @@
 <template>
-  <div>
-    <!--Header.-->
-    <div class="front-header">
-      <div class="front-header-left" @click="navTo('/front/home')">
-        <img src="@/assets/imgs/logo.png" alt="">
-        <div class="title">在线购物商城</div>
+  <div class="front-shell">
+    <header class="front-header">
+      <button class="front-header-left" type="button" @click="navTo('/front/home')">
+        <span class="brand-mark" aria-hidden="true">N</span>
+        <span class="title">NorrByte Market</span>
+      </button>
+      <div class="front-header-center">
+        <el-input class="search-input" placeholder="Search products" v-model="name" @keyup.enter="search"></el-input>
+        <el-button class="search-button" @click="search">Search</el-button>
       </div>
-      <div class="front-header-center" style="text-align: right">
-        <el-input style="width: 200px" placeholder="请输入商品名称" v-model="name"></el-input>
-        <el-button type="primary" style="margin-left: 5px" @click="search">搜素</el-button>
-      </div>
-      <div class="front-header-right">
-        <div v-if="!user.username">
-          <el-button @click="$router.push('/login')">登录</el-button>
-          <el-button @click="$router.push('/register')">注册</el-button>
+      <nav class="front-header-right" aria-label="Account navigation">
+        <div v-if="!user.username" class="guest-actions">
+          <el-button text @click="$router.push('/login')">Sign in</el-button>
+          <el-button class="account-button" @click="$router.push('/register')">Create account</el-button>
         </div>
         <div v-else>
           <el-dropdown>
             <div class="front-header-dropdown">
-              <img @click="navTo('/front/person')" :src="user.avatar" alt="">
-              <div style="margin-left: 10px">
-                <span>{{ user.name }}</span><i class="el-icon-arrow-down" style="margin-left: 5px"></i>
+              <img v-if="user.avatar" @click="navTo('/front/person')" :src="user.avatar" :alt="user.name || 'Account avatar'">
+              <button v-else class="user-mark" type="button" @click="navTo('/front/person')">{{ userInitial }}</button>
+              <div class="account-name">
+                <span>{{ user.name }}</span><span style="margin-left: 5px">⌄</span>
               </div>
             </div>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>
-                <div style="text-decoration: none" @click="logout">退出</div>
-              </el-dropdown-item>
-            </el-dropdown-menu>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item v-if="user.role === 'USER'" @click="navTo('/front/orders')">My orders</el-dropdown-item>
+                <el-dropdown-item v-if="user.role === 'USER'" @click="navTo('/front/person')">Profile</el-dropdown-item>
+                <el-dropdown-item @click="logout">Sign out</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </div>
-      </div>
-    </div>
-    <!--Main content.-->
+      </nav>
+    </header>
     <div class="main-body">
       <router-view ref="child" @update:user="updateUser" />
     </div>
@@ -50,12 +51,17 @@ export default {
       top: '',
       notice: [],
       user: JSON.parse(localStorage.getItem("xm-user") || '{}'),
-      name: name,
+      name: '',
     }
   },
 
   mounted() {
     this.loadNotice()
+  },
+  computed: {
+    userInitial() {
+      return (this.user.name || this.user.username || 'N').charAt(0).toUpperCase()
+    },
   },
   methods: {
     loadNotice() {
@@ -78,7 +84,7 @@ export default {
       this.user = JSON.parse(localStorage.getItem('xm-user') || '{}')   // Reload the latest cached account.
     },
     navTo(url) {
-      location.href = url
+      this.$router.push(url)
     },
     // Log out.
     logout() {
@@ -86,8 +92,7 @@ export default {
       this.$router.push("/login");
     },
     search() {
-      let name = this.name ? this.name : ''
-      location.href = '/front/search?name=' + name
+      this.$router.push({ path: '/front/search', query: { name: this.name || '' } })
     },
   }
 

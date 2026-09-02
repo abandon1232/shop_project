@@ -37,4 +37,7 @@ public interface BusinessMapper {
 
     @Select("select * from business where username = #{username}")
     Business selectByUsername(String username);
+
+    @Select("select count(*) from business")
+    long countAll();
 }

@@ -3,8 +3,8 @@
     <div class="search-container">
       <div class="search-header">
         <div class="search-title">
-          <span class="search-icon"><i class="el-icon-search"></i></span>
-          <span class="search-text">搜索"{{name}}"的结果</span>
+          <span class="search-icon">⌕</span>
+          <span class="search-text">Search results for “{{ name }}”</span>
         </div>
       </div>
 
@@ -13,19 +13,7 @@
           <div class="results-grid">
             <el-row :gutter="30">
               <el-col :lg="6" :md="8" :sm="12" :xs="24" v-for="item in goodsData" :key="item.id">
-                <div class="product-card">
-                  <div class="image-container">
-                    <img :src="item.img" alt="" class="product-image">
-                  </div>
-                  <div class="product-info">
-                    <h3 class="product-name">{{item.name}}</h3>
-                    <div class="product-price">
-                      <span class="currency">￥</span>
-                      <span class="amount">{{item.price}}</span>
-                      <span class="unit">/ {{item.unit}}</span>
-                    </div>
-                  </div>
-                </div>
+                <ProductCard :product="item" @select="openProduct" />
               </el-col>
             </el-row>
           </div>
@@ -33,24 +21,16 @@
 
         <div class="recommend-section">
           <div class="recommend-header">
-            <span class="recommend-icon"><i class="el-icon-star-on"></i></span>
-            <span class="recommend-title">猜你喜欢</span>
+            <span class="recommend-icon">★</span>
+            <span class="recommend-title">Latest products</span>
           </div>
           <div class="recommend-list">
-            <div v-for="item in recommendData" :key="item.id" 
-                 class="recommend-item">
-              <div class="image-container">
-                <img :src="item.img" alt="" class="product-image">
-              </div>
-              <div class="product-info">
-                <h3 class="product-name">{{item.name}}</h3>
-                <div class="product-price">
-                  <span class="currency">￥</span>
-                  <span class="amount">{{item.price}}</span>
-                  <span class="unit">/ {{item.unit}}</span>
-                </div>
-              </div>
-            </div>
+            <ProductCard
+              v-for="item in recommendData"
+              :key="item.id"
+              :product="item"
+              @select="openProduct"
+            />
           </div>
         </div>
       </div>
@@ -59,14 +39,16 @@
 </template>
 
 <script>
+import ProductCard from '@/components/ProductCard.vue'
 
 export default {
-
+  name: 'StoreSearch',
+  components: { ProductCard },
   data() {
     let name = this.$route.query.name
     return {
       user: JSON.parse(localStorage.getItem('xm-user') || '{}'),
-      name: name,
+      name,
       goodsData: [],
       recommendData: [],
     }
@@ -75,10 +57,10 @@ export default {
     this.loadGoods()
     this.loadRecommend()
   },
-  // methods：Click handlers and other methods for this page
+  // Click handlers and data loaders for this page.
   methods: {
     loadRecommend() {
-      this.$request.get('/goods/recommend').then(res => {
+      this.$request.get('/goods/featured').then(res => {
         if (res.code === '200') {
           this.recommendData = res.data
         } else {
@@ -87,7 +69,7 @@ export default {
       })
     },
     loadGoods() {
-      this.$request.get('/goods/selectByName?name=' + this.name).then(res => {
+      this.$request.get('/goods/selectByName', { params: { name: this.name || '' } }).then(res => {
         if (res.code === '200') {
           this.goodsData = res.data
         } else {
@@ -95,9 +77,9 @@ export default {
         }
       })
     },
-    navTo(url) {
-      location.href = url
-    }
+    openProduct(product) {
+      this.$router.push({ name: 'ProductDetail', params: { id: product.id } })
+    },
   }
 }
 </script>

@@ -1,7 +1,5 @@
 package com.example.service;
 
-import cn.hutool.core.util.ObjectUtil;
-import com.example.common.Constants;
 import com.example.common.enums.ResultCodeEnum;
 import com.example.common.enums.RoleEnum;
 import com.example.entity.Account;
@@ -32,15 +30,15 @@ public class AdminService {
      * Create a record.
      */
     public void add(Admin admin) {
+        if (admin.getPassword() == null || admin.getPassword().isBlank()) {
+            throw new CustomException(ResultCodeEnum.PARAM_LOST_ERROR);
+        }
         Admin dbAdmin = adminMapper.selectByUsername(admin.getUsername());
-        if (ObjectUtil.isNotNull(dbAdmin)) {
+        if (dbAdmin != null) {
             throw new CustomException(ResultCodeEnum.USER_EXIST_ERROR);
         }
-        if (ObjectUtil.isEmpty(admin.getPassword())) {
-            admin.setPassword(Constants.USER_DEFAULT_PASSWORD);
-        }
         admin.setPassword(passwordService.encode(admin.getPassword()));
-        if (ObjectUtil.isEmpty(admin.getName())) {
+        if (admin.getName() == null || admin.getName().isEmpty()) {
             admin.setName(admin.getUsername());
         }
         admin.setRole(RoleEnum.ADMIN.name());
@@ -67,7 +65,9 @@ public class AdminService {
      * Update a record.
      */
     public void updateById(Admin admin) {
-        if (ObjectUtil.isNotEmpty(admin.getPassword()) && passwordService.needsUpgrade(admin.getPassword())) {
+        if (admin.getPassword() == null || admin.getPassword().isBlank()) {
+            admin.setPassword(null);
+        } else if (passwordService.needsUpgrade(admin.getPassword())) {
             admin.setPassword(passwordService.encode(admin.getPassword()));
         }
         adminMapper.updateById(admin);
@@ -105,7 +105,7 @@ public class AdminService {
      */
     public Account login(Account account) {
         Admin dbAdmin = adminMapper.selectByUsername(account.getUsername());
-        if (ObjectUtil.isNull(dbAdmin)) {
+        if (dbAdmin == null) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
         if (!passwordService.matches(account.getPassword(), dbAdmin.getPassword())) {
@@ -136,7 +136,7 @@ public class AdminService {
      */
     public void updatePassword(Account account) {
         Admin dbAdmin = adminMapper.selectByUsername(account.getUsername());
-        if (ObjectUtil.isNull(dbAdmin)) {
+        if (dbAdmin == null) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
         if (!passwordService.matches(account.getPassword(), dbAdmin.getPassword())) {

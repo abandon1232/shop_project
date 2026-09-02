@@ -1,6 +1,5 @@
 package com.example.common.config;
 
-import cn.hutool.core.util.ObjectUtil;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -25,6 +24,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Arrays;
+import java.util.Set;
 
 /**
  * JWT authentication interceptor.
@@ -33,6 +33,13 @@ import java.util.Arrays;
 public class JwtInterceptor implements HandlerInterceptor {
 
     private static final Logger log = LoggerFactory.getLogger(JwtInterceptor.class);
+    private static final Set<String> PUBLIC_GET_PATHS = Set.of(
+            "/goods/featured",
+            "/goods/selectById",
+            "/goods/selectByTypeId",
+            "/goods/selectByName",
+            "/type/selectAll",
+            "/notice/selectAll");
 
     @Resource
     private AdminService adminService;
@@ -43,17 +50,13 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        if ("GET".equalsIgnoreCase(request.getMethod()) && request.getRequestURI().startsWith("/files/")) {
+        if (isPublicGetRequest(request)) {
             return true;
         }
         // 1. Read the token from the HTTP request header.
         String token = request.getHeader(Constants.TOKEN);
-        if (ObjectUtil.isEmpty(token)) {
-            // Fall back to the request parameter when the header is absent.
-            token = request.getParameter(Constants.TOKEN);
-        }
         // 2. Start authentication.
-        if (ObjectUtil.isEmpty(token)) {
+        if (token == null || token.isEmpty()) {
             throw new CustomException(ResultCodeEnum.TOKEN_INVALID_ERROR);
         }
         Account account = null;
@@ -75,7 +78,7 @@ public class JwtInterceptor implements HandlerInterceptor {
         } catch (Exception e) {
             throw new CustomException(ResultCodeEnum.TOKEN_CHECK_ERROR);
         }
-        if (ObjectUtil.isNull(account)) {
+        if (account == null) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
         try {
@@ -86,7 +89,18 @@ public class JwtInterceptor implements HandlerInterceptor {
             throw new CustomException(ResultCodeEnum.TOKEN_CHECK_ERROR);
         }
         authorize(handler, account);
+        request.setAttribute(Constants.CURRENT_USER, account);
         return true;
+    }
+
+    private boolean isPublicGetRequest(HttpServletRequest request) {
+        if (!"GET".equalsIgnoreCase(request.getMethod())) {
+            return false;
+        }
+        String requestUri = request.getRequestURI();
+        return requestUri.startsWith("/files/")
+                || requestUri.startsWith("/type/selectById/")
+                || PUBLIC_GET_PATHS.contains(requestUri);
     }
 
     private void authorize(Object handler, Account account) {

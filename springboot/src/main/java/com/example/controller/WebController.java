@@ -1,14 +1,13 @@
 package com.example.controller;
 
-import cn.hutool.core.util.ObjectUtil;
-import cn.hutool.core.util.StrUtil;
 import com.example.common.Result;
 import com.example.common.enums.ResultCodeEnum;
-import com.example.common.enums.RoleEnum;
-import com.example.entity.Account;
+import com.example.controller.request.AuthRequest;
+import com.example.controller.request.PasswordChangeRequest;
 import com.example.service.AdminService;
 import com.example.service.BusinessService;
 import com.example.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.annotation.Resource;
@@ -29,71 +28,61 @@ public class WebController {
 
     @GetMapping("/")
     public Result hello() {
-        return Result.success("访问成功");
+        return Result.success("API is running");
     }
 
     /**
      * Authenticate an account.
      */
     @PostMapping("/login")
-    public Result login(@RequestBody Account account) {
-        if (ObjectUtil.isEmpty(account.getUsername()) || ObjectUtil.isEmpty(account.getPassword())
-                || ObjectUtil.isEmpty(account.getRole())) {
-            return Result.error(ResultCodeEnum.PARAM_LOST_ERROR);
-        }
-        if (RoleEnum.ADMIN.name().equals(account.getRole())) {
-            account = adminService.login(account);
-        }
-        if (RoleEnum.BUSINESS.name().equals(account.getRole())) {
-            account = businessService.login(account);
-        }
-        if (RoleEnum.USER.name().equals(account.getRole())) {
-            account = userService.login(account);
-        }
-        return Result.success(account);
+    public Result login(@Valid @RequestBody AuthRequest request) {
+        return switch (request.role()) {
+            case "ADMIN" -> Result.success(adminService.login(request.toAccount()));
+            case "BUSINESS" -> Result.success(businessService.login(request.toAccount()));
+            case "USER" -> Result.success(userService.login(request.toAccount()));
+            default -> Result.error(ResultCodeEnum.PARAM_ERROR);
+        };
     }
 
     /**
      * Register an account.
      */
     @PostMapping("/register")
-    public Result register(@RequestBody Account account) {
-        if (StrUtil.isBlank(account.getUsername()) || StrUtil.isBlank(account.getPassword())
-                || ObjectUtil.isEmpty(account.getRole())) {
-            return Result.error(ResultCodeEnum.PARAM_LOST_ERROR);
-        }
-        if (RoleEnum.ADMIN.name().equals(account.getRole())) {
-            return Result.error(ResultCodeEnum.FORBIDDEN_ERROR);
-        }
-        if (RoleEnum.BUSINESS.name().equals(account.getRole())) {
-            businessService.register(account);
-        }
-        if (RoleEnum.USER.name().equals(account.getRole())) {
-            userService.register(account);
-        }
-
-        return Result.success();
+    public Result register(@Valid @RequestBody AuthRequest request) {
+        return switch (request.role()) {
+            case "ADMIN" -> Result.error(ResultCodeEnum.FORBIDDEN_ERROR);
+            case "BUSINESS" -> {
+                businessService.register(request.toAccount());
+                yield Result.success();
+            }
+            case "USER" -> {
+                userService.register(request.toAccount());
+                yield Result.success();
+            }
+            default -> Result.error(ResultCodeEnum.PARAM_ERROR);
+        };
     }
 
     /**
      * Change a password.
      */
     @PutMapping("/updatePassword")
-    public Result updatePassword(@RequestBody Account account) {
-        if (StrUtil.isBlank(account.getUsername()) || StrUtil.isBlank(account.getPassword())
-                || ObjectUtil.isEmpty(account.getNewPassword())) {
-            return Result.error(ResultCodeEnum.PARAM_LOST_ERROR);
-        }
-        if (RoleEnum.ADMIN.name().equals(account.getRole())) {
-            adminService.updatePassword(account);
-        }
-        if (RoleEnum.BUSINESS.name().equals(account.getRole())) {
-            businessService.updatePassword(account);
-        }
-        if (RoleEnum.USER.name().equals(account.getRole())) {
-            userService.updatePassword(account);
-        }
-        return Result.success();
+    public Result updatePassword(@Valid @RequestBody PasswordChangeRequest request) {
+        return switch (request.role()) {
+            case "ADMIN" -> {
+                adminService.updatePassword(request.toAccount());
+                yield Result.success();
+            }
+            case "BUSINESS" -> {
+                businessService.updatePassword(request.toAccount());
+                yield Result.success();
+            }
+            case "USER" -> {
+                userService.updatePassword(request.toAccount());
+                yield Result.success();
+            }
+            default -> Result.error(ResultCodeEnum.PARAM_ERROR);
+        };
     }
 
 }

@@ -1,6 +1,7 @@
 package com.example.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 /**
  * Product record.
@@ -17,8 +18,8 @@ public class Goods implements Serializable {
     /** Primary product image. */
     private String img;
     /** Product price. */
-    private Double price;
-    /** Product price. */
+    private BigDecimal price;
+    /** Unit of measure. */
     private String unit;
     private Integer count;
     private Integer typeId;
@@ -59,11 +60,11 @@ public class Goods implements Serializable {
         this.img = img;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
