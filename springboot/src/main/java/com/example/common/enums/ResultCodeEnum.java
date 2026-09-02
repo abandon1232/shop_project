@@ -16,6 +16,10 @@ public enum ResultCodeEnum {
     USER_NOT_EXIST_ERROR("5004", "Account not found"),
     PARAM_PASSWORD_ERROR("5005", "Current password is incorrect"),
     PRODUCT_NOT_FOUND("4041", "Product not found"),
+    ORDER_NOT_FOUND("4042", "Order not found"),
+    ORDER_ACCESS_DENIED("4031", "You cannot access this order"),
+    INSUFFICIENT_STOCK("4091", "Not enough stock is available"),
+    INVALID_ORDER_STATUS("4092", "This order status change is not allowed"),
     ;
 
     public String code;
