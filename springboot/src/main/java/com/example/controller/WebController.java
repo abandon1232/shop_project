@@ -28,7 +28,7 @@ public class WebController {
 
     @GetMapping("/")
     public Result hello() {
-        return Result.success("访问成功");
+        return Result.success("API is running");
     }
 
     /**

@@ -50,7 +50,16 @@ class WebControllerTest {
         Result result = controller.login(new AuthRequest("alice", "secret123", "OWNER"));
 
         assertEquals(ResultCodeEnum.PARAM_ERROR.code, result.getCode());
+        assertEquals("Invalid parameters", result.getMsg());
         verifyNoInteractions(adminService, businessService, userService);
+    }
+
+    @Test
+    void rootEndpointUsesAnEnglishHealthMessage() {
+        Result result = controller.hello();
+
+        assertEquals("Success", result.getMsg());
+        assertEquals("API is running", result.getData());
     }
 
     @Test
