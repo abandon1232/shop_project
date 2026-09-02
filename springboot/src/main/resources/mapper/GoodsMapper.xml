@@ -32,7 +32,7 @@
         from goods
         join business on goods.business_id = business.id
         left join type on goods.type_id = type.id
-        where business.status = '审核通过'
+        where business.status = 'APPROVED'
         order by goods.id desc
         limit #{limit}
     </select>

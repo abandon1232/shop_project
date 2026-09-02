@@ -3,7 +3,6 @@ package com.example.service;
 import com.example.common.Constants;
 import com.example.common.enums.ResultCodeEnum;
 import com.example.common.enums.RoleEnum;
-import com.example.common.enums.StatusEnum;
 import com.example.entity.Account;
 import com.example.entity.Business;
 import com.example.entity.Goods;
@@ -49,7 +48,7 @@ class GoodsServiceTest {
     @Test
     void batchDeleteChecksEveryProductBeforeDeletingAny() {
         bindAccount(7, RoleEnum.BUSINESS);
-        when(businessMapper.selectById(7)).thenReturn(business(7, StatusEnum.CHECK_OK.status));
+        when(businessMapper.selectById(7)).thenReturn(business(7, "APPROVED"));
         when(goodsMapper.selectById(11)).thenReturn(goods(11, 7));
         when(goodsMapper.selectById(12)).thenReturn(goods(12, 9));
 
@@ -63,7 +62,7 @@ class GoodsServiceTest {
     @Test
     void pendingBusinessCannotCreateProduct() {
         bindAccount(7, RoleEnum.BUSINESS);
-        when(businessMapper.selectById(7)).thenReturn(business(7, StatusEnum.CHECKING.status));
+        when(businessMapper.selectById(7)).thenReturn(business(7, "PENDING"));
 
         CustomException error = assertThrows(CustomException.class,
                 () -> service.add(new Goods()));
@@ -75,7 +74,7 @@ class GoodsServiceTest {
     @Test
     void approvedBusinessCreatesProductUnderOwnAccount() {
         bindAccount(7, RoleEnum.BUSINESS);
-        when(businessMapper.selectById(7)).thenReturn(business(7, StatusEnum.CHECK_OK.status));
+        when(businessMapper.selectById(7)).thenReturn(business(7, "APPROVED"));
         Goods goods = new Goods();
 
         service.add(goods);
@@ -87,7 +86,7 @@ class GoodsServiceTest {
     @Test
     void pendingBusinessCannotDeleteOwnedProduct() {
         bindAccount(7, RoleEnum.BUSINESS);
-        when(businessMapper.selectById(7)).thenReturn(business(7, StatusEnum.CHECKING.status));
+        when(businessMapper.selectById(7)).thenReturn(business(7, "PENDING"));
 
         CustomException error = assertThrows(CustomException.class,
                 () -> service.deleteById(11));

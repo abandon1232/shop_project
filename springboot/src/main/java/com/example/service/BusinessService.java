@@ -44,7 +44,7 @@ public class BusinessService {
             business.setName(business.getUsername());
         }
         if (business.getStatus() == null || business.getStatus().isEmpty()) {
-            business.setStatus(StatusEnum.CHECKING.status);
+            business.setStatus(StatusEnum.PENDING.code());
         }
         business.setRole(RoleEnum.BUSINESS.name());
         businessMapper.insert(business);

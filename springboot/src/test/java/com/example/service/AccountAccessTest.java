@@ -110,6 +110,19 @@ class AccountAccessTest {
     }
 
     @Test
+    void newBusinessStartsWithPendingStatus() {
+        Business business = new Business();
+        business.setUsername("shop2");
+        business.setPassword("password");
+        when(passwordService.encode("password")).thenReturn("encoded-password");
+
+        businessService.add(business);
+
+        assertEquals("PENDING", business.getStatus());
+        verify(businessMapper).insert(business);
+    }
+
+    @Test
     void accountUpdatesIgnoreBlankPasswords() {
         bindCurrentAccount(1, RoleEnum.ADMIN);
         Admin admin = new Admin();

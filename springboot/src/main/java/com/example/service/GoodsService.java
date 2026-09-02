@@ -130,7 +130,7 @@ public class GoodsService {
 
     private void requireApprovedBusiness(Account currentUser) {
         Business business = businessMapper.selectById(currentUser.getId());
-        if (business == null || !StatusEnum.CHECK_OK.status.equals(business.getStatus())) {
+        if (business == null || !StatusEnum.APPROVED.code().equals(business.getStatus())) {
             throw new CustomException(ResultCodeEnum.FORBIDDEN_ERROR);
         }
     }
