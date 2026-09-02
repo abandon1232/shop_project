@@ -12,6 +12,7 @@ import com.example.mapper.CartMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -20,11 +21,14 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -33,7 +37,6 @@ import static org.mockito.Mockito.when;
 class CartServiceTest {
     @Mock private CartMapper cartMapper;
     @Mock private GoodsService goodsService;
-    @Mock private OrderService orderService;
     @InjectMocks private CartService service;
 
     @AfterEach
@@ -93,6 +96,91 @@ class CartServiceTest {
         verifyNoInteractions(cartMapper);
     }
 
+    @Test
+    void customerReadsOnlyTheirCurrentCart() {
+        bindAccount(3, RoleEnum.USER);
+        List<CartItem> savedCart = List.of(cartItem(14, 3, 7, 2));
+        when(cartMapper.selectByUserId(3)).thenReturn(savedCart);
+
+        List<CartItem> result = service.selectCurrentCart();
+
+        assertSame(savedCart, result);
+        verify(cartMapper).selectByUserId(3);
+    }
+
+    @Test
+    void addingNewProductInsertsForCurrentCustomerAndReturnsGeneratedLine() {
+        bindAccount(3, RoleEnum.USER);
+        when(goodsService.selectPurchasableById(7)).thenReturn(goods(7, 8, "QuietWave Headphones", "1990.00"));
+        when(cartMapper.selectByUserAndGoods(3, 7)).thenReturn(null);
+        doAnswer(invocation -> {
+            invocation.getArgument(0, CartItem.class).setId(41);
+            return 1;
+        }).when(cartMapper).insert(any(CartItem.class));
+        CartItem persisted = cartItem(41, 3, 7, 2);
+        when(cartMapper.selectOwnedById(41, 3)).thenReturn(persisted);
+
+        CartItem result = service.add(new AddCartItemRequest(7, 2));
+
+        ArgumentCaptor<CartItem> inserted = ArgumentCaptor.forClass(CartItem.class);
+        verify(cartMapper).insert(inserted.capture());
+        assertEquals(3, inserted.getValue().getUserId());
+        assertEquals(7, inserted.getValue().getGoodsId());
+        assertEquals(2, inserted.getValue().getQuantity());
+        verify(cartMapper).selectOwnedById(41, 3);
+        assertSame(persisted, result);
+    }
+
+    @Test
+    void customerCanUpdateTheirOwnedLineWithinStock() {
+        bindAccount(3, RoleEnum.USER);
+        CartItem existing = cartItem(99, 3, 7, 1);
+        CartItem updated = cartItem(99, 3, 7, 2);
+        when(cartMapper.selectOwnedById(99, 3)).thenReturn(existing, updated);
+        when(goodsService.selectPurchasableById(7)).thenReturn(goods(7, 8, "QuietWave Headphones", "1990.00"));
+        when(cartMapper.updateQuantity(99, 3, 2)).thenReturn(1);
+
+        CartItem result = service.update(99, new UpdateCartItemRequest(2));
+
+        assertSame(updated, result);
+        verify(cartMapper).updateQuantity(99, 3, 2);
+    }
+
+    @Test
+    void updatingBeyondCurrentStockDoesNotMutateOwnedLine() {
+        bindAccount(3, RoleEnum.USER);
+        when(cartMapper.selectOwnedById(99, 3)).thenReturn(cartItem(99, 3, 7, 1));
+        when(goodsService.selectPurchasableById(7)).thenReturn(goods(7, 1, "QuietWave Headphones", "1990.00"));
+
+        CustomException error = assertThrows(CustomException.class,
+                () -> service.update(99, new UpdateCartItemRequest(2)));
+
+        assertEquals("4091", error.getCode());
+        verify(cartMapper).selectOwnedById(99, 3);
+        verify(cartMapper, never()).updateQuantity(any(), any(), any());
+    }
+
+    @Test
+    void customerCanDeleteTheirOwnedLine() {
+        bindAccount(3, RoleEnum.USER);
+        when(cartMapper.deleteOwned(99, 3)).thenReturn(1);
+
+        service.delete(99);
+
+        verify(cartMapper).deleteOwned(99, 3);
+    }
+
+    @Test
+    void deletingMissingOrForeignLineReturnsNotFound() {
+        bindAccount(3, RoleEnum.USER);
+        when(cartMapper.deleteOwned(99, 3)).thenReturn(0);
+
+        CustomException error = assertThrows(CustomException.class, () -> service.delete(99));
+
+        assertEquals("4043", error.getCode());
+        verify(cartMapper).deleteOwned(99, 3);
+    }
+
     private Goods goods(int id, int stock, String name, String price) {
         Goods goods = new Goods();
         goods.setId(id);
@@ -108,12 +196,6 @@ class CartServiceTest {
         item.setUserId(userId);
         item.setGoodsId(goodsId);
         item.setQuantity(quantity);
-        return item;
-    }
-
-    private CartItem detailedCartItem(int id, int userId, int goodsId, int quantity, int stock) {
-        CartItem item = cartItem(id, userId, goodsId, quantity);
-        item.setStock(stock);
         return item;
     }
 
