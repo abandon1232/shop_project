@@ -1,13 +1,14 @@
 <template>
-  <div>
-    <el-card style="width: 50%">
+  <div class="management-page">
+    <header class="page-heading"><div><span class="page-eyebrow">Account</span><h1>Profile</h1><p>Keep your contact details up to date.</p></div></header>
+    <el-card class="profile-card">
       <el-form :model="user" label-width="100px" style="padding-right: 50px">
         <div style="margin: 15px; text-align: center">
           <el-upload
               class="avatar-uploader"
               :action="$baseUrl + '/files/upload'"
               :headers="{ token: user.token }"
-              accept="image/jpeg,image/png,image/gif"
+              accept="image/jpeg,image/png,image/webp"
               :show-file-list="false"
               :on-success="handleAvatarSuccess"
           >

@@ -13,6 +13,7 @@ describe('router', () => {
     expect(new Set(names).size).toBe(names.length)
     expect(names).toEqual(expect.arrayContaining([
       'ManagerHome', 'ManagerType', 'StoreHome', 'StoreType', 'ProductDetail',
+      'ManagerOrders',
     ]))
   })
 
@@ -56,5 +57,13 @@ describe('router', () => {
     await router.push('/front/orders')
     expect(router.currentRoute.value.path).toBe('/login')
     expect(router.currentRoute.value.query.redirect).toBe('/front/orders')
+  })
+
+  it('stops a seller from opening administrator-only pages', async () => {
+    localStorage.setItem('xm-user', JSON.stringify({ id: 7, role: 'BUSINESS', token: 'token' }))
+
+    await router.push('/business')
+
+    expect(router.currentRoute.value.path).toBe('/403')
   })
 })

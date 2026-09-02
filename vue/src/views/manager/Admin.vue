@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div class="management-page">
+    <header class="page-heading">
+      <div><span class="page-eyebrow">Access control</span><h1>Administrators</h1><p>Manage the team members responsible for the marketplace.</p></div>
+    </header>
     <div class="search">
       <el-input placeholder="Search by username" style="width: 200px" v-model="username"></el-input>
       <el-button type="info" plain style="margin-left: 10px" @click="load(1)">Search</el-button>

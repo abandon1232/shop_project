@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div class="management-page">
+    <header class="page-heading">
+      <div><span class="page-eyebrow">Storefront content</span><h1>Notices</h1><p>Publish short updates for visitors and customers.</p></div>
+    </header>
     <div class="search">
       <el-input placeholder="Search by title" style="width: 200px" v-model="title"></el-input>
       <el-button type="info" plain style="margin-left: 10px" @click="load(1)">Search</el-button>

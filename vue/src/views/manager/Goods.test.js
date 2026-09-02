@@ -1,12 +1,19 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { describe, expect, it, vi } from 'vitest'
 import Goods from './Goods.vue'
+import goodsSource from './Goods.vue?raw'
 
 const dialogStub = {
   template: '<section><slot /></section>',
 }
 
 describe('Goods view', () => {
+  it('uses a single SEK price field without legacy unit text', () => {
+    expect(goodsSource).not.toContain('prop="unit"')
+    expect(goodsSource).not.toContain('label="Unit"')
+    expect(goodsSource).not.toMatch(/(?:kr|SEK)\s*\/\s*p\b/i)
+  })
+
   it('renders a product description as text', async () => {
     const request = {
       get: () => Promise.resolve({ code: '200', data: { list: [], total: 0 } }),

@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div class="management-page">
+    <header class="page-heading">
+      <div><span class="page-eyebrow">Catalogue</span><h1>{{ user.role === 'BUSINESS' ? 'My products' : 'Products' }}</h1><p>Keep product details, pricing and availability accurate.</p></div>
+    </header>
     <div class="search">
       <el-input v-model="name" placeholder="Search by product name" style="width: 200px" />
       <el-button type="info" plain style="margin-left: 10px" @click="load(1)">Search</el-button>
@@ -34,7 +37,6 @@
         <el-table-column label="Price" show-overflow-tooltip>
           <template #default="scope">{{ formatSek(scope.row.price) }}</template>
         </el-table-column>
-        <el-table-column prop="unit" label="Unit" show-overflow-tooltip />
         <el-table-column prop="typeName" label="Category" show-overflow-tooltip />
         <el-table-column prop="businessName" label="Seller" show-overflow-tooltip />
         <el-table-column prop="count" label="Stock" show-overflow-tooltip />
@@ -65,7 +67,7 @@
             class="avatar-uploader"
             :action="$baseUrl + '/files/upload'"
             :headers="{ token: user.token }"
-            accept="image/jpeg,image/png,image/gif"
+            accept="image/jpeg,image/png,image/webp"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
           >
@@ -82,9 +84,6 @@
           <el-select v-model="form.typeId" placeholder="Select a category" style="width: 100%">
             <el-option v-for="item in typeData" :key="item.id" :label="item.name" :value="item.id" />
           </el-select>
-        </el-form-item>
-        <el-form-item prop="unit" label="Unit">
-          <el-input v-model="form.unit" autocomplete="off" />
         </el-form-item>
         <el-form-item prop="count" label="Stock">
           <el-input-number v-model="form.count" :min="0" :precision="0" style="width: 100%" />

@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div class="management-page">
+    <header class="page-heading">
+      <div><span class="page-eyebrow">Marketplace</span><h1>Sellers</h1><p>Review stores and manage who can publish marketplace products.</p></div>
+    </header>
     <div class="search">
       <el-input placeholder="Search by username" style="width: 200px" v-model="username"></el-input>
       <el-button type="info" plain style="margin-left: 10px" @click="load(1)">Search</el-button>
@@ -76,7 +79,7 @@
               class="avatar-uploader"
               :action="$baseUrl + '/files/upload'"
               :headers="{ token: user.token }"
-              accept="image/jpeg,image/png,image/gif"
+              accept="image/jpeg,image/png,image/webp"
               list-type="picture"
               :on-success="handleAvatarSuccess"
           >

@@ -6,17 +6,18 @@ const routes = [
     name: 'Manager',
     component: () => import('../views/Manager.vue'),
     children: [
-      { path: '403', name: 'NoAuth', meta: { name: 'Access denied' }, component: () => import('../views/manager/403.vue') },
-      { path: 'home', name: 'ManagerHome', meta: { name: 'Dashboard' }, component: () => import('../views/manager/Home.vue') },
-      { path: 'admin', name: 'Admin', meta: { name: 'Administrators' }, component: () => import('../views/manager/Admin.vue') },
-      { path: 'business', name: 'Business', meta: { name: 'Sellers' }, component: () => import('../views/manager/Business.vue') },
-      { path: 'user', name: 'User', meta: { name: 'Customers' }, component: () => import('../views/manager/User.vue') },
-      { path: 'adminPerson', name: 'AdminPerson', meta: { name: 'Profile' }, component: () => import('../views/manager/AdminPerson.vue') },
-      { path: 'businessPerson', name: 'BusinessPerson', meta: { name: 'Profile' }, component: () => import('../views/manager/BusinessPerson.vue') },
-      { path: 'password', name: 'Password', meta: { name: 'Change password' }, component: () => import('../views/manager/Password.vue') },
-      { path: 'notice', name: 'Notice', meta: { name: 'Notices' }, component: () => import('../views/manager/Notice.vue') },
-      { path: 'type', name: 'ManagerType', meta: { name: 'Categories' }, component: () => import('../views/manager/Type.vue') },
-      { path: 'goods', name: 'Goods', meta: { name: 'Products' }, component: () => import('../views/manager/Goods.vue') },
+      { path: '403', name: 'NoAuth', meta: { name: 'Access denied', roles: ['ADMIN', 'BUSINESS'] }, component: () => import('../views/manager/403.vue') },
+      { path: 'home', name: 'ManagerHome', meta: { name: 'Dashboard', roles: ['ADMIN', 'BUSINESS'] }, component: () => import('../views/manager/Home.vue') },
+      { path: 'admin', name: 'Admin', meta: { name: 'Administrators', roles: ['ADMIN'] }, component: () => import('../views/manager/Admin.vue') },
+      { path: 'business', name: 'Business', meta: { name: 'Sellers', roles: ['ADMIN'] }, component: () => import('../views/manager/Business.vue') },
+      { path: 'user', name: 'User', meta: { name: 'Customers', roles: ['ADMIN'] }, component: () => import('../views/manager/User.vue') },
+      { path: 'adminPerson', name: 'AdminPerson', meta: { name: 'Profile', roles: ['ADMIN'] }, component: () => import('../views/manager/AdminPerson.vue') },
+      { path: 'businessPerson', name: 'BusinessPerson', meta: { name: 'Profile', roles: ['BUSINESS'] }, component: () => import('../views/manager/BusinessPerson.vue') },
+      { path: 'password', name: 'Password', meta: { name: 'Change password', roles: ['ADMIN', 'BUSINESS'] }, component: () => import('../views/manager/Password.vue') },
+      { path: 'notice', name: 'Notice', meta: { name: 'Notices', roles: ['ADMIN'] }, component: () => import('../views/manager/Notice.vue') },
+      { path: 'type', name: 'ManagerType', meta: { name: 'Categories', roles: ['ADMIN'] }, component: () => import('../views/manager/Type.vue') },
+      { path: 'goods', name: 'Goods', meta: { name: 'Products', roles: ['ADMIN', 'BUSINESS'] }, component: () => import('../views/manager/Goods.vue') },
+      { path: 'orders', name: 'ManagerOrders', meta: { name: 'Orders', roles: ['ADMIN', 'BUSINESS'] }, component: () => import('../views/manager/Orders.vue') },
     ],
   },
   {
@@ -56,6 +57,9 @@ router.beforeEach(to => {
 
   if (!user.token) {
     return { path: '/login', query: { redirect: to.fullPath } }
+  }
+  if (to.meta.roles && !to.meta.roles.includes(user.role)) {
+    return user.role === 'USER' ? '/front/home' : '/403'
   }
   if (to.path === '/') {
     return user.role === 'USER' ? '/front/home' : '/home'
