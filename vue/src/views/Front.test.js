@@ -39,6 +39,9 @@ describe('Front layout', () => {
 
     expect(request.get).toHaveBeenCalledWith('/cart/items')
     expect(wrapper.get('.cart-action').text()).toContain('Cart')
+    expect(wrapper.get('.cart-icon').element.tagName).toBe('svg')
+    expect(wrapper.get('.cart-icon').attributes('aria-hidden')).toBe('true')
+    expect(wrapper.get('.cart-icon').text()).toBe('')
     expect(wrapper.get('.cart-count').text()).toBe('3')
 
     await wrapper.get('.cart-action').trigger('click')

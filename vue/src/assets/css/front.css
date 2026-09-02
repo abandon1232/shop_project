@@ -107,6 +107,12 @@
     color: #fff;
 }
 
+.cart-icon {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 auto;
+}
+
 .cart-count {
     display: inline-grid;
     min-width: 19px;

@@ -16,7 +16,9 @@
         </div>
         <template v-else>
           <button v-if="user.role === 'USER'" class="cart-action" type="button" @click="navTo('/front/cart')">
-            <span aria-hidden="true">Cart</span>
+            <svg class="cart-icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+              <path fill="currentColor" d="M3 4h2l2.4 11.5a2 2 0 0 0 2 1.5h7.9a2 2 0 0 0 1.9-1.4L21 8H7.1l-.8-4H3v2Zm6.8 11a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1Zm8 0a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1Z"/>
+            </svg>
             <span class="cart-label">Cart</span>
             <span v-if="cartCount > 0" class="cart-count">{{ cartCount }}</span>
           </button>
