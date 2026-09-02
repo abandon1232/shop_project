@@ -6,11 +6,13 @@
           <el-upload
               class="avatar-uploader"
               :action="$baseUrl + '/files/upload'"
+              :headers="{ token: user.token }"
+              accept="image/jpeg,image/png,image/gif"
               :show-file-list="false"
               :on-success="handleAvatarSuccess"
           >
             <img v-if="user.avatar" :src="user.avatar" class="avatar" />
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            <span v-else class="avatar-uploader-icon">+</span>
           </el-upload>
         </div>
         <el-form-item label="用户名" prop="username">
@@ -41,7 +43,7 @@
 
 <script>
 export default {
-  name: "AdminPerson",
+  name: "BusinessPerson",
   data() {
     return {
       user: JSON.parse(localStorage.getItem('xm-user') || '{}')
@@ -70,27 +72,31 @@ export default {
     },
     handleAvatarSuccess(response, file, fileList) {
       // Set the avatar field to the uploaded image URL.
-      this.$set(this.user, 'avatar', response.data)
+      if (response.code === '200') {
+        this.user.avatar = response.data
+      } else {
+        this.$message.error(response.msg)
+      }
     },
   }
 }
 </script>
 
 <style scoped>
-/deep/.el-form-item__label {
+:deep(.el-form-item__label) {
   font-weight: bold;
 }
-/deep/.el-upload {
+:deep(.el-upload) {
   border-radius: 50%;
 }
-/deep/.avatar-uploader .el-upload {
+:deep(.avatar-uploader .el-upload) {
   border: 1px dashed #d9d9d9;
   cursor: pointer;
   position: relative;
   overflow: hidden;
   border-radius: 50%;
 }
-/deep/.avatar-uploader .el-upload:hover {
+:deep(.avatar-uploader .el-upload:hover) {
   border-color: #409EFF;
 }
 .avatar-uploader-icon {

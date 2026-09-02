@@ -21,9 +21,9 @@
         <el-table-column prop="user" label="创建人"></el-table-column>
 
         <el-table-column label="操作" width="180" align="center">
-          <template v-slot="scope">
-            <el-button plain type="primary" @click="handleEdit(scope.row)" size="mini">编辑</el-button>
-            <el-button plain type="danger" size="mini" @click=del(scope.row.id)>删除</el-button>
+          <template #default="scope">
+            <el-button plain type="primary" @click="handleEdit(scope.row)" size="small">编辑</el-button>
+            <el-button plain type="danger" size="small" @click="del(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -42,7 +42,7 @@
     </div>
 
 
-    <el-dialog title="信息" :visible.sync="fromVisible" width="40%" :close-on-click-modal="false" destroy-on-close>
+    <el-dialog v-model="fromVisible" title="公告信息" width="40%" :close-on-click-modal="false" destroy-on-close>
       <el-form label-width="100px" style="padding-right: 50px" :model="form" :rules="rules" ref="formRef">
         <el-form-item prop="title" label="标题">
           <el-input v-model="form.title" autocomplete="off"></el-input>
@@ -51,10 +51,10 @@
           <el-input type="textarea" :rows="5" v-model="form.content" autocomplete="off"></el-input>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
+      <template #footer>
         <el-button @click="fromVisible = false">取 消</el-button>
         <el-button type="primary" @click="save">确 定</el-button>
-      </div>
+      </template>
     </el-dialog>
 
 

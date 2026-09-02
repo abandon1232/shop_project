@@ -8,14 +8,16 @@
       <div style="width: 50%;" class="card">
         <div style="margin-bottom: 30px; font-size: 20px; font-weight: bold">公告列表</div>
         <div >
-          <el-timeline  reverse slot="reference">
+          <el-timeline reverse>
             <el-timeline-item v-for="item in notices" :key="item.id" :timestamp="item.time">
               <el-popover
                   placement="right"
                   width="200"
                   trigger="hover"
                   :content="item.content">
-                <span slot="reference">{{ item.title }}</span>
+                <template #reference>
+                  <span>{{ item.title }}</span>
+                </template>
               </el-popover>
             </el-timeline-item>
           </el-timeline>

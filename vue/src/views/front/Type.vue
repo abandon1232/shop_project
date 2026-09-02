@@ -29,7 +29,7 @@
       
       <div class="recommend-section">
         <div class="section-header">
-          <h2 class="section-title">猜你喜欢</h2>
+          <h2 class="section-title">最新商品</h2>
           <div class="section-divider"></div>
         </div>
         <div class="recommend-list">
@@ -74,7 +74,7 @@ export default {
   // methods：Click handlers and other methods for this page
   methods: {
     loadRecommend() {
-      this.$request.get('/goods/recommend').then(res => {
+      this.$request.get('/goods/featured').then(res => {
         if (res.code === '200') {
           this.recommendData = res.data
         } else {

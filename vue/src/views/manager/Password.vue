@@ -3,13 +3,13 @@
     <el-card style="width: 50%">
       <el-form ref="formRef" :model="user" :rules="rules" label-width="100px" style="padding-right: 50px">
         <el-form-item label="原始密码" prop="password">
-          <el-input show-password v-model="user.password" placeholder="原始密码"></el-input>
+          <el-input v-model="user.password" type="password" show-password placeholder="原始密码" />
         </el-form-item>
         <el-form-item label="新密码" prop="newPassword">
-          <el-input show-password v-model="user.newPassword" placeholder="新密码"></el-input>
+          <el-input v-model="user.newPassword" type="password" show-password placeholder="新密码" />
         </el-form-item>
         <el-form-item label="确认新密码" prop="confirmPassword">
-          <el-input show-password v-model="user.confirmPassword" placeholder="确认密码"></el-input>
+          <el-input v-model="user.confirmPassword" type="password" show-password placeholder="确认密码" />
         </el-form-item>
         <div style="text-align: center; margin-bottom: 20px">
           <el-button type="primary" @click="update">确认修改</el-button>
@@ -73,7 +73,7 @@ export default {
 </script>
 
 <style scoped>
-/deep/.el-form-item__label {
+:deep(.el-form-item__label) {
   font-weight: bold;
 }
 </style>

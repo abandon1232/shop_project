@@ -8,7 +8,7 @@
       </div>
 
       <div class="manager-header-center">
-        <el-breadcrumb separator-class="el-icon-arrow-right">
+        <el-breadcrumb separator="/">
           <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
           <el-breadcrumb-item :to="{ path: $route.path }">{{ $route.meta.name }}</el-breadcrumb-item>
         </el-breadcrumb>
@@ -20,11 +20,13 @@
             <img :src="user.avatar || 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'" />
             <div>{{ user.name ||  '管理员' }}</div>
           </div>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item @click.native="goToPerson">个人信息</el-dropdown-item>
-            <el-dropdown-item @click.native="$router.push('/password')">修改密码</el-dropdown-item>
-            <el-dropdown-item @click.native="logout">退出登录</el-dropdown-item>
-          </el-dropdown-menu>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="goToPerson">个人信息</el-dropdown-item>
+              <el-dropdown-item @click="$router.push('/password')">修改密码</el-dropdown-item>
+              <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
         </el-dropdown>
       </div>
     </div>
@@ -35,26 +37,25 @@
       <div class="manager-main-left">
         <el-menu :default-openeds="['info', 'user']" router style="border: none" :default-active="$route.path">
           <el-menu-item index="/home">
-            <i class="el-icon-s-home"></i>
-            <span slot="title">系统首页</span>
+            <span>系统首页</span>
           </el-menu-item>
-          <el-submenu index="info">
-            <template slot="title">
-              <i class="el-icon-menu"></i><span>信息管理</span>
+          <el-sub-menu index="info">
+            <template #title>
+              <span>信息管理</span>
             </template>
             <el-menu-item v-if="user.role === 'ADMIN'" index="/notice">公告信息</el-menu-item>
             <el-menu-item v-if="user.role === 'ADMIN'" index="/type">分类信息</el-menu-item>
             <el-menu-item index="/goods">商品信息</el-menu-item>
-          </el-submenu>
+          </el-sub-menu>
 
-          <el-submenu index="user" v-if="user.role === 'ADMIN'">
-            <template slot="title">
-              <i class="el-icon-menu"></i><span>用户管理</span>
+          <el-sub-menu index="user" v-if="user.role === 'ADMIN'">
+            <template #title>
+              <span>用户管理</span>
             </template>
             <el-menu-item index="/admin">管理员信息</el-menu-item>
             <el-menu-item index="/business">商家信息</el-menu-item>
             <el-menu-item index="/user">用户信息</el-menu-item>
-          </el-submenu>
+          </el-sub-menu>
         </el-menu>
       </div>
 

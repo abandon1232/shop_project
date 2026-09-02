@@ -3,7 +3,7 @@
     <div class="search-container">
       <div class="search-header">
         <div class="search-title">
-          <span class="search-icon"><i class="el-icon-search"></i></span>
+          <span class="search-icon">⌕</span>
           <span class="search-text">搜索"{{name}}"的结果</span>
         </div>
       </div>
@@ -33,8 +33,8 @@
 
         <div class="recommend-section">
           <div class="recommend-header">
-            <span class="recommend-icon"><i class="el-icon-star-on"></i></span>
-            <span class="recommend-title">猜你喜欢</span>
+            <span class="recommend-icon">★</span>
+            <span class="recommend-title">最新商品</span>
           </div>
           <div class="recommend-list">
             <div v-for="item in recommendData" :key="item.id" 
@@ -66,7 +66,7 @@ export default {
     let name = this.$route.query.name
     return {
       user: JSON.parse(localStorage.getItem('xm-user') || '{}'),
-      name: name,
+      name,
       goodsData: [],
       recommendData: [],
     }
@@ -78,7 +78,7 @@ export default {
   // methods：Click handlers and other methods for this page
   methods: {
     loadRecommend() {
-      this.$request.get('/goods/recommend').then(res => {
+      this.$request.get('/goods/featured').then(res => {
         if (res.code === '200') {
           this.recommendData = res.data
         } else {
@@ -87,7 +87,7 @@ export default {
       })
     },
     loadGoods() {
-      this.$request.get('/goods/selectByName?name=' + this.name).then(res => {
+      this.$request.get('/goods/selectByName', { params: { name: this.name || '' } }).then(res => {
         if (res.code === '200') {
           this.goodsData = res.data
         } else {

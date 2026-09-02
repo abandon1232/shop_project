@@ -9,11 +9,13 @@
           <el-upload
               class="avatar-uploader"
               :action="$baseUrl + '/files/upload'"
+              :headers="{ token: user.token }"
+              accept="image/jpeg,image/png,image/gif"
               :show-file-list="false"
               :on-success="handleAvatarSuccess"
           >
             <img v-if="user.avatar" :src="user.avatar" class="avatar" />
-            <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+            <span v-else class="avatar-uploader-icon">+</span>
           </el-upload>
         </div>
         <el-form-item label="用户名" prop="username">
@@ -33,22 +35,22 @@
         </div>
       </el-form>
     </el-card>
-    <el-dialog title="修改密码" :visible.sync="dialogVisible" width="30%" :close-on-click-modal="false" destroy-on-close>
+    <el-dialog v-model="dialogVisible" title="修改密码" width="30%" :close-on-click-modal="false" destroy-on-close>
       <el-form :model="user" label-width="80px" style="padding-right: 20px" :rules="rules" ref="formRef">
         <el-form-item label="原始密码" prop="password">
-          <el-input show-password v-model="user.password" placeholder="原始密码"></el-input>
+          <el-input v-model="user.password" type="password" show-password placeholder="原始密码" />
         </el-form-item>
         <el-form-item label="新密码" prop="newPassword">
-          <el-input show-password v-model="user.newPassword" placeholder="新密码"></el-input>
+          <el-input v-model="user.newPassword" type="password" show-password placeholder="新密码" />
         </el-form-item>
         <el-form-item label="确认密码" prop="confirmPassword">
-          <el-input show-password v-model="user.confirmPassword" placeholder="确认密码"></el-input>
+          <el-input v-model="user.confirmPassword" type="password" show-password placeholder="确认密码" />
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="fromVisible = false">取 消</el-button>
+      <template #footer>
+        <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="save">确 定</el-button>
-      </div>
+      </template>
     </el-dialog>
   </div>
 </template>
@@ -104,7 +106,11 @@ export default {
     },
     handleAvatarSuccess(response, file, fileList) {
       // Set the avatar field to the uploaded image URL.
-      this.$set(this.user, 'avatar', response.data)
+      if (response.code === '200') {
+        this.user.avatar = response.data
+      } else {
+        this.$message.error(response.msg)
+      }
     },
     // Change a password.
     updatePassword() {
@@ -130,20 +136,20 @@ export default {
 </script>
 
 <style scoped>
-/deep/.el-form-item__label {
+:deep(.el-form-item__label) {
   font-weight: bold;
 }
-/deep/.el-upload {
+:deep(.el-upload) {
   border-radius: 50%;
 }
-/deep/.avatar-uploader .el-upload {
+:deep(.avatar-uploader .el-upload) {
   border: 1px dashed #d9d9d9;
   cursor: pointer;
   position: relative;
   overflow: hidden;
   border-radius: 50%;
 }
-/deep/.avatar-uploader .el-upload:hover {
+:deep(.avatar-uploader .el-upload:hover) {
   border-color: #409EFF;
 }
 .avatar-uploader-icon {

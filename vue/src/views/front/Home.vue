@@ -4,7 +4,7 @@
       <div class="content-wrapper">
         <!-- Left category navigation. -->
         <div class="category-sidebar">
-          <h2 class="section-title">PORDUCT catergary</h2>
+          <h2 class="section-title">商品分类</h2>
           <div class="category-list">
             <div class="category-item" v-for="item in typeData" :key="item.id" @click="navTo('/front/type?id=' + item.id)">
               <img :src="item.img" :alt="item.name">
@@ -22,37 +22,14 @@
             </el-carousel-item>
           </el-carousel>
 
-          <!-- Popular products. -->
+          <!-- Latest approved products. -->
           <div class="section-block">
             <div class="section-header">
-              <h2>热卖商品</h2>
+              <h2>最新商品</h2>
               <div class="section-more">查看更多 ></div>
             </div>
             <div class="products-grid">
-              <div class="product-card" v-for="item in goodsData" :key="item.id">
-                <div class="product-image">
-                  <img :src="item.img" :alt="item.name">
-                </div>
-                <div class="product-info">
-                  <h3 class="product-name">{{ item.name }}</h3>
-                  <div class="product-price">
-                    <span class="currency">¥</span>
-                    <span class="amount">{{ item.price }}</span>
-                    <span class="unit">/ {{ item.unit }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Recommended products. -->
-          <div class="section-block">
-            <div class="section-header">
-              <h2>猜你喜欢</h2>
-              <div class="section-more">查看更多 ></div>
-            </div>
-            <div class="products-grid">
-              <div class="product-card" v-for="item in recommendData" :key="item.id">
+              <div class="product-card" v-for="item in featuredData" :key="item.id">
                 <div class="product-image">
                   <img :src="item.img" :alt="item.name">
                 </div>
@@ -96,8 +73,7 @@ export default {
     return {
         user: JSON.parse(localStorage.getItem('xm-user') || '{}'),
         typeData: [],
-        goodsData:[],
-        recommendData:[],
+        featuredData: [],
         carousel_top:[
           carouselOne,
           carouselTwo,
@@ -107,15 +83,14 @@ export default {
   },
   mounted() {
     this.loadType()
-    this.loadGoods()
-    this.loadRecommend()
+    this.loadFeatured()
   },
   // methods：Click handlers and other methods for this page
   methods: {
-    loadRecommend(){
-      this.$request.get('/goods/recommend').then(res => {
+    loadFeatured(){
+      this.$request.get('/goods/featured').then(res => {
         if (res.code === '200') {
-          this.recommendData = res.data
+          this.featuredData = res.data || []
         } else {
           this.$message.error(res.msg)
         }
@@ -130,17 +105,8 @@ export default {
         }
       })
     },
-    loadGoods() {
-      this.$request.get('/goods/selectTop15').then(res => {
-        if (res.code === '200') {
-          this.goodsData = res.data
-        } else {
-          this.$message.error(res.msg)
-        }
-      })
-    },
     navTo(url) {
-      location.href = url
+      this.$router.push(url)
     },
   }
 }

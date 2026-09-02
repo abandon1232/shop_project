@@ -12,7 +12,7 @@
     </div>
 
     <div class="table">
-      <el-table :data="tableData" strip @selection-change="handleSelectionChange">
+      <el-table :data="tableData" stripe @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55" align="center"></el-table-column>
         <el-table-column prop="id" label="序号" width="70" align="center" sortable></el-table-column>
         <el-table-column prop="username" label="账号"></el-table-column>
@@ -20,7 +20,7 @@
         <el-table-column prop="phone" label="电话"></el-table-column>
         <el-table-column prop="email" label="邮箱"></el-table-column>
         <el-table-column label="头像">
-          <template v-slot="scope">
+          <template #default="scope">
             <div style="display: flex; align-items: center">
               <el-image style="width: 40px; height: 40px; border-radius: 50%" v-if="scope.row.avatar"
                         :src="scope.row.avatar" :preview-src-list="[scope.row.avatar]"></el-image>
@@ -30,9 +30,9 @@
         <el-table-column prop="role" label="角色"></el-table-column>
 
         <el-table-column label="操作" align="center" width="180">
-          <template v-slot="scope">
-            <el-button size="mini" type="primary" plain @click="handleEdit(scope.row)">编辑</el-button>
-            <el-button size="mini" type="danger" plain @click="del(scope.row.id)">删除</el-button>
+          <template #default="scope">
+            <el-button size="small" type="primary" plain @click="handleEdit(scope.row)">编辑</el-button>
+            <el-button size="small" type="danger" plain @click="del(scope.row.id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -51,10 +51,13 @@
     </div>
 
 
-    <el-dialog title="管理员" :visible.sync="fromVisible" width="40%" :close-on-click-modal="false" destroy-on-close>
+    <el-dialog v-model="fromVisible" title="用户" width="40%" :close-on-click-modal="false" destroy-on-close>
       <el-form :model="form" label-width="100px" style="padding-right: 50px" :rules="rules" ref="formRef">
         <el-form-item label="用户名" prop="username">
           <el-input v-model="form.username" placeholder="用户名"></el-input>
+        </el-form-item>
+        <el-form-item v-if="!form.id" label="初始密码" prop="password">
+          <el-input v-model="form.password" type="password" show-password placeholder="请设置初始密码" />
         </el-form-item>
         <el-form-item label="昵称" prop="name">
           <el-input v-model="form.name" placeholder="昵称"></el-input>
@@ -70,6 +73,7 @@
               class="avatar-uploader"
               :action="$baseUrl + '/files/upload'"
               :headers="{ token: user.token }"
+              accept="image/jpeg,image/png,image/gif"
               list-type="picture"
               :on-success="handleAvatarSuccess"
           >
@@ -80,10 +84,10 @@
     
       </el-form>
 
-      <div slot="footer" class="dialog-footer">
+      <template #footer>
         <el-button @click="fromVisible = false">取 消</el-button>
         <el-button type="primary" @click="save">确 定</el-button>
-      </div>
+      </template>
     </el-dialog>
 
 
@@ -92,7 +96,7 @@
 
 <script>
 export default {
-  name: "Admin",
+  name: "User",
   data() {
     return {
       tableData: [],  // All records.
@@ -106,7 +110,10 @@ export default {
       rules: {
         username: [
           {required: true, message: '请输入账号', trigger: 'blur'},
-        ]
+        ],
+        password: [
+          {required: true, message: '请设置初始密码', trigger: 'blur'},
+        ],
       },
       ids: []
     }
@@ -196,8 +203,11 @@ export default {
       this.load(pageNum)
     },
     handleAvatarSuccess(response, file, fileList) {
-      // Set the avatar field to the uploaded image URL.
-      this.form.avatar = response.data
+      if (response.code === '200') {
+        this.form.avatar = response.data
+      } else {
+        this.$message.error(response.msg)
+      }
     },
   }
 }

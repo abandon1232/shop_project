@@ -8,7 +8,7 @@
       </div>
       <div class="front-header-center" style="text-align: right">
         <el-input style="width: 200px" placeholder="请输入商品名称" v-model="name"></el-input>
-        <el-button type="primary" style="margin-left: 5px" @click="search">搜素</el-button>
+        <el-button type="primary" style="margin-left: 5px" @click="search">搜索</el-button>
       </div>
       <div class="front-header-right">
         <div v-if="!user.username">
@@ -20,14 +20,14 @@
             <div class="front-header-dropdown">
               <img @click="navTo('/front/person')" :src="user.avatar" alt="">
               <div style="margin-left: 10px">
-                <span>{{ user.name }}</span><i class="el-icon-arrow-down" style="margin-left: 5px"></i>
+                <span>{{ user.name }}</span><span style="margin-left: 5px">⌄</span>
               </div>
             </div>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item>
-                <div style="text-decoration: none" @click="logout">退出</div>
-              </el-dropdown-item>
-            </el-dropdown-menu>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item @click="logout">退出</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </div>
       </div>
@@ -50,7 +50,7 @@ export default {
       top: '',
       notice: [],
       user: JSON.parse(localStorage.getItem("xm-user") || '{}'),
-      name: name,
+      name: '',
     }
   },
 
@@ -78,7 +78,7 @@ export default {
       this.user = JSON.parse(localStorage.getItem('xm-user') || '{}')   // Reload the latest cached account.
     },
     navTo(url) {
-      location.href = url
+      this.$router.push(url)
     },
     // Log out.
     logout() {
@@ -86,8 +86,7 @@ export default {
       this.$router.push("/login");
     },
     search() {
-      let name = this.name ? this.name : ''
-      location.href = '/front/search?name=' + name
+      this.$router.push({ path: '/front/search', query: { name: this.name || '' } })
     },
   }
 
