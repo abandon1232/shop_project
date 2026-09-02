@@ -3,16 +3,20 @@ package com.example.service;
 import com.example.common.enums.ResultCodeEnum;
 import com.example.common.enums.RoleEnum;
 import com.example.controller.request.AddCartItemRequest;
+import com.example.controller.request.PlaceOrderRequest;
 import com.example.controller.request.UpdateCartItemRequest;
 import com.example.entity.Account;
 import com.example.entity.CartItem;
+import com.example.entity.CustomerOrder;
 import com.example.entity.Goods;
 import com.example.exception.CustomException;
 import com.example.mapper.CartMapper;
 import com.example.utils.TokenUtils;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,6 +27,8 @@ public class CartService {
     private CartMapper cartMapper;
     @Resource
     private GoodsService goodsService;
+    @Resource
+    private OrderService orderService;
 
     public List<CartItem> selectCurrentCart() {
         Account account = currentCustomer();
@@ -73,6 +79,27 @@ public class CartService {
         if (cartMapper.deleteOwned(id, account.getId()) != 1) {
             throw new CustomException(ResultCodeEnum.CART_ITEM_NOT_FOUND);
         }
+    }
+
+    @Transactional
+    public List<CustomerOrder> checkout() {
+        Account account = currentCustomer();
+        List<CartItem> items = cartMapper.selectByUserId(account.getId());
+        if (items.isEmpty()) {
+            throw new CustomException(ResultCodeEnum.CART_EMPTY);
+        }
+
+        for (CartItem item : items) {
+            Goods goods = goodsService.selectPurchasableById(item.getGoodsId());
+            validateStock(goods, item.getQuantity());
+        }
+
+        List<CustomerOrder> orders = new ArrayList<>();
+        for (CartItem item : items) {
+            orders.add(orderService.placeOrder(new PlaceOrderRequest(item.getGoodsId(), item.getQuantity())));
+        }
+        cartMapper.deleteByUserId(account.getId());
+        return orders;
     }
 
     private Account currentCustomer() {

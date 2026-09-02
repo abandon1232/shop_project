@@ -3,9 +3,11 @@ package com.example.service;
 import com.example.common.Constants;
 import com.example.common.enums.RoleEnum;
 import com.example.controller.request.AddCartItemRequest;
+import com.example.controller.request.PlaceOrderRequest;
 import com.example.controller.request.UpdateCartItemRequest;
 import com.example.entity.Account;
 import com.example.entity.CartItem;
+import com.example.entity.CustomerOrder;
 import com.example.entity.Goods;
 import com.example.exception.CustomException;
 import com.example.mapper.CartMapper;
@@ -29,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -37,6 +40,7 @@ import static org.mockito.Mockito.when;
 class CartServiceTest {
     @Mock private CartMapper cartMapper;
     @Mock private GoodsService goodsService;
+    @Mock private OrderService orderService;
     @InjectMocks private CartService service;
 
     @AfterEach
@@ -179,6 +183,68 @@ class CartServiceTest {
 
         assertEquals("4043", error.getCode());
         verify(cartMapper).deleteOwned(99, 3);
+    }
+
+    @Test
+    void checkoutCreatesOneOrderPerLineThenClearsCart() {
+        bindAccount(3, RoleEnum.USER);
+        CartItem first = cartItem(14, 3, 7, 2);
+        CartItem second = cartItem(15, 3, 8, 1);
+        when(cartMapper.selectByUserId(3)).thenReturn(List.of(first, second));
+        when(goodsService.selectPurchasableById(7)).thenReturn(goods(7, 6, "Headphones", "1990.00"));
+        when(goodsService.selectPurchasableById(8)).thenReturn(goods(8, 4, "Keyboard", "990.00"));
+        CustomerOrder firstOrder = new CustomerOrder();
+        CustomerOrder secondOrder = new CustomerOrder();
+        when(orderService.placeOrder(new PlaceOrderRequest(7, 2))).thenReturn(firstOrder);
+        when(orderService.placeOrder(new PlaceOrderRequest(8, 1))).thenReturn(secondOrder);
+
+        List<CustomerOrder> result = service.checkout();
+
+        assertEquals(List.of(firstOrder, secondOrder), result);
+        var sequence = inOrder(orderService, cartMapper);
+        sequence.verify(orderService).placeOrder(new PlaceOrderRequest(7, 2));
+        sequence.verify(orderService).placeOrder(new PlaceOrderRequest(8, 1));
+        sequence.verify(cartMapper).deleteByUserId(3);
+    }
+
+    @Test
+    void failedCheckoutDoesNotClearCart() {
+        bindAccount(3, RoleEnum.USER);
+        CartItem line = cartItem(14, 3, 7, 3);
+        when(cartMapper.selectByUserId(3)).thenReturn(List.of(line));
+        when(goodsService.selectPurchasableById(7)).thenReturn(goods(7, 2, "Headphones", "1990.00"));
+
+        CustomException error = assertThrows(CustomException.class, service::checkout);
+
+        assertEquals("4091", error.getCode());
+        verifyNoInteractions(orderService);
+        verify(cartMapper, never()).deleteByUserId(any());
+    }
+
+    @Test
+    void checkoutPrevalidatesEveryLineBeforePlacingAnyOrder() {
+        bindAccount(3, RoleEnum.USER);
+        CartItem first = cartItem(14, 3, 7, 1);
+        CartItem unavailableSecond = cartItem(15, 3, 8, 2);
+        when(cartMapper.selectByUserId(3)).thenReturn(List.of(first, unavailableSecond));
+        when(goodsService.selectPurchasableById(7)).thenReturn(goods(7, 1, "Headphones", "1990.00"));
+        when(goodsService.selectPurchasableById(8)).thenReturn(goods(8, 1, "Keyboard", "990.00"));
+
+        CustomException error = assertThrows(CustomException.class, service::checkout);
+
+        assertEquals("4091", error.getCode());
+        verifyNoInteractions(orderService);
+        verify(cartMapper, never()).deleteByUserId(any());
+    }
+
+    @Test
+    void emptyCartCannotCheckout() {
+        bindAccount(3, RoleEnum.USER);
+        when(cartMapper.selectByUserId(3)).thenReturn(List.of());
+
+        CustomException error = assertThrows(CustomException.class, service::checkout);
+
+        assertEquals("4093", error.getCode());
     }
 
     private Goods goods(int id, int stock, String name, String price) {
