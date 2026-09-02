@@ -1,10 +1,9 @@
 package com.example.service;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.example.common.Constants;
+import cn.hutool.core.util.StrUtil;
 import com.example.common.enums.ResultCodeEnum;
 import com.example.common.enums.RoleEnum;
-import com.example.common.enums.StatusEnum;
 import com.example.entity.Account;
 import com.example.entity.User;
 import com.example.exception.CustomException;
@@ -34,12 +33,12 @@ public class UserService {
      * Create a record.
      */
     public void add(User user) {
+        if (StrUtil.isBlank(user.getPassword())) {
+            throw new CustomException(ResultCodeEnum.PARAM_LOST_ERROR);
+        }
         User dbUser = userMapper.selectByUsername(user.getUsername());
         if (ObjectUtil.isNotNull(dbUser)) {
             throw new CustomException(ResultCodeEnum.USER_EXIST_ERROR);
-        }
-        if (ObjectUtil.isEmpty(user.getPassword())) {
-            user.setPassword(Constants.USER_DEFAULT_PASSWORD);
         }
         user.setPassword(passwordService.encode(user.getPassword()));
         if (ObjectUtil.isEmpty(user.getName())) {
@@ -89,6 +88,16 @@ public class UserService {
      * Find a record by ID.
      */
     public User selectById(Integer id) {
+        return userMapper.selectById(id);
+    }
+
+    public User selectAccessibleById(Integer id) {
+        Account current = TokenUtils.getCurrentUser();
+        if (!RoleEnum.ADMIN.name().equals(current.getRole())
+                && !(RoleEnum.USER.name().equals(current.getRole())
+                && Objects.equals(current.getId(), id))) {
+            throw new CustomException(ResultCodeEnum.FORBIDDEN_ERROR);
+        }
         return userMapper.selectById(id);
     }
 

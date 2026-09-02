@@ -1,7 +1,7 @@
 package com.example.service;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.example.common.Constants;
+import cn.hutool.core.util.StrUtil;
 import com.example.common.enums.ResultCodeEnum;
 import com.example.common.enums.RoleEnum;
 import com.example.common.enums.StatusEnum;
@@ -34,12 +34,12 @@ public class BusinessService {
      * Create a record.
      */
     public void add(Business business) {
+        if (StrUtil.isBlank(business.getPassword())) {
+            throw new CustomException(ResultCodeEnum.PARAM_LOST_ERROR);
+        }
         Business dbBusiness = businessMapper.selectByUsername(business.getUsername());
         if (ObjectUtil.isNotNull(dbBusiness)) {
             throw new CustomException(ResultCodeEnum.USER_EXIST_ERROR);
-        }
-        if (ObjectUtil.isEmpty(business.getPassword())) {
-            business.setPassword(Constants.USER_DEFAULT_PASSWORD);
         }
         business.setPassword(passwordService.encode(business.getPassword()));
         if (ObjectUtil.isEmpty(business.getName())) {
@@ -92,6 +92,16 @@ public class BusinessService {
      * Find a record by ID.
      */
     public Business selectById(Integer id) {
+        return businessMapper.selectById(id);
+    }
+
+    public Business selectAccessibleById(Integer id) {
+        Account current = TokenUtils.getCurrentUser();
+        if (!RoleEnum.ADMIN.name().equals(current.getRole())
+                && !(RoleEnum.BUSINESS.name().equals(current.getRole())
+                && Objects.equals(current.getId(), id))) {
+            throw new CustomException(ResultCodeEnum.FORBIDDEN_ERROR);
+        }
         return businessMapper.selectById(id);
     }
 

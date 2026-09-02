@@ -67,7 +67,7 @@ public class BusinessController {
     @GetMapping("/selectById/{id}")
     @RequireRoles({RoleEnum.ADMIN, RoleEnum.BUSINESS})
     public Result selectById(@PathVariable Integer id) {
-        Business business = businessService.selectById(id);
+        Business business = businessService.selectAccessibleById(id);
         return Result.success(business);
     }
 

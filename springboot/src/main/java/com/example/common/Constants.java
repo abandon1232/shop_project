@@ -6,6 +6,4 @@ public interface Constants {
 
     String CURRENT_USER = "currentUser";
 
-    String USER_DEFAULT_PASSWORD = "123";
-
 }

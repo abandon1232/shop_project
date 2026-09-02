@@ -1,7 +1,7 @@
 package com.example.service;
 
 import cn.hutool.core.util.ObjectUtil;
-import com.example.common.Constants;
+import cn.hutool.core.util.StrUtil;
 import com.example.common.enums.ResultCodeEnum;
 import com.example.common.enums.RoleEnum;
 import com.example.entity.Account;
@@ -32,12 +32,12 @@ public class AdminService {
      * Create a record.
      */
     public void add(Admin admin) {
+        if (StrUtil.isBlank(admin.getPassword())) {
+            throw new CustomException(ResultCodeEnum.PARAM_LOST_ERROR);
+        }
         Admin dbAdmin = adminMapper.selectByUsername(admin.getUsername());
         if (ObjectUtil.isNotNull(dbAdmin)) {
             throw new CustomException(ResultCodeEnum.USER_EXIST_ERROR);
-        }
-        if (ObjectUtil.isEmpty(admin.getPassword())) {
-            admin.setPassword(Constants.USER_DEFAULT_PASSWORD);
         }
         admin.setPassword(passwordService.encode(admin.getPassword()));
         if (ObjectUtil.isEmpty(admin.getName())) {
