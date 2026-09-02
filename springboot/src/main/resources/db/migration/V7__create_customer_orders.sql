@@ -1,0 +1,25 @@
+-- Persist the intentionally simple checkout and fulfilment workflow.
+CREATE TABLE IF NOT EXISTS customer_order (
+    id INT NOT NULL AUTO_INCREMENT,
+    order_number VARCHAR(64) NOT NULL,
+    goods_id INT NULL,
+    user_id INT NULL,
+    business_id INT NULL,
+    product_name VARCHAR(160) NOT NULL,
+    product_img VARCHAR(500) NULL,
+    quantity INT NOT NULL,
+    unit_price DECIMAL(12, 2) NOT NULL,
+    total_price DECIMAL(12, 2) NOT NULL,
+    status VARCHAR(32) NOT NULL DEFAULT 'PLACED',
+    created_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6),
+    updated_at TIMESTAMP(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_customer_order_number (order_number),
+    KEY idx_customer_order_user (user_id),
+    KEY idx_customer_order_business (business_id),
+    KEY idx_customer_order_status (status),
+    KEY idx_customer_order_created (created_at),
+    CONSTRAINT fk_customer_order_goods FOREIGN KEY (goods_id) REFERENCES goods (id) ON DELETE SET NULL,
+    CONSTRAINT fk_customer_order_user FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE SET NULL,
+    CONSTRAINT fk_customer_order_business FOREIGN KEY (business_id) REFERENCES business (id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

@@ -1,32 +1,34 @@
 package com.example.controller;
 
-import cn.hutool.core.collection.CollUtil;
-import cn.hutool.core.io.FileUtil;
-import cn.hutool.core.lang.Dict;
-import cn.hutool.core.thread.ThreadUtil;
-import cn.hutool.core.util.StrUtil;
 import com.example.common.Result;
+import com.example.common.enums.RoleEnum;
+import com.example.common.security.RequireRoles;
+import com.example.service.FileStorageService;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.OutputStream;
-import java.net.URLEncoder;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.nio.charset.StandardCharsets;
 
 /**
- * File endpoints.
+ * Image upload and download endpoints.
  */
 @RestController
 @RequestMapping("/files")
 public class FileController {
 
-    // File upload storage path.
-    @Value("${filePath}")
-    private String filePath;
+    private final FileStorageService fileStorageService;
 
     @Value("${server.port:9090}")
     private String port;
@@ -34,89 +36,44 @@ public class FileController {
     @Value("${ip:localhost}")
     private String ip;
 
-    /**
-     * Upload a file.
-     */
+    public FileController(FileStorageService fileStorageService) {
+        this.fileStorageService = fileStorageService;
+    }
+
     @PostMapping("/upload")
-    public Result upload(MultipartFile file) {
-        String flag;
-        synchronized (FileController.class) {
-            flag = System.currentTimeMillis() + "";
-            ThreadUtil.sleep(1L);
-        }
-        String fileName = file.getOriginalFilename();
-        try {
-            if (!FileUtil.isDirectory(filePath)) {
-                FileUtil.mkdir(filePath);
-            }
-            // Store files as timestamp-filename.
-            FileUtil.writeBytes(file.getBytes(), filePath + flag + "-" + fileName);  // ***/manager/files/1697438073596-avatar.png
-            System.out.println(fileName + "--上传成功");
-
-        } catch (Exception e) {
-            System.err.println(fileName + "--文件上传失败");
-        }
-        String http = "http://" + ip + ":" + port + "/files/";
-        return Result.success(http + flag + "-" + fileName);  //  http://localhost:9090/files/1697438073596-avatar.png
+    public Result upload(@RequestParam("file") MultipartFile file) {
+        String storedName = fileStorageService.storeImage(file);
+        String url = "http://" + ip + ":" + port + "/files/" + storedName;
+        return Result.success(url);
     }
 
+    @GetMapping("/{storedName}")
+    public ResponseEntity<Resource> download(@PathVariable String storedName) {
+        Resource resource = fileStorageService.load(storedName);
+        return ResponseEntity.ok()
+                .contentType(contentType(storedName))
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.inline()
+                                .filename(storedName, StandardCharsets.UTF_8)
+                                .build().toString())
+                .body(resource);
+    }
 
-    /**
-     * Download a file.
-     *
-     * @param flag
-     * @param response
-     */
-    @GetMapping("/{flag}")   //  1697438073596-avatar.png
-    public void avatarPath(@PathVariable String flag, HttpServletResponse response) {
-        OutputStream os;
-        try {
-            if (StrUtil.isNotEmpty(flag)) {
-                response.addHeader("Content-Disposition", "attachment;filename=" + URLEncoder.encode(flag, "UTF-8"));
-                response.setContentType("application/octet-stream");
-                byte[] bytes = FileUtil.readBytes(filePath + flag);
-                os = response.getOutputStream();
-                os.write(bytes);
-                os.flush();
-                os.close();
-            }
-        } catch (Exception e) {
-            System.out.println("文件下载失败");
+    @DeleteMapping("/{storedName}")
+    @RequireRoles(RoleEnum.ADMIN)
+    public Result delFile(@PathVariable String storedName) {
+        fileStorageService.delete(storedName);
+        return Result.success();
+    }
+
+    private MediaType contentType(String storedName) {
+        String lowerName = storedName.toLowerCase();
+        if (lowerName.endsWith(".png")) {
+            return MediaType.IMAGE_PNG;
         }
-    }
-
-    /**
-     * Delete a file.
-     *
-     * @param flag
-     */
-    @DeleteMapping("/{flag}")
-    public void delFile(@PathVariable String flag) {
-        FileUtil.del(filePath + flag);
-        System.out.println("删除文件" + flag + "成功");
-    }
-
-    /**
-     * Upload endpoint for wangEditor.
-     */
-    @PostMapping("/wang/upload")
-    public Map<String, Object> wangEditorUpload(MultipartFile file) {
-        String flag = System.currentTimeMillis() + "";
-        String fileName = file.getOriginalFilename();
-        try {
-            // Store files as timestamp-filename.
-            FileUtil.writeBytes(file.getBytes(), filePath + flag + "-" + fileName);
-            System.out.println(fileName + "--上传成功");
-            Thread.sleep(1L);
-        } catch (Exception e) {
-            System.err.println(fileName + "--文件上传失败");
+        if (lowerName.endsWith(".gif")) {
+            return MediaType.IMAGE_GIF;
         }
-        String http = "http://" + ip + ":" + port + "/files/";
-        Map<String, Object> resMap = new HashMap<>();
-        // Return the payload required by wangEditor after a successful image upload.
-        resMap.put("errno", 0);
-        resMap.put("data", CollUtil.newArrayList(Dict.create().set("url", http + flag + "-" + fileName)));
-        return resMap;
+        return MediaType.IMAGE_JPEG;
     }
-
 }

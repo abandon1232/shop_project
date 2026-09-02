@@ -67,7 +67,7 @@ public class UserController {
     @GetMapping("/selectById/{id}")
     @RequireRoles({RoleEnum.ADMIN, RoleEnum.USER})
     public Result selectById(@PathVariable Integer id) {
-        User user = userService.selectById(id);
+        User user = userService.selectAccessibleById(id);
         return Result.success(user);
     }
 

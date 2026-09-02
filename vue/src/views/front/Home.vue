@@ -1,119 +1,135 @@
 <template>
-  <div class="main-content">
-    <div class="container">
-      <div class="content-wrapper">
-        <!-- Left category navigation. -->
-        <div class="category-sidebar">
-          <h2 class="section-title">PORDUCT catergary</h2>
-          <div class="category-list">
-            <div class="category-item" v-for="item in typeData" :key="item.id" @click="navTo('/front/type?id=' + item.id)">
-              <img :src="item.img" :alt="item.name">
-              <span>{{ item.name }}</span>
+  <main class="store-home">
+    <section class="hero-section" aria-label="Store highlights">
+      <el-carousel class="hero-carousel" height="430px" :interval="6500">
+        <el-carousel-item v-for="slide in heroSlides" :key="slide.title">
+          <div class="hero-slide">
+            <img :src="slide.image" :alt="slide.imageAlt">
+            <div class="hero-shade"></div>
+            <div class="hero-copy" :class="slide.copyPosition">
+              <span class="eyebrow">{{ slide.eyebrow }}</span>
+              <h1>{{ slide.title }}</h1>
+              <p>{{ slide.description }}</p>
+              <el-button class="hero-button" @click="scrollToProducts">Explore products</el-button>
             </div>
           </div>
-        </div>
+        </el-carousel-item>
+      </el-carousel>
+    </section>
 
-        <!-- Main center content. -->
-        <div class="main-section">
-          <!-- Carousel. -->
-          <el-carousel class="banner-carousel" height="400px">
-            <el-carousel-item v-for="(item, index) in carousel_top" :key="index">
-              <img :src="item" alt="banner">
-            </el-carousel-item>
-          </el-carousel>
-
-          <!-- Popular products. -->
-          <div class="section-block">
-            <div class="section-header">
-              <h2>热卖商品</h2>
-              <div class="section-more">查看更多 ></div>
-            </div>
-            <div class="products-grid">
-              <div class="product-card" v-for="item in goodsData" :key="item.id">
-                <div class="product-image">
-                  <img :src="item.img" :alt="item.name">
-                </div>
-                <div class="product-info">
-                  <h3 class="product-name">{{ item.name }}</h3>
-                  <div class="product-price">
-                    <span class="currency">¥</span>
-                    <span class="amount">{{ item.price }}</span>
-                    <span class="unit">/ {{ item.unit }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Recommended products. -->
-          <div class="section-block">
-            <div class="section-header">
-              <h2>猜你喜欢</h2>
-              <div class="section-more">查看更多 ></div>
-            </div>
-            <div class="products-grid">
-              <div class="product-card" v-for="item in recommendData" :key="item.id">
-                <div class="product-image">
-                  <img :src="item.img" :alt="item.name">
-                </div>
-                <div class="product-info">
-                  <h3 class="product-name">{{ item.name }}</h3>
-                  <div class="product-price">
-                    <span class="currency">¥</span>
-                    <span class="amount">{{ item.price }}</span>
-                    <span class="unit">/ {{ item.unit }}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- User information panel. -->
-        <div class="user-sidebar">
-          <div class="user-profile">
-            <img :src="user.avatar" :alt="user.name" @click="navTo('/front/person')">
-            <h3>Hi，{{ user.name }}</h3>
-          </div>
-          <div class="promo-banner">
-            <img src="@/assets/imgs/right.png" alt="promotional banner">
-          </div>
-          <div class="quick-actions">
-          </div>
-        </div>
+    <section class="trust-strip" aria-label="Marketplace benefits">
+      <div>
+        <strong>Clear catalogue</strong>
+        <span>Compare products, categories and stock in one place.</span>
       </div>
-    </div>
-  </div>
+      <div>
+        <strong>Approved sellers</strong>
+        <span>Products are published by reviewed marketplace sellers.</span>
+      </div>
+      <div>
+        <strong>Built for Sweden</strong>
+        <span>Prices are presented in Swedish kronor.</span>
+      </div>
+    </section>
+
+    <section class="catalogue-layout">
+      <aside class="category-panel">
+        <div class="panel-heading">
+          <span class="eyebrow">Browse</span>
+          <h2 class="section-title">Shop by category</h2>
+        </div>
+        <div v-if="typeData.length" class="category-list">
+          <button
+            v-for="item in typeData"
+            :key="item.id"
+            class="category-item"
+            type="button"
+            @click="navTo('/front/type?id=' + item.id)"
+          >
+            <img :src="item.img || productPlaceholder" :alt="item.name" @error="handleImageError">
+            <span>{{ item.name }}</span>
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+        <p v-else class="empty-copy">Categories will appear here when they are available.</p>
+      </aside>
+
+      <section id="featured-products" class="product-panel">
+        <div class="section-header">
+          <div>
+            <span class="eyebrow">New in the catalogue</span>
+            <h2>Featured products</h2>
+          </div>
+          <span class="section-note">From approved sellers</span>
+        </div>
+
+        <div v-if="featuredData.length" class="products-grid">
+          <ProductCard
+            v-for="item in featuredData"
+            :key="item.id"
+            :product="item"
+            @select="openProduct"
+          />
+        </div>
+        <div v-else class="product-empty">
+          <img :src="productPlaceholder" alt="Generic wireless speaker">
+          <div>
+            <h3>The catalogue is being prepared</h3>
+            <p>Featured products will appear here after an approved seller publishes them.</p>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
 </template>
 
 <script>
+import heroHome from '@/assets/imgs/hero-home.webp'
+import heroWorkspace from '@/assets/imgs/hero-workspace.webp'
+import productPlaceholder from '@/assets/imgs/product-placeholder.webp'
+import ProductCard from '@/components/ProductCard.vue'
+import { applyImageFallback } from '@/utils/imageFallback'
 
 export default {
-
+  name: 'StoreHome',
+  components: { ProductCard },
   data() {
     return {
-        user: JSON.parse(localStorage.getItem('xm-user') || '{}'),
-        typeData: [],
-        goodsData:[],
-        recommendData:[],
-        carousel_top:[
-          require('@/assets/imgs/carousel-1.png'),
-          require('@/assets/imgs/carousel-2.png'),
-          require('@/assets/imgs/carousel-9.png'),
-      ]
+      typeData: [],
+      featuredData: [],
+      productPlaceholder,
+      heroSlides: [
+        {
+          eyebrow: 'Everyday technology',
+          title: 'A calmer setup for work and study',
+          description: 'Browse practical electronics for a focused Scandinavian workspace.',
+          image: heroWorkspace,
+          imageAlt: 'Laptop, headphones and desk accessories in a bright home workspace',
+          copyPosition: 'copy-left',
+        },
+        {
+          eyebrow: 'Made for home',
+          title: 'Simple upgrades for every room',
+          description: 'Discover useful products from approved sellers in one clear catalogue.',
+          image: heroHome,
+          imageAlt: 'Television and audio equipment in a Scandinavian living room',
+          copyPosition: 'copy-right',
+        },
+      ],
     }
   },
   mounted() {
     this.loadType()
-    this.loadGoods()
-    this.loadRecommend()
+    this.loadFeatured()
   },
-  // methods：Click handlers and other methods for this page
   methods: {
-    loadRecommend(){
-      this.$request.get('/goods/recommend').then(res => {
+    handleImageError(event) {
+      applyImageFallback(event, productPlaceholder)
+    },
+    loadFeatured() {
+      this.$request.get('/goods/featured').then(res => {
         if (res.code === '200') {
-          this.recommendData = res.data
+          this.featuredData = res.data || []
         } else {
           this.$message.error(res.msg)
         }
@@ -122,216 +138,364 @@ export default {
     loadType() {
       this.$request.get('/type/selectAll').then(res => {
         if (res.code === '200') {
-          this.typeData = res.data
-        } else {
-          this.$message.error(res.msg)
-        }
-      })
-    },
-    loadGoods() {
-      this.$request.get('/goods/selectTop15').then(res => {
-        if (res.code === '200') {
-          this.goodsData = res.data
+          this.typeData = res.data || []
         } else {
           this.$message.error(res.msg)
         }
       })
     },
     navTo(url) {
-      location.href = url
+      this.$router.push(url)
     },
-  }
+    openProduct(product) {
+      this.$router.push({ name: 'ProductDetail', params: { id: product.id } })
+    },
+    scrollToProducts() {
+      document.getElementById('featured-products')?.scrollIntoView({ behavior: 'smooth' })
+    },
+  },
 }
 </script>
 
 <style scoped>
-.main-content {
+.store-home {
   min-height: 100vh;
-  background-color: #f5f5f5;
-  padding: 20px 0;
-  background-image: url('@/assets/imgs/bg.jpg');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
+  padding: 28px max(24px, calc((100vw - 1440px) / 2)) 72px;
+  background: #f3f5f7;
+  color: #142033;
 }
 
-.container {
-  max-width: 1400px;
+.hero-section,
+.trust-strip,
+.catalogue-layout {
+  max-width: 1380px;
   margin: 0 auto;
-  padding: 0 20px;
 }
 
-.content-wrapper {
+.hero-carousel {
+  overflow: hidden;
+  border-radius: 24px;
+  box-shadow: 0 20px 50px rgba(12, 32, 56, 0.14);
+}
+
+.hero-slide {
+  position: relative;
+  height: 430px;
+  overflow: hidden;
+  background: #13243b;
+}
+
+.hero-slide > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.hero-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(9, 28, 51, 0.88) 0%, rgba(9, 28, 51, 0.5) 35%, rgba(9, 28, 51, 0.06) 68%);
+}
+
+.hero-copy {
+  position: absolute;
+  top: 50%;
+  width: min(480px, 44%);
+  transform: translateY(-50%);
+  color: #fff;
+}
+
+.copy-left {
+  left: 7%;
+}
+
+.copy-right {
+  right: 7%;
+  padding: 28px;
+  border-radius: 18px;
+  background: rgba(9, 28, 51, 0.82);
+  backdrop-filter: blur(6px);
+}
+
+.eyebrow {
+  color: #e76f2e;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.hero-copy h1 {
+  max-width: 620px;
+  margin: 12px 0 14px;
+  font-size: clamp(34px, 4vw, 58px);
+  line-height: 1.03;
+  letter-spacing: -0.04em;
+}
+
+.hero-copy p {
+  max-width: 470px;
+  margin-bottom: 24px;
+  color: rgba(255, 255, 255, 0.84);
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+.hero-button {
+  border: 0;
+  background: #e76f2e;
+  color: #fff;
+  font-weight: 700;
+}
+
+.trust-strip {
   display: grid;
-  grid-template-columns: 250px 1fr 300px;
-  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 18px;
+  overflow: hidden;
+  border: 1px solid #dce2e8;
+  border-radius: 16px;
+  background: #fff;
 }
 
-/* Left category navigation styles. */
-.category-sidebar {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+.trust-strip div {
+  display: grid;
+  gap: 5px;
+  padding: 20px 28px;
+}
+
+.trust-strip div + div {
+  border-left: 1px solid #e6e9ed;
+}
+
+.trust-strip strong {
+  color: #13243b;
+  font-size: 15px;
+}
+
+.trust-strip span,
+.empty-copy,
+.section-note,
+.product-empty p {
+  color: #687586;
+  line-height: 1.5;
+}
+
+.catalogue-layout {
+  display: grid;
+  grid-template-columns: 270px minmax(0, 1fr);
+  gap: 22px;
+  margin-top: 22px;
+}
+
+.category-panel,
+.product-panel {
+  border: 1px solid #dce2e8;
+  border-radius: 18px;
+  background: #fff;
+}
+
+.category-panel {
+  align-self: start;
+  padding: 24px;
+}
+
+.panel-heading,
+.section-header {
+  margin-bottom: 20px;
+}
+
+.section-title,
+.section-header h2 {
+  margin-top: 7px;
+  color: #13243b;
+  font-size: 25px;
+  letter-spacing: -0.025em;
+}
+
+.category-list {
+  display: grid;
+  gap: 8px;
 }
 
 .category-item {
-  display: flex;
+  display: grid;
+  grid-template-columns: 38px 1fr auto;
   align-items: center;
-  padding: 12px;
+  gap: 12px;
+  width: 100%;
+  padding: 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #28384d;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
-  transition: all 0.3s;
-  border-radius: 8px;
 }
 
 .category-item:hover {
-  background: #f0f2ff;
+  background: #eef2f6;
 }
 
 .category-item img {
-  width: 24px;
-  height: 24px;
-  margin-right: 12px;
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  object-fit: cover;
 }
 
-/* Center content styles. */
-.main-section {
-  background: transparent;
-}
-
-.banner-carousel {
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-}
-
-.section-block {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  margin-top: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+.product-panel {
+  padding: 28px;
 }
 
 .section-header {
   display: flex;
+  align-items: flex-end;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.section-header h2 {
-  font-size: 20px;
-  color: #333;
-}
-
-.section-more {
-  color: #666;
-  cursor: pointer;
+  gap: 24px;
 }
 
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 16px;
 }
 
 .product-card {
-  background: white;
-  border-radius: 8px;
   overflow: hidden;
-  transition: all 0.3s;
-  cursor: pointer;
+  border: 1px solid #e0e5ea;
+  border-radius: 14px;
+  background: #fff;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .product-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(15, 39, 66, 0.11);
+}
+
+.product-image {
+  aspect-ratio: 4 / 3;
+  padding: 16px;
+  background: #f4f6f8;
 }
 
 .product-image img {
   width: 100%;
-  height: 200px;
-  object-fit: cover;
+  height: 100%;
+  object-fit: contain;
 }
 
 .product-info {
-  padding: 12px;
+  padding: 17px;
+}
+
+.product-kicker {
+  color: #778393;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .product-name {
-  font-size: 14px;
-  margin-bottom: 8px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-height: 44px;
+  margin: 7px 0 14px;
+  color: #142033;
+  font-size: 16px;
+  line-height: 1.4;
 }
 
 .product-price {
-  color: #ff4400;
-  font-size: 16px;
-}
-
-/* User information styles. */
-.user-sidebar {
-  background: white;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
-}
-
-.user-profile {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.user-profile img {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  margin-bottom: 12px;
-  cursor: pointer;
-  border: 2px solid #eee;
-  transition: all 0.3s;
-}
-
-.user-profile img:hover {
-  border-color: #4169E1;
-}
-
-.quick-actions {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.action-item {
   display: flex;
-  flex-direction: column;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.amount {
+  color: #c94f13;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.unit {
+  color: #7b8693;
+  font-size: 12px;
+}
+
+.product-empty {
+  display: flex;
   align-items: center;
-  padding: 15px;
-  cursor: pointer;
-  border-radius: 8px;
-  transition: all 0.3s;
+  gap: 24px;
+  padding: 24px;
+  border-radius: 14px;
+  background: #f4f6f8;
 }
 
-.action-item:hover {
-  background: #f0f2ff;
+.product-empty img {
+  width: 140px;
+  height: 110px;
+  object-fit: contain;
 }
 
-.action-item img {
-  width: 28px;
-  height: 28px;
+.product-empty h3 {
   margin-bottom: 8px;
 }
 
-.promo-banner {
-  margin: 20px 0;
+@media (max-width: 900px) {
+  .hero-copy {
+    width: 58%;
+  }
+
+  .trust-strip,
+  .catalogue-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .trust-strip div + div {
+    border-top: 1px solid #e6e9ed;
+    border-left: 0;
+  }
 }
 
-.promo-banner img {
-  width: 100%;
-  border-radius: 8px;
+@media (max-width: 600px) {
+  .store-home {
+    padding: 14px 14px 48px;
+  }
+
+  .hero-carousel,
+  .hero-slide {
+    height: 420px !important;
+  }
+
+  .hero-slide > img {
+    opacity: 0.68;
+  }
+
+  .hero-copy,
+  .copy-left,
+  .copy-right {
+    right: 24px;
+    left: 24px;
+    width: auto;
+    padding: 0;
+    background: transparent;
+  }
+
+  .hero-copy h1 {
+    font-size: 36px;
+  }
+
+  .section-header,
+  .product-empty {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .product-panel,
+  .category-panel {
+    padding: 20px;
+  }
 }
 </style>

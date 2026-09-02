@@ -37,4 +37,7 @@ public interface UserMapper {
 
     @Select("select * from user where username = #{username}")
     User selectByUsername(String username);
+
+    @Select("select count(*) from user")
+    long countAll();
 }

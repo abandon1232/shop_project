@@ -4,6 +4,6 @@ public interface Constants {
 
     String TOKEN = "token";
 
-    String USER_DEFAULT_PASSWORD = "123";
+    String CURRENT_USER = "currentUser";
 
 }

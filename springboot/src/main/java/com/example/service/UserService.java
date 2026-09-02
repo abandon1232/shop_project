@@ -1,10 +1,7 @@
 package com.example.service;
 
-import cn.hutool.core.util.ObjectUtil;
-import com.example.common.Constants;
 import com.example.common.enums.ResultCodeEnum;
 import com.example.common.enums.RoleEnum;
-import com.example.common.enums.StatusEnum;
 import com.example.entity.Account;
 import com.example.entity.User;
 import com.example.exception.CustomException;
@@ -34,15 +31,15 @@ public class UserService {
      * Create a record.
      */
     public void add(User user) {
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
+            throw new CustomException(ResultCodeEnum.PARAM_LOST_ERROR);
+        }
         User dbUser = userMapper.selectByUsername(user.getUsername());
-        if (ObjectUtil.isNotNull(dbUser)) {
+        if (dbUser != null) {
             throw new CustomException(ResultCodeEnum.USER_EXIST_ERROR);
         }
-        if (ObjectUtil.isEmpty(user.getPassword())) {
-            user.setPassword(Constants.USER_DEFAULT_PASSWORD);
-        }
         user.setPassword(passwordService.encode(user.getPassword()));
-        if (ObjectUtil.isEmpty(user.getName())) {
+        if (user.getName() == null || user.getName().isEmpty()) {
             user.setName(user.getUsername());
         }
 
@@ -79,7 +76,9 @@ public class UserService {
             user.setPassword(null);
             user.setRole(null);
         }
-        if (ObjectUtil.isNotEmpty(user.getPassword()) && passwordService.needsUpgrade(user.getPassword())) {
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
+            user.setPassword(null);
+        } else if (passwordService.needsUpgrade(user.getPassword())) {
             user.setPassword(passwordService.encode(user.getPassword()));
         }
         userMapper.updateById(user);
@@ -89,6 +88,16 @@ public class UserService {
      * Find a record by ID.
      */
     public User selectById(Integer id) {
+        return userMapper.selectById(id);
+    }
+
+    public User selectAccessibleById(Integer id) {
+        Account current = TokenUtils.getCurrentUser();
+        if (!RoleEnum.ADMIN.name().equals(current.getRole())
+                && !(RoleEnum.USER.name().equals(current.getRole())
+                && Objects.equals(current.getId(), id))) {
+            throw new CustomException(ResultCodeEnum.FORBIDDEN_ERROR);
+        }
         return userMapper.selectById(id);
     }
 
@@ -113,7 +122,7 @@ public class UserService {
      */
     public Account login(Account account) {
         User dbUser = userMapper.selectByUsername(account.getUsername());
-        if (ObjectUtil.isNull(dbUser)) {
+        if (dbUser == null) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
         if (!passwordService.matches(account.getPassword(), dbUser.getPassword())) {
@@ -145,7 +154,7 @@ public class UserService {
      */
     public void updatePassword(Account account) {
         User dbUser = userMapper.selectByUsername(account.getUsername());
-        if (ObjectUtil.isNull(dbUser)) {
+        if (dbUser == null) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
         if (!passwordService.matches(account.getPassword(), dbUser.getPassword())) {

@@ -9,19 +9,7 @@
         <div class="goods-grid">
           <el-row :gutter="30">
             <el-col :lg="6" :md="8" :sm="12" :xs="24" v-for="item in goodsData" :key="item.id" class="goods-item">
-              <div class="goods-card">
-                <div class="goods-image-wrapper">
-                  <img :src="item.img" alt="" class="goods-image">
-                </div>
-                <div class="goods-info">
-                  <div class="goods-name">{{item.name}}</div>
-                  <div class="goods-price">
-                    <span class="price-symbol">￥</span>
-                    <span class="price-value">{{item.price}}</span>
-                    <span class="price-unit">/ {{item.unit}}</span>
-                  </div>
-                </div>
-              </div>
+              <ProductCard :product="item" @select="openProduct" />
             </el-col>
           </el-row>
         </div>
@@ -29,23 +17,16 @@
       
       <div class="recommend-section">
         <div class="section-header">
-          <h2 class="section-title">猜你喜欢</h2>
+          <h2 class="section-title">Latest products</h2>
           <div class="section-divider"></div>
         </div>
         <div class="recommend-list">
-          <div v-for="item in recommendData" :key="item.id" class="recommend-item">
-            <div class="goods-image-wrapper">
-              <img :src="item.img" alt="" class="goods-image">
-            </div>
-            <div class="goods-info">
-              <div class="goods-name">{{item.name}}</div>
-              <div class="goods-price">
-                <span class="price-symbol">￥</span>
-                <span class="price-value">{{item.price}}</span>
-                <span class="price-unit">/ {{item.unit}}</span>
-              </div>
-            </div>
-          </div>
+          <ProductCard
+            v-for="item in recommendData"
+            :key="item.id"
+            :product="item"
+            @select="openProduct"
+          />
         </div>
       </div>
     </div>
@@ -53,9 +34,11 @@
 </template>
 
 <script>
+import ProductCard from '@/components/ProductCard.vue'
 
 export default {
-
+  name: 'StoreType',
+  components: { ProductCard },
   data() {
     let typeId = this.$route.query.id
     return {
@@ -71,10 +54,10 @@ export default {
     this.loadType()
     this.loadRecommend()
   },
-  // methods：Click handlers and other methods for this page
+  // Click handlers and data loaders for this page.
   methods: {
     loadRecommend() {
-      this.$request.get('/goods/recommend').then(res => {
+      this.$request.get('/goods/featured').then(res => {
         if (res.code === '200') {
           this.recommendData = res.data
         } else {
@@ -100,9 +83,9 @@ export default {
         }
       })
     },
-    navTo(url) {
-      location.href = url
-    }
+    openProduct(product) {
+      this.$router.push({ name: 'ProductDetail', params: { id: product.id } })
+    },
   }
 }
 </script>

@@ -1,7 +1,5 @@
 package com.example.service;
 
-import cn.hutool.core.util.ObjectUtil;
-import com.example.common.Constants;
 import com.example.common.enums.ResultCodeEnum;
 import com.example.common.enums.RoleEnum;
 import com.example.common.enums.StatusEnum;
@@ -34,19 +32,19 @@ public class BusinessService {
      * Create a record.
      */
     public void add(Business business) {
+        if (business.getPassword() == null || business.getPassword().isBlank()) {
+            throw new CustomException(ResultCodeEnum.PARAM_LOST_ERROR);
+        }
         Business dbBusiness = businessMapper.selectByUsername(business.getUsername());
-        if (ObjectUtil.isNotNull(dbBusiness)) {
+        if (dbBusiness != null) {
             throw new CustomException(ResultCodeEnum.USER_EXIST_ERROR);
         }
-        if (ObjectUtil.isEmpty(business.getPassword())) {
-            business.setPassword(Constants.USER_DEFAULT_PASSWORD);
-        }
         business.setPassword(passwordService.encode(business.getPassword()));
-        if (ObjectUtil.isEmpty(business.getName())) {
+        if (business.getName() == null || business.getName().isEmpty()) {
             business.setName(business.getUsername());
         }
-        if (ObjectUtil.isEmpty(business.getStatus())){
-            business.setStatus(StatusEnum.CHECKING.status);
+        if (business.getStatus() == null || business.getStatus().isEmpty()) {
+            business.setStatus(StatusEnum.PENDING.code());
         }
         business.setRole(RoleEnum.BUSINESS.name());
         businessMapper.insert(business);
@@ -82,7 +80,9 @@ public class BusinessService {
             business.setRole(null);
             business.setStatus(null);
         }
-        if (ObjectUtil.isNotEmpty(business.getPassword()) && passwordService.needsUpgrade(business.getPassword())) {
+        if (business.getPassword() == null || business.getPassword().isBlank()) {
+            business.setPassword(null);
+        } else if (passwordService.needsUpgrade(business.getPassword())) {
             business.setPassword(passwordService.encode(business.getPassword()));
         }
         businessMapper.updateById(business);
@@ -92,6 +92,16 @@ public class BusinessService {
      * Find a record by ID.
      */
     public Business selectById(Integer id) {
+        return businessMapper.selectById(id);
+    }
+
+    public Business selectAccessibleById(Integer id) {
+        Account current = TokenUtils.getCurrentUser();
+        if (!RoleEnum.ADMIN.name().equals(current.getRole())
+                && !(RoleEnum.BUSINESS.name().equals(current.getRole())
+                && Objects.equals(current.getId(), id))) {
+            throw new CustomException(ResultCodeEnum.FORBIDDEN_ERROR);
+        }
         return businessMapper.selectById(id);
     }
 
@@ -116,7 +126,7 @@ public class BusinessService {
      */
     public Account login(Account account) {
         Business dbBusiness = businessMapper.selectByUsername(account.getUsername());
-        if (ObjectUtil.isNull(dbBusiness)) {
+        if (dbBusiness == null) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
         if (!passwordService.matches(account.getPassword(), dbBusiness.getPassword())) {
@@ -148,7 +158,7 @@ public class BusinessService {
      */
     public void updatePassword(Account account) {
         Business dbBusiness = businessMapper.selectByUsername(account.getUsername());
-        if (ObjectUtil.isNull(dbBusiness)) {
+        if (dbBusiness == null) {
             throw new CustomException(ResultCodeEnum.USER_NOT_EXIST_ERROR);
         }
         if (!passwordService.matches(account.getPassword(), dbBusiness.getPassword())) {
