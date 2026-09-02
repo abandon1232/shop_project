@@ -2,15 +2,15 @@
 
 ## Recommended CV entry
 
-**Product Management and Storefront Platform** — Java 21, Spring Boot, MyBatis, MySQL, Vue 3
+**Product Management and Storefront Platform** — Java 25, Spring Boot 4, MyBatis, MySQL, Vue 3
 
-- Built a role-based REST application for administrator, merchant, and customer workflows, with JWT authentication, BCrypt password storage, ownership checks, and validated product operations.
+- Built a role-based REST application for administrator, seller, and customer workflows, with JWT authentication, BCrypt password storage, ownership checks, and validated product operations.
 - Managed schema changes with Flyway and added automated backend/frontend verification through Maven, Vitest, and GitHub Actions.
 - Implemented pagination, search, safe image uploads, stock handling, and a deterministic latest-products feed in a maintainable modular monolith.
 
 ## Short version
 
-Developed and tested a Java 21/Spring Boot and Vue 3 shop-management application with role-based authorization, MySQL/Flyway persistence, validated product workflows, and secure local image storage.
+Developed and tested a Java 25/Spring Boot 4 and Vue 3 shop-management application with role-based authorization, MySQL/Flyway persistence, validated product workflows, and secure local image storage.
 
 ## Interview boundary
 
