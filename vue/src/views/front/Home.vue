@@ -87,7 +87,9 @@
 </template>
 
 <script>
-
+import carouselOne from '@/assets/imgs/carousel-1.png'
+import carouselTwo from '@/assets/imgs/carousel-2.png'
+import carouselNine from '@/assets/imgs/carousel-9.png'
 export default {
 
   data() {
@@ -97,9 +99,9 @@ export default {
         goodsData:[],
         recommendData:[],
         carousel_top:[
-          require('@/assets/imgs/carousel-1.png'),
-          require('@/assets/imgs/carousel-2.png'),
-          require('@/assets/imgs/carousel-9.png'),
+          carouselOne,
+          carouselTwo,
+          carouselNine,
       ]
     }
   },

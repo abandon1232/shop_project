@@ -1,20 +1,17 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
+import ElementPlus from 'element-plus'
+import 'element-plus/dist/index.css'
+import '@/assets/css/global.css'
+
 import App from './App.vue'
 import router from './router'
-import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-chalk/index.css'
-import '@/assets/css/global.css'
-import '@/assets/css/theme/index.css'
-import request from "@/utils/request";
+import request from './utils/request'
 
-Vue.config.productionTip = false
+const app = createApp(App)
 
-Vue.prototype.$request = request
-Vue.prototype.$baseUrl = process.env.VUE_APP_BASEURL
+app.config.globalProperties.$request = request
+app.config.globalProperties.$baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:9090'
 
-Vue.use(ElementUI, {size: "small"})
-
-new Vue({
-    router,
-    render: h => h(App)
-}).$mount('#app')
+app.use(router)
+app.use(ElementPlus, { size: 'small' })
+app.mount('#app')

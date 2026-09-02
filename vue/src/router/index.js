@@ -1,13 +1,4 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-
-Vue.use(VueRouter)
-
-// Prevent duplicate-navigation errors when menu items are clicked repeatedly in vue-router 3+.
-const originalPush = VueRouter.prototype.push
-VueRouter.prototype.push = function push (location) {
-  return originalPush.call(this, location).catch(err => err)
-}
+import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
   {
@@ -15,58 +6,60 @@ const routes = [
     name: 'Manager',
     component: () => import('../views/Manager.vue'),
     children: [
-      { path: '403', name: 'NoAuth', meta: { name: '无权限' }, component: () => import('../views/manager/403') },
-      { path: 'home', name: 'Home', meta: { name: '系统首页' }, component: () => import('../views/manager/Home') },
-      { path: 'admin', name: 'Admin', meta: { name: '管理员信息' }, component: () => import('../views/manager/Admin') },
-      { path: 'business', name: 'Business', meta: { name: '商家信息' }, component: () => import('../views/manager/Business') },
-      { path: 'user', name: 'User', meta: { name: '用户信息' }, component: () => import('../views/manager/User') },
-      { path: 'adminPerson', name: 'AdminPerson', meta: { name: '个人信息' }, component: () => import('../views/manager/AdminPerson') },
-      { path: 'businessPerson', name: 'BusinessPerson', meta: { name: '个人信息' }, component: () => import('../views/manager/BusinessPerson') },
-      { path: 'password', name: 'Password', meta: { name: '修改密码' }, component: () => import('../views/manager/Password') },
-      { path: 'notice', name: 'Notice', meta: { name: '公告信息' }, component: () => import('../views/manager/Notice') },
-      { path: 'type', name: 'Type', meta: { name: '分类信息' }, component: () => import('../views/manager/Type') },
-      { path: 'goods', name: 'Goods', meta: { name: '商品信息' }, component: () => import('../views/manager/Goods') },
-    ]
+      { path: '403', name: 'NoAuth', meta: { name: '无权限' }, component: () => import('../views/manager/403.vue') },
+      { path: 'home', name: 'ManagerHome', meta: { name: '系统首页' }, component: () => import('../views/manager/Home.vue') },
+      { path: 'admin', name: 'Admin', meta: { name: '管理员信息' }, component: () => import('../views/manager/Admin.vue') },
+      { path: 'business', name: 'Business', meta: { name: '商家信息' }, component: () => import('../views/manager/Business.vue') },
+      { path: 'user', name: 'User', meta: { name: '用户信息' }, component: () => import('../views/manager/User.vue') },
+      { path: 'adminPerson', name: 'AdminPerson', meta: { name: '个人信息' }, component: () => import('../views/manager/AdminPerson.vue') },
+      { path: 'businessPerson', name: 'BusinessPerson', meta: { name: '个人信息' }, component: () => import('../views/manager/BusinessPerson.vue') },
+      { path: 'password', name: 'Password', meta: { name: '修改密码' }, component: () => import('../views/manager/Password.vue') },
+      { path: 'notice', name: 'Notice', meta: { name: '公告信息' }, component: () => import('../views/manager/Notice.vue') },
+      { path: 'type', name: 'ManagerType', meta: { name: '分类信息' }, component: () => import('../views/manager/Type.vue') },
+      { path: 'goods', name: 'Goods', meta: { name: '商品信息' }, component: () => import('../views/manager/Goods.vue') },
+    ],
   },
   {
     path: '/front',
     name: 'Front',
     component: () => import('../views/Front.vue'),
     children: [
-      { path: 'home', name: 'Home', meta: { name: '系统首页' }, component: () => import('../views/front/Home') },
-      { path: 'person', name: 'Person', meta: { name: '个人信息' }, component: () => import('../views/front/Person') },
-      { path: 'type', name: 'Type', meta: { name: '分类商品' }, component: () => import('../views/front/Type') },
-      { path: 'search', name: 'Search', meta: { name: '搜索页面' }, component: () => import('../views/front/Search') },
-    ]
+      { path: 'home', name: 'StoreHome', meta: { name: '商城首页' }, component: () => import('../views/front/Home.vue') },
+      { path: 'person', name: 'Person', meta: { name: '个人信息' }, component: () => import('../views/front/Person.vue') },
+      { path: 'type', name: 'StoreType', meta: { name: '分类商品' }, component: () => import('../views/front/Type.vue') },
+      { path: 'search', name: 'Search', meta: { name: '搜索页面' }, component: () => import('../views/front/Search.vue') },
+    ],
   },
-  { path: '/login', name: 'Login', meta: { name: '登录' }, component: () => import('../views/Login.vue') },
-  { path: '/register', name: 'Register', meta: { name: '注册' }, component: () => import('../views/Register.vue') },
-  { path: '*', name: 'NotFound', meta: { name: '无法访问' }, component: () => import('../views/404.vue') },
+  { path: '/login', name: 'Login', meta: { name: '登录', public: true }, component: () => import('../views/Login.vue') },
+  { path: '/register', name: 'Register', meta: { name: '注册', public: true }, component: () => import('../views/Register.vue') },
+  { path: '/:pathMatch(.*)*', name: 'NotFound', meta: { name: '无法访问' }, component: () => import('../views/404.vue') },
 ]
 
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes,
 })
 
-// Projects without a storefront can disable this navigation guard.
-// Navigation guard.
-// router.beforeEach((to ,from, next) => {
-//   let user = JSON.parse(localStorage.getItem("xm-user") || '{}');
-//   if (to.path === '/') {
-//     if (user.role) {
-//       if (user.role === 'USER') {
-//         next('/front/home')
-//       } else {
-//         next('/home')
-//       }
-//     } else {
-//       next('/login')
-//     }
-//   } else {
-//     next()
-//   }
-// })
+router.beforeEach(to => {
+  if (to.meta.public) {
+    return true
+  }
 
+  let user = {}
+  try {
+    user = JSON.parse(localStorage.getItem('xm-user') || '{}')
+  } catch {
+    localStorage.removeItem('xm-user')
+  }
+
+  if (!user.token) {
+    return { path: '/login', query: { redirect: to.fullPath } }
+  }
+  if (to.path === '/') {
+    return user.role === 'USER' ? '/front/home' : '/home'
+  }
+  return true
+})
+
+export { routes }
 export default router
