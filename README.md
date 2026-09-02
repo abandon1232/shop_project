@@ -11,7 +11,8 @@ A full-stack portfolio project for administrator, merchant, and customer workflo
 - Product and category management with non-negative price and stock validation
 - Public storefront browsing, category filtering, search, clickable product cards, and product detail pages
 - Six English catalogue categories, 18 realistic products, and 24 local WebP catalogue images
-- Transactional customer ordering with server-side prices, atomic stock updates, and customer order history
+- Persistent customer cart with quantity updates and atomic checkout
+- Transactional customer checkout with server-side prices, atomic stock updates, one fulfilment order per product, and customer order history
 - Administrator and seller order fulfilment with guarded status transitions and stock restoration on cancellation
 - Role-scoped management dashboards for catalogue, order, revenue, account, and low-stock totals
 - JPEG, PNG, and GIF uploads with decoded-content validation, a 5 MiB limit, generated filenames, and path isolation
@@ -74,7 +75,7 @@ FLUSH PRIVILEGES;
 
 Flyway creates and versions the tables when the API starts. For an existing pre-Flyway copy of this project, it records the original core schema as version 1 and then applies the later migrations.
 
-Migrations V1–V5 are retained unchanged for compatibility with earlier copies of the project. Migration `V6__replace_demo_catalog.sql` removes the old demo products and categories, then loads the current English catalogue while preserving accounts. Migration `V7__create_customer_orders.sql` adds the current order table.
+Migrations V1–V5 are retained unchanged for compatibility with earlier copies of the project. Migration `V6__replace_demo_catalog.sql` removes the old demo products and categories, then loads the current English catalogue while preserving accounts. Migration `V7__create_customer_orders.sql` adds the current fulfilment order table; the cart tables are created by the retained V4 migration.
 
 ### 2. Configure and start the backend
 
@@ -147,11 +148,21 @@ Open `http://localhost:8080/front/home`. If Vite reports that port 8080 is alrea
 ## Main demo flows
 
 - Visitor: browse categories, search, open a product, and inspect stock and price.
-- Customer: register or sign in, buy a product, and review the order under **My orders**.
+- Customer: register or sign in, add products to **Cart**, adjust quantities, check out the basket, and review the resulting fulfilment orders under **My orders**.
 - Seller: sign in after approval, maintain owned products, review owned orders, and update fulfilment status.
 - Administrator: manage the whole catalogue and accounts, review all orders, and use the global dashboard.
 
-This project intentionally stops before payment processing. The purchase button creates a persisted demonstration order but does not collect payment details.
+This project intentionally stops before payment processing. Checkout creates persisted demonstration fulfilment orders, but does not collect payment details.
+
+## Customer cart API
+
+All cart endpoints require an authenticated customer account. The cart is stored in the database and is scoped to the current customer:
+
+- `GET /cart/items` — list the current cart lines.
+- `POST /cart/items` — add `{ "goodsId": 7, "quantity": 2 }`; adding an existing product increases its cart quantity.
+- `PUT /cart/items/{id}` — replace a cart line quantity with `{ "quantity": 3 }`.
+- `DELETE /cart/items/{id}` — remove one cart line.
+- `POST /cart/checkout` — validate every line against current server-side price and stock, create one fulfilment order per product, and clear the basket atomically. If any line cannot be purchased, the complete checkout rolls back.
 
 ## Verification
 
@@ -176,7 +187,7 @@ npm audit --omit=dev --audit-level=high
 - Visitors may browse the storefront, product categories, and search results without signing in.
 - Public users may log in and register customer or seller accounts; public administrator registration is blocked.
 - Customers may read or update only their own account profile.
-- Customers may create orders from the server-side product price and see only their own order history.
+- Customers may add products to their persistent cart, update or remove only their own cart lines, check out using server-side prices and stock, and see only their own order history.
 - Sellers may read or update only their own profile, may modify only their own products after approval, and may manage only their own orders.
 - Administrators may manage accounts, approvals, categories, notices, products, uploaded files, and all orders.
 
