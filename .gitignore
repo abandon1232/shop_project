@@ -7,10 +7,12 @@
 **/target/
 *.class
 *.log
+.m2/
 
 # Frontend dependencies and build output
 **/node_modules/
 **/dist/
+.npm-cache/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
