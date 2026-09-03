@@ -91,5 +91,50 @@ describe('Customer orders', () => {
       name: 'ProductDetail',
       params: { id: 7 },
     })
+
+    router.push.mockClear()
+    await wrapper.get('.order-summary strong').trigger('click')
+    await wrapper.get('.status-pill').trigger('click')
+    expect(router.push).not.toHaveBeenCalled()
+  })
+
+  it('renders a deleted product snapshot without broken detail links', async () => {
+    const router = { push: vi.fn() }
+    const request = {
+      get: vi.fn(() => Promise.resolve({
+        code: '200',
+        data: {
+          list: [{
+            id: 42,
+            goodsId: null,
+            orderNumber: 'NB-20260903-DELETED',
+            productName: 'Discontinued speaker',
+            productImg: '/images/catalog/products/discontinued-speaker.webp',
+            quantity: 1,
+            totalPrice: 799,
+            status: 'PLACED',
+            createdAt: '2026-09-03T10:00:00',
+          }],
+          total: 1,
+        },
+      })),
+    }
+    const wrapper = mount(Orders, {
+      global: {
+        mocks: {
+          $request: request,
+          $message: { error: vi.fn() },
+          $router: router,
+        },
+        stubs: { ElPagination: true },
+      },
+    })
+    await flushPromises()
+
+    expect(wrapper.find('.order-product-image-link').exists()).toBe(false)
+    expect(wrapper.find('.order-product-name-link').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Discontinued speaker')
+    expect(wrapper.text()).toContain('Product unavailable')
+    expect(router.push).not.toHaveBeenCalled()
   })
 })

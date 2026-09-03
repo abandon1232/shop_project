@@ -85,6 +85,12 @@ describe('Customer cart', () => {
       name: 'ProductDetail',
       params: { id: 7 },
     })
+
+    router.push.mockClear()
+    await wrapper.find('.cart-line-main > strong').trigger('click')
+    await wrapper.find('.availability').trigger('click')
+    await wrapper.find('.cart-line-subtotal').trigger('click')
+    expect(router.push).not.toHaveBeenCalled()
   })
 
   it('updates a cart line quantity and reloads the current lines', async () => {

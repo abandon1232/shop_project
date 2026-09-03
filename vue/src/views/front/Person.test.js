@@ -1,6 +1,7 @@
 import { mount } from '@vue/test-utils'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import Person from './Person.vue'
+import personSource from './Person.vue?raw'
 
 describe('Customer profile', () => {
   beforeEach(() => {
@@ -36,5 +37,6 @@ describe('Customer profile', () => {
     const passwordForm = wrapper.get('.profile-password-form')
     expect(passwordForm.attributes('label-width')).toBe('150px')
     expect(wrapper.findAll('.profile-password-form-item')).toHaveLength(3)
+    expect(personSource).toMatch(/@media \(max-width: 640px\)[\s\S]*\.profile-password-form-item \.el-form-item__label[\s\S]*width: auto !important/)
   })
 })

@@ -51,6 +51,7 @@ export default {
       name,
       goodsData: [],
       recommendData: [],
+      searchRequestId: 0,
     }
   },
   mounted() {
@@ -77,7 +78,10 @@ export default {
       })
     },
     loadGoods() {
-      this.$request.get('/goods/selectByName', { params: { name: this.name || '' } }).then(res => {
+      const requestId = ++this.searchRequestId
+      const searchName = this.name || ''
+      this.$request.get('/goods/selectByName', { params: { name: searchName } }).then(res => {
+        if (requestId !== this.searchRequestId) return
         if (res.code === '200') {
           this.goodsData = res.data
         } else {
