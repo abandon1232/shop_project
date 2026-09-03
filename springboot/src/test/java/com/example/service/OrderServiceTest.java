@@ -11,6 +11,7 @@ import com.example.entity.Goods;
 import com.example.exception.CustomException;
 import com.example.mapper.GoodsMapper;
 import com.example.mapper.OrderMapper;
+import com.github.pagehelper.PageHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +50,8 @@ class OrderServiceTest {
     private OrderService service;
 
     @AfterEach
-    void clearRequest() {
+    void clearThreadContext() {
+        PageHelper.clearPage();
         RequestContextHolder.resetRequestAttributes();
     }
 
@@ -59,6 +61,7 @@ class OrderServiceTest {
         Goods goods = goods(7, 9, "QuietWave Wireless Headphones", "headphones.webp", "1990.00");
         when(goodsService.selectPurchasableById(7)).thenReturn(goods);
         when(goodsMapper.decreaseStock(7, 2)).thenReturn(1);
+        when(orderMapper.insert(any())).thenReturn(1);
 
         CustomerOrder result = service.placeOrder(new PlaceOrderRequest(7, 2));
 
@@ -77,6 +80,20 @@ class OrderServiceTest {
         assertTrue(inserted.getOrderNumber().startsWith("NB-"));
         assertEquals(inserted, result);
         verify(goodsMapper).decreaseStock(7, 2);
+    }
+
+    @Test
+    void zeroRowOrderInsertIsReportedSoTheTransactionCanRollbackStock() {
+        bindAccount(3, RoleEnum.USER);
+        when(goodsService.selectPurchasableById(7)).thenReturn(
+                goods(7, 9, "QuietWave Wireless Headphones", "headphones.webp", "1990.00"));
+        when(goodsMapper.decreaseStock(7, 2)).thenReturn(1);
+        when(orderMapper.insert(any())).thenReturn(0);
+
+        CustomException error = assertThrows(CustomException.class,
+                () -> service.placeOrder(new PlaceOrderRequest(7, 2)));
+
+        assertEquals("5006", error.getCode());
     }
 
     @Test

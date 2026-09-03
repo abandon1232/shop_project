@@ -69,7 +69,9 @@ public class OrderService {
         order.setUnitPrice(goods.getPrice());
         order.setTotalPrice(goods.getPrice().multiply(BigDecimal.valueOf(request.quantity())));
         order.setStatus(OrderStatus.PLACED.name());
-        orderMapper.insert(order);
+        if (orderMapper.insert(order) != 1) {
+            throw new CustomException(ResultCodeEnum.ORDER_CREATE_FAILED);
+        }
         return order;
     }
 

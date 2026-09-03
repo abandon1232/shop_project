@@ -1,14 +1,14 @@
 <template>
   <div>
-    <el-card style="width: 50%">
-      <el-form ref="formRef" :model="user" :rules="rules" label-width="100px" style="padding-right: 50px">
-        <el-form-item label="Current password" prop="password">
+    <el-card class="password-card">
+      <el-form ref="formRef" class="password-form" :model="user" :rules="rules" label-width="150px" style="padding-right: 50px">
+        <el-form-item class="password-form-item" label="Current password" prop="password">
           <el-input v-model="user.password" type="password" show-password placeholder="Current password" />
         </el-form-item>
-        <el-form-item label="New password" prop="newPassword">
+        <el-form-item class="password-form-item" label="New password" prop="newPassword">
           <el-input v-model="user.newPassword" type="password" show-password placeholder="New password" />
         </el-form-item>
-        <el-form-item label="Confirm password" prop="confirmPassword">
+        <el-form-item class="password-form-item" label="Confirm password" prop="confirmPassword">
           <el-input v-model="user.confirmPassword" type="password" show-password placeholder="Confirm password" />
         </el-form-item>
         <div style="text-align: center; margin-bottom: 20px">
@@ -73,7 +73,26 @@ export default {
 </script>
 
 <style scoped>
+.password-card {
+  width: min(760px, 100%);
+}
+
 :deep(.el-form-item__label) {
   font-weight: bold;
+}
+
+@media (max-width: 640px) {
+  .password-form {
+    padding-right: 0 !important;
+  }
+
+  :deep(.password-form-item) {
+    display: block;
+  }
+
+  :deep(.password-form-item .el-form-item__label) {
+    width: auto !important;
+    justify-content: flex-start;
+  }
 }
 </style>

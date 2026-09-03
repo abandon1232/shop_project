@@ -14,7 +14,14 @@
           <el-button text @click="$router.push('/login')">Sign in</el-button>
           <el-button class="account-button" @click="$router.push('/register')">Create account</el-button>
         </div>
-        <div v-else>
+        <template v-else>
+          <button v-if="user.role === 'USER'" class="cart-action" type="button" @click="navTo('/front/cart')">
+            <svg class="cart-icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+              <path fill="currentColor" d="M3 4h2l2.4 11.5a2 2 0 0 0 2 1.5h7.9a2 2 0 0 0 1.9-1.4L21 8H7.1l-.8-4H3v2Zm6.8 11a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1Zm8 0a.5.5 0 1 1 0 1 .5.5 0 0 1 0-1Z"/>
+            </svg>
+            <span class="cart-label">Cart</span>
+            <span v-if="cartCount > 0" class="cart-count">{{ cartCount }}</span>
+          </button>
           <el-dropdown>
             <div class="front-header-dropdown">
               <img v-if="user.avatar" @click="navTo('/front/person')" :src="user.avatar" :alt="user.name || 'Account avatar'">
@@ -31,11 +38,11 @@
               </el-dropdown-menu>
             </template>
           </el-dropdown>
-        </div>
+        </template>
       </nav>
     </header>
     <div class="main-body">
-      <router-view ref="child" @update:user="updateUser" />
+      <router-view ref="child" @update:user="updateUser" @cart-updated="loadCartCount" />
     </div>
   </div>
 
@@ -52,11 +59,13 @@ export default {
       notice: [],
       user: JSON.parse(localStorage.getItem("xm-user") || '{}'),
       name: '',
+      cartCount: 0,
     }
   },
 
   mounted() {
     this.loadNotice()
+    if (this.user.role === 'USER') this.loadCartCount()
   },
   computed: {
     userInitial() {
@@ -82,6 +91,25 @@ export default {
     },
     updateUser() {
       this.user = JSON.parse(localStorage.getItem('xm-user') || '{}')   // Reload the latest cached account.
+      if (this.user.role === 'USER') {
+        this.loadCartCount()
+      } else {
+        this.cartCount = 0
+      }
+    },
+    loadCartCount() {
+      if (this.user.role !== 'USER') {
+        this.cartCount = 0
+        return Promise.resolve()
+      }
+      return this.$request.get('/cart/items').then(res => {
+        if (res.code === '200') {
+          this.cartCount = (res.data || []).reduce(
+            (sum, item) => sum + Number(item.quantity || 0),
+            0,
+          )
+        }
+      })
     },
     navTo(url) {
       this.$router.push(url)
@@ -89,6 +117,8 @@ export default {
     // Log out.
     logout() {
       localStorage.removeItem("xm-user");
+      this.user = {}
+      this.cartCount = 0
       this.$router.push("/login");
     },
     search() {

@@ -23,7 +23,7 @@
         <div class="detail-meta">
           <div>
             <span>Sold by</span>
-            <strong>{{ sellerName }}</strong>
+            <strong>{{ product.businessName || 'NorrByte Market' }}</strong>
           </div>
           <div>
             <span>Availability</span>
@@ -49,14 +49,12 @@
             type="primary"
             size="large"
             :disabled="!product.count"
-            :loading="purchasing"
-            @click="buyNow"
+            :loading="addingToCart"
+            @click="addToCart"
           >
-            Buy now
+            Add to cart
           </el-button>
         </div>
-
-        <p class="purchase-note">Demo checkout · No payment details are collected</p>
       </div>
     </section>
 
@@ -74,13 +72,6 @@ import { applyImageFallback } from '@/utils/imageFallback'
 
 export default {
   name: 'ProductDetail',
-  computed: {
-    sellerName() {
-      const name = String(this.product?.businessName || '').trim()
-      if (!name) return 'NorrByte Market'
-      return /^\d+$/.test(name) ? 'Approved marketplace seller' : name
-    },
-  },
   data() {
     return {
       user: JSON.parse(localStorage.getItem('xm-user') || '{}'),
@@ -88,7 +79,7 @@ export default {
       productFallback,
       quantity: 1,
       loading: true,
-      purchasing: false,
+      addingToCart: false,
     }
   },
   mounted() {
@@ -115,7 +106,7 @@ export default {
         this.loading = false
       })
     },
-    async buyNow() {
+    async addToCart() {
       if (!this.user.token) {
         return this.$router.push({
           path: '/login',
@@ -123,25 +114,25 @@ export default {
         })
       }
       if (this.user.role !== 'USER') {
-        this.$message.error('Sign in with a customer account to place an order')
+        this.$message.error('Sign in with a customer account to add items to cart')
         return undefined
       }
-      if (this.purchasing) return undefined
+      if (this.addingToCart) return undefined
 
-      this.purchasing = true
+      this.addingToCart = true
       try {
-        const res = await this.$request.post('/orders/add', {
+        const res = await this.$request.post('/cart/items', {
           goodsId: this.product.id,
           quantity: this.quantity,
         })
         if (res.code === '200') {
-          this.$message.success(`Order ${res.data.orderNumber} placed successfully`)
-          await this.loadProduct()
+          this.$message.success('Added to cart')
+          this.$emit('cart-updated')
         } else {
           this.$message.error(res.msg)
         }
       } finally {
-        this.purchasing = false
+        this.addingToCart = false
       }
       return undefined
     },
@@ -284,13 +275,6 @@ export default {
   font-weight: 800;
 }
 
-.purchase-note {
-  margin-top: 14px;
-  color: #7c8794;
-  font-size: 12px;
-  text-align: right;
-}
-
 @media (max-width: 820px) {
   .detail-shell {
     grid-template-columns: 1fr;
@@ -312,10 +296,6 @@ export default {
 
   .purchase-panel {
     grid-template-columns: 1fr;
-  }
-
-  .purchase-note {
-    text-align: left;
   }
 }
 </style>

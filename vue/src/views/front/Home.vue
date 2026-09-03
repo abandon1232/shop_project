@@ -34,7 +34,7 @@
 
     <section class="catalogue-layout">
       <aside class="category-panel">
-        <div class="panel-heading">
+        <div class="panel-heading category-heading">
           <span class="eyebrow">Browse</span>
           <h2 class="section-title">Shop by category</h2>
         </div>
@@ -305,12 +305,22 @@ export default {
   margin-bottom: 20px;
 }
 
+.category-heading {
+  display: grid;
+  gap: 7px;
+}
+
 .section-title,
 .section-header h2 {
   margin-top: 7px;
   color: #13243b;
   font-size: 25px;
   letter-spacing: -0.025em;
+}
+
+.category-heading .section-title {
+  margin-top: 0;
+  white-space: nowrap;
 }
 
 .category-list {

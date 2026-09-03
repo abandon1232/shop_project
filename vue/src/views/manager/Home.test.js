@@ -1,11 +1,14 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import Home from './Home.vue'
 
 describe('Management dashboard', () => {
   beforeEach(() => localStorage.clear())
+  afterEach(() => vi.useRealTimers())
 
   it('shows the global business summary to administrators', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2024-01-01T19:00:00'))
     localStorage.setItem('xm-user', JSON.stringify({ id: 1, role: 'ADMIN', name: 'Alicia' }))
     const request = {
       get: vi.fn(path => Promise.resolve(path === '/dashboard/summary'
