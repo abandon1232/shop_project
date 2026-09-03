@@ -21,10 +21,21 @@
     <section v-else class="cart-layout">
       <div class="cart-lines" aria-label="Cart items">
         <article v-for="item in items" :key="item.id" class="cart-line">
-          <img :src="item.productImg || productFallback" :alt="item.productName" @error="handleImageError">
+          <button
+            type="button"
+            class="product-link cart-product-image-link"
+            :aria-label="`View ${item.productName}`"
+            @click="openProduct(item)"
+          >
+            <img :src="item.productImg || productFallback" :alt="item.productName" @error="handleImageError">
+          </button>
           <div class="cart-line-main">
             <span class="cart-seller">{{ item.businessName || 'NorrByte Market' }}</span>
-            <h2>{{ item.productName }}</h2>
+            <h2>
+              <button type="button" class="product-link cart-product-name-link" @click="openProduct(item)">
+                {{ item.productName }}
+              </button>
+            </h2>
             <strong>{{ formatSek(item.unitPrice) }}</strong>
             <p v-if="item.quantity > item.stock" class="availability unavailable">Only {{ item.stock }} available</p>
             <p v-else-if="item.businessStatus && item.businessStatus !== 'APPROVED'" class="availability unavailable">Seller is unavailable</p>
@@ -97,6 +108,9 @@ export default {
     formatSek,
     handleImageError(event) {
       applyImageFallback(event, productFallback)
+    },
+    openProduct(item) {
+      this.$router.push({ name: 'ProductDetail', params: { id: item.goodsId } })
     },
     loadCart() {
       this.loading = true
@@ -253,6 +267,34 @@ export default {
   border-radius: 10px;
   background: #f4f2ed;
   object-fit: contain;
+}
+
+.product-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.product-link:focus-visible {
+  border-radius: 5px;
+  outline: 3px solid rgba(64, 158, 255, 0.35);
+  outline-offset: 3px;
+}
+
+.cart-product-image-link {
+  border-radius: 10px;
+}
+
+.cart-product-image-link img {
+  display: block;
+}
+
+.cart-product-name-link {
+  font-weight: 700;
 }
 
 .cart-line-main h2 {

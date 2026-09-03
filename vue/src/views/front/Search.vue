@@ -51,11 +51,20 @@ export default {
       name,
       goodsData: [],
       recommendData: [],
+      searchRequestId: 0,
     }
   },
   mounted() {
-    this.loadGoods()
     this.loadRecommend()
+  },
+  watch: {
+    '$route.query.name': {
+      immediate: true,
+      handler(value) {
+        this.name = typeof value === 'string' ? value : ''
+        this.loadGoods()
+      },
+    },
   },
   // Click handlers and data loaders for this page.
   methods: {
@@ -69,7 +78,10 @@ export default {
       })
     },
     loadGoods() {
-      this.$request.get('/goods/selectByName', { params: { name: this.name || '' } }).then(res => {
+      const requestId = ++this.searchRequestId
+      const searchName = this.name || ''
+      this.$request.get('/goods/selectByName', { params: { name: searchName } }).then(res => {
+        if (requestId !== this.searchRequestId) return
         if (res.code === '200') {
           this.goodsData = res.data
         } else {

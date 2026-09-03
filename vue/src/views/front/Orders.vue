@@ -13,15 +13,41 @@
 
     <section v-else-if="orders.length" class="orders-list" aria-label="Order history">
       <article v-for="order in orders" :key="order.id" class="order-card">
-        <img
-          :src="order.productImg || productFallback"
-          :alt="order.productName"
-          @error="handleImageError"
+        <button
+          v-if="order.goodsId"
+          type="button"
+          class="product-link order-product-image-link"
+          :aria-label="`View ${order.productName}`"
+          @click="openProduct(order)"
         >
+          <img
+            :src="order.productImg || productFallback"
+            :alt="order.productName"
+            @error="handleImageError"
+          >
+        </button>
+        <div v-else class="order-product-image-unavailable">
+          <img
+            :src="order.productImg || productFallback"
+            :alt="order.productName"
+            @error="handleImageError"
+          >
+        </div>
         <div class="order-main">
           <div class="order-number">{{ order.orderNumber }}</div>
-          <h2>{{ order.productName }}</h2>
+          <h2>
+            <button
+              v-if="order.goodsId"
+              type="button"
+              class="product-link order-product-name-link"
+              @click="openProduct(order)"
+            >
+              {{ order.productName }}
+            </button>
+            <span v-else>{{ order.productName }}</span>
+          </h2>
           <p>Quantity {{ order.quantity }} · {{ formatDate(order.createdAt) }}</p>
+          <p v-if="!order.goodsId" class="product-unavailable">Product unavailable</p>
         </div>
         <div class="order-summary">
           <strong>{{ formatSek(order.totalPrice) }}</strong>
@@ -85,6 +111,9 @@ export default {
     },
     handleImageError(event) {
       applyImageFallback(event, productFallback)
+    },
+    openProduct(order) {
+      this.$router.push({ name: 'ProductDetail', params: { id: order.goodsId } })
     },
     load(pageNum) {
       this.pageNum = pageNum || 1
@@ -185,6 +214,39 @@ export default {
   object-fit: contain;
 }
 
+.product-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.product-link:focus-visible {
+  border-radius: 5px;
+  outline: 3px solid rgba(64, 158, 255, 0.35);
+  outline-offset: 3px;
+}
+
+.order-product-image-link {
+  border-radius: 10px;
+}
+
+.order-product-image-link img,
+.order-product-image-unavailable img {
+  display: block;
+}
+
+.order-product-image-unavailable {
+  border-radius: 10px;
+}
+
+.order-product-name-link {
+  font-weight: 700;
+}
+
 .order-number {
   color: #758293;
   font-size: 12px;
@@ -199,6 +261,12 @@ export default {
 .order-main p {
   margin: 0;
   font-size: 13px;
+}
+
+.order-main .product-unavailable {
+  margin-top: 6px;
+  color: #8a4f20;
+  font-weight: 700;
 }
 
 .order-summary {
