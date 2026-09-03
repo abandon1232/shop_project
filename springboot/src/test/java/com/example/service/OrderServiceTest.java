@@ -11,6 +11,7 @@ import com.example.entity.Goods;
 import com.example.exception.CustomException;
 import com.example.mapper.GoodsMapper;
 import com.example.mapper.OrderMapper;
+import com.github.pagehelper.PageHelper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +50,8 @@ class OrderServiceTest {
     private OrderService service;
 
     @AfterEach
-    void clearRequest() {
+    void clearThreadContext() {
+        PageHelper.clearPage();
         RequestContextHolder.resetRequestAttributes();
     }
 
