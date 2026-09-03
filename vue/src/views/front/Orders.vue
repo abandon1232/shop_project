@@ -13,14 +13,25 @@
 
     <section v-else-if="orders.length" class="orders-list" aria-label="Order history">
       <article v-for="order in orders" :key="order.id" class="order-card">
-        <img
-          :src="order.productImg || productFallback"
-          :alt="order.productName"
-          @error="handleImageError"
+        <button
+          type="button"
+          class="product-link order-product-image-link"
+          :aria-label="`View ${order.productName}`"
+          @click="openProduct(order)"
         >
+          <img
+            :src="order.productImg || productFallback"
+            :alt="order.productName"
+            @error="handleImageError"
+          >
+        </button>
         <div class="order-main">
           <div class="order-number">{{ order.orderNumber }}</div>
-          <h2>{{ order.productName }}</h2>
+          <h2>
+            <button type="button" class="product-link order-product-name-link" @click="openProduct(order)">
+              {{ order.productName }}
+            </button>
+          </h2>
           <p>Quantity {{ order.quantity }} · {{ formatDate(order.createdAt) }}</p>
         </div>
         <div class="order-summary">
@@ -85,6 +96,9 @@ export default {
     },
     handleImageError(event) {
       applyImageFallback(event, productFallback)
+    },
+    openProduct(order) {
+      this.$router.push({ name: 'ProductDetail', params: { id: order.goodsId } })
     },
     load(pageNum) {
       this.pageNum = pageNum || 1
@@ -183,6 +197,34 @@ export default {
   border-radius: 10px;
   background: #f4f2ed;
   object-fit: contain;
+}
+
+.product-link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.product-link:focus-visible {
+  border-radius: 5px;
+  outline: 3px solid rgba(64, 158, 255, 0.35);
+  outline-offset: 3px;
+}
+
+.order-product-image-link {
+  border-radius: 10px;
+}
+
+.order-product-image-link img {
+  display: block;
+}
+
+.order-product-name-link {
+  font-weight: 700;
 }
 
 .order-number {

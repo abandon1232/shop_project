@@ -54,8 +54,16 @@ export default {
     }
   },
   mounted() {
-    this.loadGoods()
     this.loadRecommend()
+  },
+  watch: {
+    '$route.query.name': {
+      immediate: true,
+      handler(value) {
+        this.name = typeof value === 'string' ? value : ''
+        this.loadGoods()
+      },
+    },
   },
   // Click handlers and data loaders for this page.
   methods: {

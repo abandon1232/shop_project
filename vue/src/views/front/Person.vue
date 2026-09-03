@@ -35,15 +35,15 @@
         </div>
       </el-form>
     </el-card>
-    <el-dialog v-model="dialogVisible" title="Change password" width="30%" :close-on-click-modal="false" destroy-on-close>
-      <el-form :model="user" label-width="80px" style="padding-right: 20px" :rules="rules" ref="formRef">
-        <el-form-item label="Current password" prop="password">
+    <el-dialog v-model="dialogVisible" title="Change password" width="min(600px, 92vw)" :close-on-click-modal="false" destroy-on-close>
+      <el-form ref="formRef" class="profile-password-form" :model="user" label-width="150px" :rules="rules">
+        <el-form-item class="profile-password-form-item" label="Current password" prop="password">
           <el-input v-model="user.password" type="password" show-password placeholder="Current password" />
         </el-form-item>
-        <el-form-item label="New password" prop="newPassword">
+        <el-form-item class="profile-password-form-item" label="New password" prop="newPassword">
           <el-input v-model="user.newPassword" type="password" show-password placeholder="New password" />
         </el-form-item>
-        <el-form-item label="Confirm password" prop="confirmPassword">
+        <el-form-item class="profile-password-form-item" label="Confirm password" prop="confirmPassword">
           <el-input v-model="user.confirmPassword" type="password" show-password placeholder="Confirm password" />
         </el-form-item>
       </el-form>
@@ -139,6 +139,10 @@ export default {
 :deep(.el-form-item__label) {
   font-weight: bold;
 }
+
+.profile-password-form {
+  padding-right: 20px;
+}
 :deep(.el-upload) {
   border-radius: 50%;
 }
@@ -166,5 +170,20 @@ export default {
   height: 120px;
   display: block;
   border-radius: 50%;
+}
+
+@media (max-width: 640px) {
+  .profile-password-form {
+    padding-right: 0;
+  }
+
+  :deep(.profile-password-form-item) {
+    display: block;
+  }
+
+  :deep(.profile-password-form-item .el-form-item__label) {
+    width: auto !important;
+    justify-content: flex-start;
+  }
 }
 </style>

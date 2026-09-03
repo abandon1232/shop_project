@@ -69,6 +69,24 @@ describe('Customer cart', () => {
     expect(wrapper.text()).toMatch(/4[\s\u00a0]970,00\s*kr/)
   })
 
+  it('opens product details from the cart image and product name', async () => {
+    const { router, wrapper } = mountCart()
+    await flushPromises()
+
+    await wrapper.findAll('.cart-product-image-link')[0].trigger('click')
+    await wrapper.findAll('.cart-product-name-link')[0].trigger('click')
+
+    expect(router.push).toHaveBeenCalledTimes(2)
+    expect(router.push).toHaveBeenNthCalledWith(1, {
+      name: 'ProductDetail',
+      params: { id: 7 },
+    })
+    expect(router.push).toHaveBeenNthCalledWith(2, {
+      name: 'ProductDetail',
+      params: { id: 7 },
+    })
+  })
+
   it('updates a cart line quantity and reloads the current lines', async () => {
     const { request, wrapper } = mountCart()
     await flushPromises()
