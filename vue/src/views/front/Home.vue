@@ -86,7 +86,7 @@
 <script>
 import heroHome from '@/assets/imgs/hero-home.webp'
 import heroWorkspace from '@/assets/imgs/hero-workspace.webp'
-import productPlaceholder from '@/assets/imgs/product-placeholder.webp'
+import productPlaceholder from '@/assets/imgs/product-placeholder.png'
 import ProductCard from '@/components/ProductCard.vue'
 import { applyImageFallback } from '@/utils/imageFallback'
 

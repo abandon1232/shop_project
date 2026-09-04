@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import productFallback from '@/assets/imgs/product-placeholder.webp'
+import productFallback from '@/assets/imgs/product-placeholder.png'
 import { formatSek } from '@/utils/format'
 import { applyImageFallback } from '@/utils/imageFallback'
 

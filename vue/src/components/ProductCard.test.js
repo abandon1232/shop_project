@@ -31,4 +31,22 @@ describe('ProductCard', () => {
 
     expect(wrapper.emitted('select')).toEqual([[product]])
   })
+
+  it('labels the neutral placeholder when the product has no image', () => {
+    const wrapper = mount(ProductCard, {
+      props: { product: { ...product, img: '' } },
+    })
+
+    expect(wrapper.get('.product-image-unavailable').text()).toBe('Image unavailable')
+    expect(wrapper.get('img').attributes('src')).toMatch(/product-placeholder\.png$/)
+  })
+
+  it('labels the neutral placeholder when the product image cannot be loaded', async () => {
+    const wrapper = mount(ProductCard, { props: { product } })
+
+    await wrapper.get('img').trigger('error')
+
+    expect(wrapper.get('.product-image-unavailable').text()).toBe('Image unavailable')
+    expect(wrapper.get('img').attributes('src')).toMatch(/product-placeholder\.png$/)
+  })
 })

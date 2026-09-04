@@ -1,4 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
+import { ElForm, ElFormItem, ElInput, ElInputNumber, ElOption, ElSelect } from 'element-plus'
 import { describe, expect, it, vi } from 'vitest'
 import Goods from './Goods.vue'
 import goodsSource from './Goods.vue?raw'
@@ -73,5 +74,49 @@ describe('Goods view', () => {
       'Your seller account must be approved before you can publish products',
     )
     expect(wrapper.vm.formVisible).toBe(false)
+  })
+
+  it('does not save a product until an image has been uploaded', async () => {
+    localStorage.setItem('xm-user', JSON.stringify({ role: 'ADMIN' }))
+    const request = vi.fn(() => Promise.resolve({ code: '200' }))
+    const error = vi.fn()
+    request.get = vi.fn(url => Promise.resolve({
+      code: '200',
+      data: url === '/type/selectAll' ? [] : { list: [], total: 0 },
+    }))
+    const wrapper = mount(Goods, {
+      global: {
+        components: { ElForm, ElFormItem, ElInput, ElInputNumber, ElOption, ElSelect },
+        mocks: {
+          $request: request,
+          $message: { error, warning: vi.fn(), success: vi.fn() },
+          $baseUrl: 'http://localhost:9090',
+        },
+        stubs: {
+          ElTable: true,
+          ElTableColumn: true,
+          ElImage: true,
+          ElDialog: dialogStub,
+          ElPagination: true,
+          ElButton: true,
+          ElUpload: true,
+        },
+      },
+    })
+    await flushPromises()
+    wrapper.vm.form = {
+      name: 'Desk lamp',
+      price: 499,
+      count: 4,
+      typeId: 2,
+      description: 'A compact lamp.',
+    }
+    await wrapper.vm.$nextTick()
+
+    wrapper.vm.save()
+    await flushPromises()
+
+    expect(request).not.toHaveBeenCalled()
+    expect(error).toHaveBeenCalledWith('Upload a product image')
   })
 })

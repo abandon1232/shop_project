@@ -14,7 +14,7 @@ public record GoodsRequest(
         @Positive Integer id,
         @NotBlank @Size(max = 160) String name,
         @Size(max = 5000) String description,
-        @Size(max = 500) String img,
+        @NotBlank @Size(max = 500) String img,
         @NotNull @DecimalMin("0.00") BigDecimal price,
         @Size(max = 32) String unit,
         @NotNull @PositiveOrZero Integer count,
