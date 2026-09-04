@@ -58,4 +58,26 @@ describe('store home', () => {
     wrapper.findComponent(ProductCard).vm.$emit('select', { id: 7 })
     expect(router.push).toHaveBeenCalledWith({ name: 'ProductDetail', params: { id: 7 } })
   })
+
+  it('does not describe the empty-catalogue placeholder as a real product', async () => {
+    const request = {
+      get: vi.fn(() => Promise.resolve({ code: '200', data: [] })),
+    }
+    const wrapper = mount(Home, {
+      global: {
+        mocks: {
+          $request: request,
+          $message: { error() {} },
+          $router: { push: vi.fn() },
+        },
+        stubs: {
+          ElCarousel: { template: '<div><slot /></div>' },
+          ElCarouselItem: { template: '<div><slot /></div>' },
+        },
+      },
+    })
+    await flushPromises()
+
+    expect(wrapper.get('.product-empty img').attributes('alt')).toBe('No featured products')
+  })
 })

@@ -46,7 +46,11 @@
             type="button"
             @click="navTo('/front/type?id=' + item.id)"
           >
-            <img :src="item.img || productPlaceholder" :alt="item.name" @error="handleImageError">
+            <img
+              :src="item.img || productPlaceholder"
+              :alt="item.img ? item.name : 'Image unavailable'"
+              @error="handleImageError"
+            >
             <span>{{ item.name }}</span>
             <span aria-hidden="true">→</span>
           </button>
@@ -72,7 +76,7 @@
           />
         </div>
         <div v-else class="product-empty">
-          <img :src="productPlaceholder" alt="Generic wireless speaker">
+          <img :src="productPlaceholder" alt="No featured products">
           <div>
             <h3>The catalogue is being prepared</h3>
             <p>Featured products will appear here after an approved seller publishes them.</p>

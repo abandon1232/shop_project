@@ -4,7 +4,7 @@
       <span class="product-card-image">
         <img
           :src="product.img || productFallback"
-          :alt="product.name"
+          :alt="imageUnavailable ? 'Image unavailable' : product.name"
           loading="lazy"
           @error="handleImageError"
         >

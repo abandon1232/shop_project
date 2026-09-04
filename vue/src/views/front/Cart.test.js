@@ -69,6 +69,13 @@ describe('Customer cart', () => {
     expect(wrapper.text()).toMatch(/4[\s\u00a0]970,00\s*kr/)
   })
 
+  it('labels a missing cart product image as unavailable', async () => {
+    const { wrapper } = mountCart([{ ...items[0], productImg: '' }])
+    await flushPromises()
+
+    expect(wrapper.get('.cart-product-image-link img').attributes('alt')).toBe('Image unavailable')
+  })
+
   it('opens product details from the cart image and product name', async () => {
     const { router, wrapper } = mountCart()
     await flushPromises()

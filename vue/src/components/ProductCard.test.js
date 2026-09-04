@@ -39,6 +39,7 @@ describe('ProductCard', () => {
 
     expect(wrapper.get('.product-image-unavailable').text()).toBe('Image unavailable')
     expect(wrapper.get('img').attributes('src')).toMatch(/product-placeholder\.png$/)
+    expect(wrapper.get('img').attributes('alt')).toBe('Image unavailable')
   })
 
   it('labels the neutral placeholder when the product image cannot be loaded', async () => {
@@ -48,5 +49,6 @@ describe('ProductCard', () => {
 
     expect(wrapper.get('.product-image-unavailable').text()).toBe('Image unavailable')
     expect(wrapper.get('img').attributes('src')).toMatch(/product-placeholder\.png$/)
+    expect(wrapper.get('img').attributes('alt')).toBe('Image unavailable')
   })
 })

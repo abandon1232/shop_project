@@ -22,14 +22,14 @@
         >
           <img
             :src="order.productImg || productFallback"
-            :alt="order.productName"
+            :alt="order.productImg ? order.productName : 'Image unavailable'"
             @error="handleImageError"
           >
         </button>
         <div v-else class="order-product-image-unavailable">
           <img
             :src="order.productImg || productFallback"
-            :alt="order.productName"
+            :alt="order.productImg ? order.productName : 'Image unavailable'"
             @error="handleImageError"
           >
         </div>

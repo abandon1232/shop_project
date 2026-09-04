@@ -17,9 +17,9 @@ describe('ProductDetail', () => {
 
   beforeEach(() => localStorage.clear())
 
-  function mountDetail() {
+  function mountDetail(productData = product) {
     const request = {
-      get: vi.fn(() => Promise.resolve({ code: '200', data: product })),
+      get: vi.fn(() => Promise.resolve({ code: '200', data: productData })),
       post: vi.fn(() => Promise.resolve({ code: '200' })),
     }
     const router = { push: vi.fn() }
@@ -68,6 +68,14 @@ describe('ProductDetail', () => {
     expect(wrapper.text()).toContain('Nordic Sound AB')
     expect(wrapper.text()).not.toContain('Approved marketplace seller')
     product.businessName = originalBusinessName
+  })
+
+  it('clearly labels the neutral placeholder when the product has no image', async () => {
+    const { wrapper } = mountDetail({ ...product, img: '' })
+    await flushPromises()
+
+    expect(wrapper.get('.detail-image-panel img').attributes('alt')).toBe('Image unavailable')
+    expect(wrapper.get('.product-image-unavailable').text()).toBe('Image unavailable')
   })
 
   it('sends a guest to sign in with a return address', async () => {

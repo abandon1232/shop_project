@@ -27,7 +27,11 @@
             :aria-label="`View ${item.productName}`"
             @click="openProduct(item)"
           >
-            <img :src="item.productImg || productFallback" :alt="item.productName" @error="handleImageError">
+            <img
+              :src="item.productImg || productFallback"
+              :alt="item.productImg ? item.productName : 'Image unavailable'"
+              @error="handleImageError"
+            >
           </button>
           <div class="cart-line-main">
             <span class="cart-seller">{{ item.businessName || 'NorrByte Market' }}</span>
