@@ -5,4 +5,5 @@ export const applyImageFallback = (event, fallbackUrl) => {
 
   image.dataset.fallbackApplied = 'true'
   image.src = fallbackUrl
+  image.alt = 'Image unavailable'
 }

@@ -62,7 +62,10 @@
 
     <el-dialog v-model="formVisible" title="Product details" width="40%" :close-on-click-modal="false" destroy-on-close>
       <el-form ref="formRef" :model="form" :rules="rules" label-width="100px" style="padding-right: 50px">
-        <el-form-item label="Product image">
+        <el-form-item prop="img" label="Product image">
+          <div v-if="form.img" class="product-image-preview">
+            <el-image :src="form.img" fit="contain" alt="Uploaded product preview" />
+          </div>
           <el-upload
             class="avatar-uploader"
             :action="$baseUrl + '/files/upload'"
@@ -71,7 +74,7 @@
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
           >
-            <el-button type="primary">Upload image</el-button>
+            <el-button type="primary">{{ form.img ? 'Replace image' : 'Upload image' }}</el-button>
           </el-upload>
         </el-form-item>
         <el-form-item prop="name" label="Product name">
@@ -122,6 +125,7 @@ export default {
       form: { price: 0, count: 0 },
       user: JSON.parse(localStorage.getItem('xm-user') || '{}'),
       rules: {
+        img: [{ required: true, message: 'Upload a product image', trigger: 'change' }],
         name: [{ required: true, message: 'Enter a product name', trigger: 'blur' }],
         price: [{ required: true, message: 'Enter a product price', trigger: 'change' }],
         typeId: [{ required: true, message: 'Select a product category', trigger: 'change' }],
@@ -164,6 +168,10 @@ export default {
       this.descriptionVisible = true
     },
     save() {
+      if (!this.form.img?.trim()) {
+        this.$message.error('Upload a product image')
+        return
+      }
       this.$refs.formRef.validate(valid => {
         if (!valid) return
         this.$request({
@@ -237,6 +245,7 @@ export default {
     handleAvatarSuccess(response) {
       if (response.code === '200') {
         this.form.img = response.data
+        this.$refs.formRef?.validateField('img')
       } else {
         this.$message.error(response.msg)
       }
@@ -246,6 +255,21 @@ export default {
 </script>
 
 <style scoped>
+.product-image-preview {
+  width: 160px;
+  height: 120px;
+  margin-bottom: 12px;
+  overflow: hidden;
+  border: 1px solid #dfe5eb;
+  border-radius: 10px;
+  background: #f4f2ed;
+}
+
+.product-image-preview :deep(.el-image) {
+  width: 100%;
+  height: 100%;
+}
+
 .description-preview {
   white-space: pre-wrap;
   overflow-wrap: anywhere;

@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,6 +60,30 @@ class GoodsValidationTest {
                         .contentType(APPLICATION_JSON)
                         .content("""
                                 {"name":"Milk", "price":-0.01, "count":4, "typeId":2}
+                                """))
+                .andExpect(jsonPath("$.code").value(ResultCodeEnum.PARAM_ERROR.code));
+
+        verifyNoInteractions(goodsService);
+    }
+
+    @Test
+    void addRejectsMissingProductImage() throws Exception {
+        mockMvc.perform(post("/goods/add")
+                        .contentType(APPLICATION_JSON)
+                        .content("""
+                                {"name":"Desk lamp", "price":499.00, "count":4, "typeId":2}
+                                """))
+                .andExpect(jsonPath("$.code").value(ResultCodeEnum.PARAM_ERROR.code));
+
+        verifyNoInteractions(goodsService);
+    }
+
+    @Test
+    void updateRejectsBlankProductImage() throws Exception {
+        mockMvc.perform(put("/goods/update")
+                        .contentType(APPLICATION_JSON)
+                        .content("""
+                                {"id":7, "name":"Desk lamp", "img":"  ", "price":499.00, "count":4, "typeId":2}
                                 """))
                 .andExpect(jsonPath("$.code").value(ResultCodeEnum.PARAM_ERROR.code));
 

@@ -109,7 +109,7 @@ describe('Customer orders', () => {
             goodsId: null,
             orderNumber: 'NB-20260903-DELETED',
             productName: 'Discontinued speaker',
-            productImg: '/images/catalog/products/discontinued-speaker.webp',
+            productImg: '',
             quantity: 1,
             totalPrice: 799,
             status: 'PLACED',
@@ -133,6 +133,7 @@ describe('Customer orders', () => {
 
     expect(wrapper.find('.order-product-image-link').exists()).toBe(false)
     expect(wrapper.find('.order-product-name-link').exists()).toBe(false)
+    expect(wrapper.get('.order-product-image-unavailable img').attributes('alt')).toBe('Image unavailable')
     expect(wrapper.text()).toContain('Discontinued speaker')
     expect(wrapper.text()).toContain('Product unavailable')
     expect(router.push).not.toHaveBeenCalled()

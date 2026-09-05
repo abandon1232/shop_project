@@ -10,9 +10,10 @@
       <div class="detail-image-panel">
         <img
           :src="product.img || productFallback"
-          :alt="product.name"
+          :alt="imageUnavailable ? 'Image unavailable' : product.name"
           @error="handleImageError"
         >
+        <span v-if="imageUnavailable" class="product-image-unavailable">Image unavailable</span>
       </div>
 
       <div class="detail-content">
@@ -66,7 +67,7 @@
 </template>
 
 <script>
-import productFallback from '@/assets/imgs/product-placeholder.webp'
+import productFallback from '@/assets/imgs/product-placeholder.png'
 import { formatSek } from '@/utils/format'
 import { applyImageFallback } from '@/utils/imageFallback'
 
@@ -80,7 +81,13 @@ export default {
       quantity: 1,
       loading: true,
       addingToCart: false,
+      imageFailed: false,
     }
+  },
+  computed: {
+    imageUnavailable() {
+      return !this.product?.img || this.imageFailed
+    },
   },
   mounted() {
     this.loadProduct()
@@ -88,10 +95,12 @@ export default {
   methods: {
     formatSek,
     handleImageError(event) {
+      this.imageFailed = true
       applyImageFallback(event, productFallback)
     },
     loadProduct() {
       this.loading = true
+      this.imageFailed = false
       return this.$request.get('/goods/selectById', {
         params: { id: this.$route.params.id },
       }).then(res => {
@@ -182,6 +191,7 @@ export default {
 }
 
 .detail-image-panel {
+  position: relative;
   display: grid;
   min-height: 560px;
   padding: 42px;
@@ -194,6 +204,20 @@ export default {
   height: 100%;
   max-height: 520px;
   object-fit: contain;
+}
+
+.product-image-unavailable {
+  position: absolute;
+  right: 24px;
+  bottom: 24px;
+  left: 24px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  color: #52606d;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.88);
 }
 
 .detail-content {

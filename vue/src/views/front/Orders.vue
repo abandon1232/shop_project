@@ -22,14 +22,14 @@
         >
           <img
             :src="order.productImg || productFallback"
-            :alt="order.productName"
+            :alt="order.productImg ? order.productName : 'Image unavailable'"
             @error="handleImageError"
           >
         </button>
         <div v-else class="order-product-image-unavailable">
           <img
             :src="order.productImg || productFallback"
-            :alt="order.productName"
+            :alt="order.productImg ? order.productName : 'Image unavailable'"
             @error="handleImageError"
           >
         </div>
@@ -78,7 +78,7 @@
 </template>
 
 <script>
-import productFallback from '@/assets/imgs/product-placeholder.webp'
+import productFallback from '@/assets/imgs/product-placeholder.png'
 import { nextOrderStatuses, orderStatusLabel, orderStatusTone } from '@/constants/orderStatus'
 import { formatSek } from '@/utils/format'
 import { applyImageFallback } from '@/utils/imageFallback'

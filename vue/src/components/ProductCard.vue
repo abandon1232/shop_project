@@ -4,10 +4,11 @@
       <span class="product-card-image">
         <img
           :src="product.img || productFallback"
-          :alt="product.name"
+          :alt="imageUnavailable ? 'Image unavailable' : product.name"
           loading="lazy"
           @error="handleImageError"
         >
+        <span v-if="imageUnavailable" class="product-image-unavailable">Image unavailable</span>
       </span>
       <span class="product-card-content">
         <span class="product-category">{{ product.typeName || 'Marketplace product' }}</span>
@@ -24,7 +25,7 @@
 </template>
 
 <script>
-import productFallback from '@/assets/imgs/product-placeholder.webp'
+import productFallback from '@/assets/imgs/product-placeholder.png'
 import { formatSek } from '@/utils/format'
 import { applyImageFallback } from '@/utils/imageFallback'
 
@@ -38,11 +39,20 @@ export default {
   },
   emits: ['select'],
   data() {
-    return { productFallback }
+    return {
+      productFallback,
+      failedImageUrl: null,
+    }
+  },
+  computed: {
+    imageUnavailable() {
+      return !this.product.img || this.failedImageUrl === this.product.img
+    },
   },
   methods: {
     formatSek,
     handleImageError(event) {
+      this.failedImageUrl = this.product.img || ''
       applyImageFallback(event, productFallback)
     },
   },
@@ -84,6 +94,7 @@ export default {
 }
 
 .product-card-image {
+  position: relative;
   display: block;
   width: 100%;
   aspect-ratio: 1;
@@ -95,6 +106,20 @@ export default {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+.product-image-unavailable {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  left: 14px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.9);
+  color: #596778;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
 }
 
 .product-card-content {
